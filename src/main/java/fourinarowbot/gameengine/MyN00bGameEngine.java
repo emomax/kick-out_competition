@@ -10,7 +10,7 @@ public class MyN00bGameEngine implements GameEngine {
     public Coordinates getCoordinatesForNextMakerToPlace(final Board board) {
         // TODO This is where your bad-ass SkyNet 2.0 logic goes.
 
-        return null;
+        return new Coordinates(0, board.getNumberOfRows() -1);
     }
 
 
