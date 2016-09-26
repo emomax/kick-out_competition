@@ -29,12 +29,15 @@ public class ServerRestController {
             final BoardSearcher boardSearcher = new BoardSearcher(board);
             final SearchResult  searchResult  = boardSearcher.searchForWinner();
             if (searchResult.isGameOver()) {
-                return createLoserResponse(searchResult, gameName, boardState);
+                final GetBoardResponse loserResponse = createLoserResponse(searchResult, gameName, boardState);
+                gameHandler.killGame(gameName);
+                return loserResponse;
             }
 
             return GetBoardResponse.responseWithBoardState(boardState);
         }
         catch (final Exception e) {
+            gameHandler.killGame(gameName);
             return GetBoardResponse.responseWithMessage("Error! " + e.getMessage() + e.getStackTrace());
         }
     }
@@ -73,6 +76,7 @@ public class ServerRestController {
         catch (final Exception e) {
             final Game       game       = gameHandler.getGame(gameName);
             final BoardState boardState = new BoardState(game.getBoard().getBoard());
+            gameHandler.killGame(gameName);
             return PlaceMarkerResponse.responseWithMessage("Error! " + e.getMessage() + e.getStackTrace(), boardState);
         }
     }

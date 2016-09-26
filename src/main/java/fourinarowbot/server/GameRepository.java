@@ -25,4 +25,10 @@ public class GameRepository {
     public Game getGame(final String gameName) {
         return games.get(gameName);
     }
+
+    public void killGame(final String gameName) {
+        synchronized (games) {
+            games.remove(gameName);
+        }
+    }
 }

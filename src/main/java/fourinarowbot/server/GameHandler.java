@@ -38,4 +38,8 @@ public class GameHandler {
         game.finishMyTurn();
         return gameStatusAfterPlacing;
     }
+
+    public void killGame(final String gameName) {
+        gameRepository.killGame(gameName);
+    }
 }
