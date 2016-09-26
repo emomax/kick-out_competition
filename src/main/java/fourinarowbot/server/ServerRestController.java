@@ -2,6 +2,7 @@ package fourinarowbot.server;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import fourinarowbot.SearchResult;
 import fourinarowbot.board.BoardImpl;
@@ -10,7 +11,7 @@ import fourinarowbot.domain.Coordinates;
 import fourinarowbot.server.response.GetBoardResponse;
 import fourinarowbot.server.response.PlaceMarkerResponse;
 
-@org.springframework.web.bind.annotation.RestController
+@RestController
 public class ServerRestController {
 
     private final GameHandler gameHandler = new GameHandler();
@@ -60,7 +61,7 @@ public class ServerRestController {
     }
 
     @RequestMapping("/test")
-    public Coordinates test() {
-        return new Coordinates(101, 202);
+    public String test() {
+        return "Hej";
     }
 }
