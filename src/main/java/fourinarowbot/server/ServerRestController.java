@@ -53,10 +53,8 @@ public class ServerRestController {
 
     private PlaceMarkerResponse createGameOverResponse(final SearchResult searchResult) {
         if (searchResult.isDraw()) {
-            System.out.println("DRAW!");
             return PlaceMarkerResponse.responseWithMessage("It's a draw!");
         }
-        System.out.println("WINNER: " + searchResult.getWinnerMarkerColor());
         return PlaceMarkerResponse.responseWithMessage(searchResult.getWinnerMarkerColor() + " wins!");
     }
 

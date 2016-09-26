@@ -10,6 +10,8 @@ import fourinarowbot.server.response.PlaceMarkerResponse;
 
 public class RemoteGame {
 
+    private static final String SERVER_ADDRESS = "127.0.0.1:8080";
+
     public static void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
         final String message;
         while (true) {
@@ -29,18 +31,18 @@ public class RemoteGame {
                 break;
             }
         }
-        System.out.println("Game over: " + message);
+        System.out.println("Game over for " + playerName + " " + message);
     }
 
     private static GetBoardResponse getBoardState(final String gameName, final String playerName) {
         final RestTemplate restTemplate = new RestTemplate();
-        final String       url          = "http://127.0.0.1/getBoard?gameName=" + gameName + "&playerName=" + playerName;
+        final String       url          = "http://" + SERVER_ADDRESS + "/getBoard?gameName=" + gameName + "&playerName=" + playerName;
         return restTemplate.getForObject(url, GetBoardResponse.class);
     }
 
     private static PlaceMarkerResponse placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
         final RestTemplate restTemplate = new RestTemplate();
-        final String       url          = "http://127.0.0.1/placeMarker?gameName=" + gameName + "&playerName=" + playerName + "&x=" + coordinates.getX() + "&y=" + coordinates.getY();
+        final String       url          = "http://" + SERVER_ADDRESS + "/placeMarker?gameName=" + gameName + "&playerName=" + playerName + "&x=" + coordinates.getX() + "&y=" + coordinates.getY();
         return restTemplate.getForObject(url, PlaceMarkerResponse.class);
     }
 }

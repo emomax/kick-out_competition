@@ -14,6 +14,11 @@ public class GameHandler {
     // Returns the board when it's your turn
     public BoardImpl getBoard(final String gameName, final String playerName) throws InterruptedException {
         final Game game = gameRepository.getOrCreateGame(gameName, playerName);
+        if (game.getYellowPlayerName() == null) {
+            // It's the first time yellow plays, set name...
+            game.setYellowPlayerName(playerName);
+        }
+        game.waitForMyTurn(playerName);
         return game.getBoard();
     }
 

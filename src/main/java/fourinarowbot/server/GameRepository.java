@@ -11,9 +11,6 @@ public class GameRepository {
         synchronized (games) {
             final Game foundGame = games.get(gameName);
             if (foundGame != null) {
-                if (!foundGame.isItMyTurn(playerName)) {
-                    foundGame.waitForMyTurn(playerName);
-                }
                 return foundGame;
             }
             else {
