@@ -2,8 +2,12 @@ package fourinarowbot.domain;
 
 public class Coordinates {
 
-    private final int x;
-    private final int y;
+    private int x;
+    private int y;
+
+    private Coordinates() {
+        // For JSON-serialization
+    }
 
     public Coordinates(final int x, final int y) {
         this.x = x;

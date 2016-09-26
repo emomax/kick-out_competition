@@ -2,8 +2,12 @@ package fourinarowbot.domain;
 
 public class Marker {
 
-    private final MarkerColor color;
-    private final Coordinates coordinates;
+    private MarkerColor color;
+    private Coordinates coordinates;
+
+    private Marker() {
+        // For JSON-serialization
+    }
 
     public Marker(final MarkerColor color, final Coordinates coordinates) {
         this.color = color;

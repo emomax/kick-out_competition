@@ -6,15 +6,15 @@ public class BoardState {
 
     private Marker[][] markers;
 
+    private BoardState() {
+        // For JSON-serialization
+    }
+
     public BoardState(final Marker[][] markers) {
         this.markers = markers;
     }
 
     public Marker[][] getMarkers() {
         return markers;
-    }
-
-    public void setMarkers(final Marker[][] markers) {
-        this.markers = markers;
     }
 }
