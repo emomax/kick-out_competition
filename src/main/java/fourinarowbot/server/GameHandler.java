@@ -22,23 +22,20 @@ public class GameHandler {
         return game.getBoard();
     }
 
+    public Game getGame(final String gameName) {
+        return gameRepository.getGame(gameName);
+    }
+
     public SearchResult placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
         final Game          game          = gameRepository.getGame(gameName);
         final BoardImpl     board         = game.getBoard();
         final BoardSearcher boardSearcher = new BoardSearcher(board);
-        final SearchResult  gameStatus    = boardSearcher.getGameStatus();
 
-        if (gameStatus.isGameOver()) {
-            game.finishMyTurn();
-            return gameStatus;
-        }
-        else {
-            final MarkerColor playerColor = game.getPlayerColor(playerName);
-            final Marker      marker      = new Marker(playerColor, coordinates);
-            board.placeMarker(marker);
-            final SearchResult gameStatusAfterPlacing = boardSearcher.getGameStatus();
-            game.finishMyTurn();
-            return gameStatusAfterPlacing;
-        }
+        final MarkerColor playerColor = game.getPlayerColor(playerName);
+        final Marker      marker      = new Marker(playerColor, coordinates);
+        board.placeMarker(marker);
+        final SearchResult gameStatusAfterPlacing = boardSearcher.getGameStatus();
+        game.finishMyTurn();
+        return gameStatusAfterPlacing;
     }
 }

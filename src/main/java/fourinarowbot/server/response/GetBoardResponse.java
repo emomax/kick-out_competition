@@ -13,6 +13,14 @@ public class GetBoardResponse {
         return serverResponse;
     }
 
+
+    public static GetBoardResponse responseWithBoardStateAndMessage(final BoardState boardState, final String message) {
+        final GetBoardResponse serverResponse = new GetBoardResponse();
+        serverResponse.setBoardState(boardState);
+        serverResponse.setMessage(message);
+        return serverResponse;
+    }
+
     public static GetBoardResponse responseWithMessage(final String message) {
         final GetBoardResponse serverResponse = new GetBoardResponse();
         serverResponse.setMessage(message);

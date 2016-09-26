@@ -3,6 +3,7 @@ package fourinarowbot.client;
 import org.springframework.web.client.RestTemplate;
 
 import fourinarowbot.board.BoardImpl;
+import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.Coordinates;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.server.response.GetBoardResponse;
@@ -14,10 +15,12 @@ public class RemoteGame {
 
     public static void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
         final String message;
+        BoardState   finalBoardState = null;
         while (true) {
             final GetBoardResponse boardStateResponse = getBoardState(gameName, playerName);
             if (boardStateResponse.getMessage() != null) {
                 message = boardStateResponse.getMessage();
+                finalBoardState = boardStateResponse.getBoardState();
                 break;
             }
 
@@ -26,12 +29,16 @@ public class RemoteGame {
 
             final PlaceMarkerResponse placeMarkerResponse = placeMarker(gameName, playerName, coordinates);
             if (placeMarkerResponse.getMessage() != null) {
-                board.print();
+                finalBoardState = placeMarkerResponse.getBoardState();
                 message = placeMarkerResponse.getMessage();
                 break;
             }
         }
-        System.out.println("Game over for " + playerName + " " + message);
+        System.out.println("Game over for " + playerName + ". " + message);
+        if (finalBoardState != null) {
+            System.out.println("Board state was:");
+            new BoardImpl(finalBoardState.getMarkers()).print();
+        }
     }
 
     private static GetBoardResponse getBoardState(final String gameName, final String playerName) {
