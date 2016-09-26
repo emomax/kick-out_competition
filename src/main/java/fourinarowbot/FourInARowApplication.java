@@ -1,11 +1,12 @@
 package fourinarowbot;
 
+import fourinarowbot.board.BoardImpl;
+import fourinarowbot.domain.Coordinates;
 import fourinarowbot.domain.Marker;
+import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 import fourinarowbot.graphics.GraphicsEngine;
-import fourinarowbot.domain.Coordinates;
-import fourinarowbot.domain.MarkerColor;
 
 public class FourInARowApplication {
 
@@ -88,7 +89,7 @@ public class FourInARowApplication {
             try {
                 playNextRound(isRedPlayerTurn);
             }
-            catch(final NullPointerException exception) {
+            catch (final NullPointerException exception) {
                 throw new RuntimeException("Null is not a good place to be.", exception);
             }
             catch (final Exception e) {

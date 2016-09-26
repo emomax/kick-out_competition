@@ -4,9 +4,9 @@ import java.awt.BorderLayout;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 
-import fourinarowbot.domain.Marker;
-import fourinarowbot.Board;
 import fourinarowbot.FourInARowApplication;
+import fourinarowbot.board.Board;
+import fourinarowbot.domain.Marker;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 
 public class GraphicsEngine extends JApplet {

@@ -1,7 +1,7 @@
 package fourinarowbot.gameengine;
 
-import fourinarowbot.Board;
 import fourinarowbot.FourInARowApplication;
+import fourinarowbot.board.Board;
 import fourinarowbot.domain.Coordinates;
 
 public class MyN00bGameEngine implements GameEngine {

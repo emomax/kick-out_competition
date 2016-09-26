@@ -1,5 +1,7 @@
 package fourinarowbot;
 
+import fourinarowbot.board.Board;
+import fourinarowbot.board.BoardImpl;
 import fourinarowbot.domain.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;

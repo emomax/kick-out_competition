@@ -1,7 +1,7 @@
-package fourinarowbot;
+package fourinarowbot.board;
 
-import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.Coordinates;
+import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
 public class BoardImpl implements Board {
@@ -9,7 +9,19 @@ public class BoardImpl implements Board {
     private static final int NUMBER_OF_ROWS = 6;
     private static final int NUMBER_OF_COLS = 7;
 
-    private Marker[][] board = new Marker[NUMBER_OF_COLS][NUMBER_OF_ROWS];
+    private Marker[][] board;
+
+    public Marker[][] getBoard() {
+        return board;
+    }
+
+    public BoardImpl() {
+        this.board = new Marker[NUMBER_OF_COLS][NUMBER_OF_ROWS];
+    }
+
+    public BoardImpl(final Marker[][] board) {
+        this.board = board;
+    }
 
     public int getNumberOfRows() {
         return NUMBER_OF_ROWS;
@@ -31,7 +43,7 @@ public class BoardImpl implements Board {
 
     private void verifyCoordinatesInsideBoard(final int x, final int y) {
         if (isOutsideBoard(x, y)) {
-            throw new IllegalArgumentException("Coordinates outside fourinarowbot.board: [" + x + ", " + y + "]");
+            throw new IllegalArgumentException("Coordinates outside fourinarow.board: [" + x + ", " + y + "]");
         }
     }
 

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 
+import fourinarowbot.board.Board;
 import fourinarowbot.domain.Marker;
-import fourinarowbot.Board;
 import fourinarowbot.domain.MarkerColor;
 
 class BoardGraphics extends JComponent {
