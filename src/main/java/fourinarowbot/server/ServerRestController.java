@@ -41,7 +41,7 @@ public class ServerRestController {
         catch (final Exception e) {
             gameHandler.killGame(gameName);
             final ServerResponse response = new ServerResponse();
-            response.setMessage("Error! " + e.getMessage() + e.getStackTrace());
+            response.setMessage("Error! " + e.getMessage());
             return response;
         }
     }
@@ -89,7 +89,7 @@ public class ServerRestController {
             gameHandler.killGame(gameName);
             final ServerResponse response = new ServerResponse();
             response.setBoardState(boardState);
-            response.setMessage("Error! " + e.getMessage() + e.getStackTrace());
+            response.setMessage("Error! " + e.getMessage());
             return response;
         }
     }

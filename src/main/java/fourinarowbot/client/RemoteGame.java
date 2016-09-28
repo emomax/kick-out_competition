@@ -3,7 +3,6 @@ package fourinarowbot.client;
 import org.springframework.web.client.RestTemplate;
 
 import fourinarowbot.board.BoardImpl;
-import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.Coordinates;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.server.response.ServerResponse;
@@ -13,30 +12,35 @@ public class RemoteGame {
     private static final String SERVER_ADDRESS = "127.0.0.1:8080";
 
     public static void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
-        final String     message;
-        final BoardState finalBoardState;
+        final ServerResponse serverResponse = runGame(playerName, gameName, gameEngine);
+        printGameResult(playerName, serverResponse);
+    }
+
+    private static ServerResponse runGame(final String playerName, final String gameName, final GameEngine gameEngine) {
+        ServerResponse serverResponse;
         while (true) {
-            final ServerResponse boardStateResponse = getBoardState(gameName, playerName);
-            if (boardStateResponse.getMessage() != null) {
-                message = boardStateResponse.getMessage();
-                finalBoardState = boardStateResponse.getBoardState();
-                break;
+            serverResponse = getBoardState(gameName, playerName);
+            if (serverResponse.getMessage() != null) {
+                return serverResponse;
             }
-
-            final BoardImpl   board       = new BoardImpl(boardStateResponse.getBoardState().getMarkers());
-            final Coordinates coordinates = gameEngine.getCoordinatesForNextMakerToPlace(board);
-
-            final ServerResponse placeMarkerResponse = placeMarker(gameName, playerName, coordinates);
-            if (placeMarkerResponse.getMessage() != null) {
-                finalBoardState = placeMarkerResponse.getBoardState();
-                message = placeMarkerResponse.getMessage();
-                break;
+            final Coordinates coordinates = getCoordinatesForNextMarkerToPlace(gameEngine, serverResponse);
+            serverResponse = placeMarker(gameName, playerName, coordinates);
+            if (serverResponse.getMessage() != null) {
+                return serverResponse;
             }
         }
-        System.out.println("Game over for " + playerName + ". " + message);
-        if (finalBoardState != null) {
+    }
+
+    private static Coordinates getCoordinatesForNextMarkerToPlace(final GameEngine gameEngine, final ServerResponse serverResponse) {
+        final BoardImpl board = new BoardImpl(serverResponse.getBoardState().getMarkers());
+        return gameEngine.getCoordinatesForNextMakerToPlace(board);
+    }
+
+    private static void printGameResult(final String playerName, final ServerResponse serverResponse) {
+        System.out.println("Game over for " + playerName + ". " + serverResponse.getMessage());
+        if (serverResponse.getBoardState() != null) {
             System.out.println("Board state was:");
-            new BoardImpl(finalBoardState.getMarkers()).print();
+            new BoardImpl(serverResponse.getBoardState().getMarkers()).print();
         }
     }
 
