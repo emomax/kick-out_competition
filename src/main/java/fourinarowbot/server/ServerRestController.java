@@ -4,12 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fourinarowbot.BoardSearcher;
-import fourinarowbot.SearchResult;
 import fourinarowbot.board.BoardImpl;
 import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.Coordinates;
-import fourinarowbot.domain.MarkerColor;
+import fourinarowbot.server.response.GameStatistics;
 import fourinarowbot.server.response.ServerResponse;
 
 @RestController
@@ -24,13 +22,13 @@ public class ServerRestController {
         try {
             final BoardImpl  board      = gameHandler.getBoard(gameName, playerName);
             final BoardState boardState = new BoardState(board.getBoard());
-
-            final BoardSearcher boardSearcher = new BoardSearcher(board);
-            final SearchResult  searchResult  = boardSearcher.searchForWinner();
-            if (searchResult.isGameOver()) {
-                final ServerResponse loserResponse = createLoserResponse(searchResult, gameName, boardState);
+            final Game       game       = gameHandler.getGame(gameName);
+            if (game.isGameOver()) {
+                final ServerResponse response = new ServerResponse();
+                response.setMessage("Game over!");
+                response.setGameStatistics(game.getGameStatistics());
                 gameHandler.killGame(gameName);
-                return loserResponse;
+                return response;
             }
             else {
                 final ServerResponse response = new ServerResponse();
@@ -46,27 +44,6 @@ public class ServerRestController {
         }
     }
 
-    private ServerResponse createLoserResponse(final SearchResult searchResult, final String gameName, final BoardState boardState) {
-        final ServerResponse response = new ServerResponse();
-        response.setBoardState(boardState);
-
-        if (searchResult.isDraw()) {
-            response.setMessage("It's a draw!");
-        }
-        else {
-            final Game   game = gameHandler.getGame(gameName);
-            final String otherPlayerName;
-            if (searchResult.getWinnerMarkerColor().equals(MarkerColor.RED)) {
-                otherPlayerName = game.getRedPlayerName();
-            }
-            else {
-                otherPlayerName = game.getYellowPlayerName();
-            }
-            response.setMessage(otherPlayerName + " (" + searchResult.getWinnerMarkerColor() + ")" + " wins!");
-        }
-        return response;
-    }
-
     @RequestMapping("/placeMarker")
     public ServerResponse placeMarker(
             @RequestParam(value = "playerName") final String playerName,
@@ -75,9 +52,12 @@ public class ServerRestController {
             @RequestParam(value = "y") final Integer y) {
         final Coordinates coordinates = new Coordinates(x, y);
         try {
-            final SearchResult searchResult = gameHandler.placeMarker(gameName, playerName, coordinates);
-            if (searchResult.isGameOver()) {
-                return createWinnerResponse(playerName, searchResult, gameName);
+            final Game game = gameHandler.placeMarker(gameName, playerName, coordinates);
+            if (game.isGameOver()) {
+                final ServerResponse response = new ServerResponse();
+                response.setMessage("Game over!");
+                response.setGameStatistics(game.getGameStatistics());
+                return response;
             }
             else {
                 return new ServerResponse();
@@ -94,22 +74,8 @@ public class ServerRestController {
         }
     }
 
-    private ServerResponse createWinnerResponse(final String playerName, final SearchResult searchResult, final String gameName) {
-        final Game           game       = gameHandler.getGame(gameName);
-        final BoardState     boardState = new BoardState(game.getBoard().getBoard());
-        final ServerResponse response   = new ServerResponse();
-        response.setBoardState(boardState);
-        if (searchResult.isDraw()) {
-            response.setMessage("It's a draw!");
-        }
-        else {
-            response.setMessage(playerName + " (" + searchResult.getWinnerMarkerColor() + ")" + " wins!");
-        }
-        return response;
-    }
-
     @RequestMapping("/test")
-    public String test() {
-        return "Hej";
+    public GameStatistics test() {
+        return new GameStatistics();
     }
 }

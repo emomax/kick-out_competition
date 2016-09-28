@@ -1,52 +1,59 @@
 package fourinarowbot.server.response;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import fourinarowbot.SearchResult;
+import fourinarowbot.board.BoardImpl;
+import fourinarowbot.board.BoardState;
+import fourinarowbot.domain.MarkerColor;
 
 public class GameStatistics {
 
-    private final AtomicInteger draws          = new AtomicInteger();
-    private final AtomicInteger redWins        = new AtomicInteger();
-    private final AtomicInteger yellowWins     = new AtomicInteger();
-    private final AtomicInteger yellowTimeouts = new AtomicInteger();
-    private final AtomicInteger redTimeouts    = new AtomicInteger();
+    private int draws;
+    private int redWins;
+    private int yellowWins;
+    private final List<BoardState> boardStates = new ArrayList<>();
 
+    // For JSON-serialization
     public int getDraws() {
-        return draws.get();
+        return draws;
     }
 
-    public void incrementDraws() {
-        draws.incrementAndGet();
-    }
-
+    // For JSON-serialization only
     public int getRedWins() {
-        return redWins.get();
+        return redWins;
     }
 
-    public void incrementRedWins() {
-        redWins.incrementAndGet();
-    }
-
+    // For JSON-serialization only
     public int getYellowWins() {
-        return yellowWins.get();
+        return yellowWins;
     }
 
-    public void incrementYellowWins() {
-        yellowWins.incrementAndGet();
+    // For JSON-serialization only
+    public List<BoardState> getBoardStates() {
+        return boardStates;
     }
 
-    public int getYellowTimeouts() {
-        return yellowTimeouts.get();
+    public void updateStatistics(final SearchResult searchResult, final BoardState boardState) {
+        if (searchResult.isDraw()) {
+            draws++;
+        }
+        else if (searchResult.getWinnerMarkerColor() == MarkerColor.RED) {
+            redWins++;
+        }
+        else {
+            yellowWins++;
+        }
+        boardStates.add(boardState);
     }
 
-    public void incrementYellowTimeouts() {
-        yellowTimeouts.incrementAndGet();
-    }
-
-    public int getRedTimeouts() {
-        return redTimeouts.get();
-    }
-
-    public void incrementRedTimeouts() {
-        redTimeouts.incrementAndGet();
+    public void print() {
+        boardStates.stream()
+                .map(boardState -> new BoardImpl(boardState.getMarkers()))
+                .forEach(BoardImpl::print);
+        System.out.println("Red wins:    " + redWins);
+        System.out.println("Yellow wins: " + yellowWins);
+        System.out.println("Draws:       " + draws);
     }
 }

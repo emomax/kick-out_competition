@@ -26,7 +26,7 @@ public class GameHandler {
         return gameRepository.getGame(gameName);
     }
 
-    public SearchResult placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
+    public Game placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
         final Game          game          = gameRepository.getGame(gameName);
         final BoardImpl     board         = game.getBoard();
         final BoardSearcher boardSearcher = new BoardSearcher(board);
@@ -35,8 +35,12 @@ public class GameHandler {
         final Marker      marker      = new Marker(playerColor, coordinates);
         board.placeMarker(marker);
         final SearchResult gameStatusAfterPlacing = boardSearcher.getGameStatus();
+        if (gameStatusAfterPlacing.isGameOver()) {
+            game.setRoundOver(gameStatusAfterPlacing, board);
+        }
+
         game.finishMyTurn();
-        return gameStatusAfterPlacing;
+        return game;
     }
 
     public void killGame(final String gameName) {

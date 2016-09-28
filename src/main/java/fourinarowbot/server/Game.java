@@ -2,20 +2,26 @@ package fourinarowbot.server;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import fourinarowbot.SearchResult;
 import fourinarowbot.board.BoardImpl;
+import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.server.response.GameStatistics;
 
 public class Game {
 
+    private static final int NUMBER_OF_ROUNDS = 10;
+
     private final UUID   id;
     private final String name;
     private final String redPlayerName;
     private       String yellowPlayerName;
-    private final BoardImpl      board           = new BoardImpl();
-    private final AtomicBoolean  isRedPlayerTurn = new AtomicBoolean(true);
-    private final GameStatistics gameStatistics  = new GameStatistics();
+    private final BoardImpl      board                 = new BoardImpl();
+    private final AtomicBoolean  isRedPlayerTurn       = new AtomicBoolean(true);
+    private final GameStatistics gameStatistics        = new GameStatistics();
+    private final AtomicInteger  numberOfFinishedGames = new AtomicInteger();
 
     public Game(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
         this.id = id;
@@ -75,5 +81,15 @@ public class Game {
 
     public void finishMyTurn() {
         isRedPlayerTurn.set(!isRedPlayerTurn.get());
+    }
+
+    public synchronized boolean isGameOver() {
+        return numberOfFinishedGames.get() == NUMBER_OF_ROUNDS;
+    }
+
+    public synchronized void setRoundOver(final SearchResult gameStatusAfterPlacing, final BoardImpl board) {
+        gameStatistics.updateStatistics(gameStatusAfterPlacing, new BoardState(board.getBoard()));
+        numberOfFinishedGames.incrementAndGet();
+        this.board.reset();
     }
 }

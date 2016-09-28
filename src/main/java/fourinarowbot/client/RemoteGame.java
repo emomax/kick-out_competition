@@ -36,11 +36,10 @@ public class RemoteGame {
         return gameEngine.getCoordinatesForNextMakerToPlace(board);
     }
 
-    private static void printGameResult(final String playerName, final ServerResponse serverResponse) {
-        System.out.println("Game over for " + playerName + ". " + serverResponse.getMessage());
-        if (serverResponse.getBoardState() != null) {
-            System.out.println("Board state was:");
-            new BoardImpl(serverResponse.getBoardState().getMarkers()).print();
+    private static void printGameResult(final String playerName, final ServerResponse response) {
+        System.out.println(response.getMessage());
+        if (response.getGameStatistics() != null) {
+            response.getGameStatistics().print();
         }
     }
 
