@@ -40,6 +40,7 @@ public class ServerRestController {
 
         if (game.isGameOver()) {
             response.setMessage("Game over!");
+            game.updateGameStatisticsWithGameTime();
             response.setGameStatistics(game.getGameStatistics());
             gameHandler.killGame(gameName);
             return response;
@@ -62,6 +63,7 @@ public class ServerRestController {
             if (game.isGameOver()) {
                 final ServerResponse response = new ServerResponse();
                 response.setMessage("Game over!");
+                game.updateGameStatisticsWithGameTime();
                 response.setGameStatistics(game.getGameStatistics());
                 response.setRedPlayerName(game.getRedPlayerName());
                 response.setYellowPlayerName(game.getYellowPlayerName());

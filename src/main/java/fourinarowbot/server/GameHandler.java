@@ -19,6 +19,7 @@ public class GameHandler {
             game.setYellowPlayerName(playerName);
         }
         game.waitForMyTurn(playerName);
+        game.getTimer().start(playerName);
         return game.getBoard();
     }
 
@@ -27,7 +28,8 @@ public class GameHandler {
     }
 
     public Game placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
-        final Game          game          = gameRepository.getGame(gameName);
+        final Game game = gameRepository.getGame(gameName);
+        game.getTimer().stop(playerName);
         final BoardImpl     board         = game.getBoard();
         final BoardSearcher boardSearcher = new BoardSearcher(board);
 

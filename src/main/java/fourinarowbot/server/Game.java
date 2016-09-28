@@ -22,6 +22,7 @@ public class Game {
     private final AtomicBoolean  isRedPlayerTurn       = new AtomicBoolean(true);
     private final GameStatistics gameStatistics        = new GameStatistics();
     private final AtomicInteger  numberOfFinishedGames = new AtomicInteger();
+    private final GameTimer      gameTimer             = new GameTimer();
 
     public Game(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
         this.id = id;
@@ -91,5 +92,14 @@ public class Game {
         gameStatistics.updateStatistics(gameStatusAfterPlacing, new BoardState(board.getBoard()));
         numberOfFinishedGames.incrementAndGet();
         this.board.reset();
+    }
+
+    public GameTimer getTimer() {
+        return gameTimer;
+    }
+
+    public void updateGameStatisticsWithGameTime() {
+        gameStatistics.setRedPlayerGameTime(gameTimer.getGameTime(redPlayerName));
+        gameStatistics.setYellowPlayerGameTime(gameTimer.getGameTime(yellowPlayerName));
     }
 }

@@ -14,6 +14,8 @@ public class GameStatistics {
     private int redWins;
     private int yellowWins;
     private final List<BoardState> boardStates = new ArrayList<>();
+    private long redPlayerGameTime;
+    private long yellowPlayerGameTime;
 
     // For JSON-serialization
     public int getDraws() {
@@ -48,6 +50,22 @@ public class GameStatistics {
         boardStates.add(boardState);
     }
 
+    public long getRedPlayerGameTime() {
+        return redPlayerGameTime;
+    }
+
+    public void setRedPlayerGameTime(final long redPlayerGameTime) {
+        this.redPlayerGameTime = redPlayerGameTime;
+    }
+
+    public long getYellowPlayerGameTime() {
+        return yellowPlayerGameTime;
+    }
+
+    public void setYellowPlayerGameTime(final long yellowPlayerGameTime) {
+        this.yellowPlayerGameTime = yellowPlayerGameTime;
+    }
+
     public void print(final String redPlayerName, final String yellowPlayerName) {
         boardStates.stream()
                 .map(boardState -> new BoardImpl(boardState.getMarkers()))
@@ -57,6 +75,9 @@ public class GameStatistics {
         System.out.println(" " + redWins + "  " + redPlayerName + " (Red) wins");
         System.out.println(" " + yellowWins + "  " + yellowPlayerName + " (Yellow) wins");
         System.out.println(" " + draws + "  Draws");
+        System.out.println("");
+        System.out.println(redPlayerName + " total play time: " + redPlayerGameTime);
+        System.out.println(yellowPlayerName + " total play time: " + yellowPlayerGameTime);
         System.out.println("___________________________________");
         System.out.println("");
     }
