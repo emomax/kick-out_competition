@@ -10,7 +10,8 @@ import fourinarowbot.server.response.ServerResponse;
 
 public class RemoteGame {
 
-    private static final String SERVER_ADDRESS = "127.0.0.1:8080";
+    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // Game server
+    //    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
 
     public static void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
         final ServerResponse serverResponse = runGame(playerName, gameName, gameEngine);
