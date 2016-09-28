@@ -48,12 +48,16 @@ public class GameStatistics {
         boardStates.add(boardState);
     }
 
-    public void print() {
+    public void print(final String redPlayerName, final String yellowPlayerName) {
         boardStates.stream()
                 .map(boardState -> new BoardImpl(boardState.getMarkers()))
                 .forEach(BoardImpl::print);
-        System.out.println("Red wins:    " + redWins);
-        System.out.println("Yellow wins: " + yellowWins);
-        System.out.println("Draws:       " + draws);
+        System.out.println("___________________________________");
+        System.out.println("");
+        System.out.println(" " + redWins + "  " + redPlayerName + " (Red) wins");
+        System.out.println(" " + yellowWins + "  " + yellowPlayerName + " (Yellow) wins");
+        System.out.println(" " + draws + "  Draws");
+        System.out.println("___________________________________");
+        System.out.println("");
     }
 }

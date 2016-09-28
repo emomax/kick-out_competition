@@ -3,11 +3,12 @@ package fourinarowbot.gameengine;
 import fourinarowbot.FourInARowApplication;
 import fourinarowbot.board.Board;
 import fourinarowbot.domain.Coordinates;
+import fourinarowbot.domain.MarkerColor;
 
 public class MyN00bGameEngine implements GameEngine {
 
     @Override
-    public Coordinates getCoordinatesForNextMakerToPlace(final Board board) {
+    public Coordinates getCoordinatesForNextMakerToPlace(final Board board, final MarkerColor myColor) {
         // TODO This is where your bad-ass SkyNet 2.0 logic goes.
 
         return null;

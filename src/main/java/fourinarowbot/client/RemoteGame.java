@@ -4,6 +4,7 @@ import org.springframework.web.client.RestTemplate;
 
 import fourinarowbot.board.BoardImpl;
 import fourinarowbot.domain.Coordinates;
+import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.server.response.ServerResponse;
 
@@ -13,7 +14,7 @@ public class RemoteGame {
 
     public static void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
         final ServerResponse serverResponse = runGame(playerName, gameName, gameEngine);
-        printGameResult(playerName, serverResponse);
+        printGameResult(serverResponse);
     }
 
     private static ServerResponse runGame(final String playerName, final String gameName, final GameEngine gameEngine) {
@@ -23,7 +24,7 @@ public class RemoteGame {
             if (serverResponse.getMessage() != null) {
                 return serverResponse;
             }
-            final Coordinates coordinates = getCoordinatesForNextMarkerToPlace(gameEngine, serverResponse);
+            final Coordinates coordinates = getCoordinatesForNextMarkerToPlace(playerName, gameEngine, serverResponse);
             serverResponse = placeMarker(gameName, playerName, coordinates);
             if (serverResponse.getMessage() != null) {
                 return serverResponse;
@@ -31,15 +32,23 @@ public class RemoteGame {
         }
     }
 
-    private static Coordinates getCoordinatesForNextMarkerToPlace(final GameEngine gameEngine, final ServerResponse serverResponse) {
-        final BoardImpl board = new BoardImpl(serverResponse.getBoardState().getMarkers());
-        return gameEngine.getCoordinatesForNextMakerToPlace(board);
+    private static Coordinates getCoordinatesForNextMarkerToPlace(final String playerName, final GameEngine gameEngine, final ServerResponse response) {
+        final BoardImpl   board         = new BoardImpl(response.getBoardState().getMarkers());
+        final MarkerColor myMarkerColor = getMyMarkerColor(playerName, response);
+        return gameEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
     }
 
-    private static void printGameResult(final String playerName, final ServerResponse response) {
+    private static MarkerColor getMyMarkerColor(final String playerName, final ServerResponse response) {
+        if (response.getRedPlayerName().equals(playerName)) {
+            return MarkerColor.RED;
+        }
+        return MarkerColor.YELLOW;
+    }
+
+    private static void printGameResult(final ServerResponse response) {
         System.out.println(response.getMessage());
         if (response.getGameStatistics() != null) {
-            response.getGameStatistics().print();
+            response.getGameStatistics().print(response.getRedPlayerName(), response.getYellowPlayerName());
         }
     }
 

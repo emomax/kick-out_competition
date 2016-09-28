@@ -20,26 +20,32 @@ public class ServerRestController {
             @RequestParam(value = "playerName") final String playerName,
             @RequestParam(value = "gameName") final String gameName) {
         try {
-            final BoardImpl  board      = gameHandler.getBoard(gameName, playerName);
-            final BoardState boardState = new BoardState(board.getBoard());
-            final Game       game       = gameHandler.getGame(gameName);
-            if (game.isGameOver()) {
-                final ServerResponse response = new ServerResponse();
-                response.setMessage("Game over!");
-                response.setGameStatistics(game.getGameStatistics());
-                gameHandler.killGame(gameName);
-                return response;
-            }
-            else {
-                final ServerResponse response = new ServerResponse();
-                response.setBoardState(boardState);
-                return response;
-            }
+            return getBoardStateResponse(playerName, gameName);
         }
         catch (final Exception e) {
             gameHandler.killGame(gameName);
             final ServerResponse response = new ServerResponse();
             response.setMessage("Error! " + e.getMessage());
+            return response;
+        }
+    }
+
+    private ServerResponse getBoardStateResponse(final @RequestParam(value = "playerName") String playerName, final @RequestParam(value = "gameName") String gameName) throws InterruptedException {
+        final BoardImpl      board      = gameHandler.getBoard(gameName, playerName);
+        final BoardState     boardState = new BoardState(board.getBoard());
+        final Game           game       = gameHandler.getGame(gameName);
+        final ServerResponse response   = new ServerResponse();
+        response.setRedPlayerName(game.getRedPlayerName());
+        response.setYellowPlayerName(game.getYellowPlayerName());
+
+        if (game.isGameOver()) {
+            response.setMessage("Game over!");
+            response.setGameStatistics(game.getGameStatistics());
+            gameHandler.killGame(gameName);
+            return response;
+        }
+        else {
+            response.setBoardState(boardState);
             return response;
         }
     }
@@ -57,6 +63,8 @@ public class ServerRestController {
                 final ServerResponse response = new ServerResponse();
                 response.setMessage("Game over!");
                 response.setGameStatistics(game.getGameStatistics());
+                response.setRedPlayerName(game.getRedPlayerName());
+                response.setYellowPlayerName(game.getYellowPlayerName());
                 return response;
             }
             else {

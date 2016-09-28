@@ -20,7 +20,6 @@ public class FourInARowApplication {
     public FourInARowApplication(final GameEngine redGameEngine) {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new MyN00bGameEngine();
-        //        this.yellowGameEngine = new ClosestGameEngine(MarkerColor.YELLOW);
         this.board = new BoardImpl();
         this.boardSearcher = new BoardSearcher(board);
         this.graphicsEngine = new GraphicsEngine(board);
@@ -133,11 +132,11 @@ public class FourInARowApplication {
 
     private Marker getNextMarkerToPlace(final boolean isRedPlayerTurn) {
         if (isRedPlayerTurn) {
-            final Coordinates coordinates = redGameEngine.getCoordinatesForNextMakerToPlace(board);
+            final Coordinates coordinates = redGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.RED);
             return new Marker(MarkerColor.RED, coordinates);
         }
         else {
-            final Coordinates coordinates = yellowGameEngine.getCoordinatesForNextMakerToPlace(board);
+            final Coordinates coordinates = yellowGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.YELLOW);
             return new Marker(MarkerColor.YELLOW, coordinates);
         }
     }

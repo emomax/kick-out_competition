@@ -2,6 +2,7 @@ package fourinarowbot.server;
 
 import fourinarowbot.board.BoardImpl;
 import fourinarowbot.domain.Coordinates;
+import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 import fourinarowbot.server.response.ServerResponse;
 
@@ -36,19 +37,27 @@ public class ServerTest {
 
             System.out.println(playerName + " got board");
 
-            final BoardImpl   board       = new BoardImpl(boardStateResponse.getBoardState().getMarkers());
-            final Coordinates coordinates = playerEngine.getCoordinatesForNextMakerToPlace(board);
+            final BoardImpl   board         = new BoardImpl(boardStateResponse.getBoardState().getMarkers());
+            final MarkerColor myMarkerColor = getMyMarkerColor(playerName, boardStateResponse);
+            final Coordinates coordinates   = playerEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
             //            System.out.println(playerName + " placing marker...");
             final ServerResponse placeMarkerResponse = server.placeMarker(playerName, gameName, coordinates.getX(), coordinates.getY());
             System.out.println(playerName + " placed marker");
             if (placeMarkerResponse.getMessage() != null) {
-                board.print(); // TODO: REMOVE
+                board.print();
                 message = placeMarkerResponse.getMessage();
                 break;
             }
             sleep(500);
         }
         System.out.println(playerName + " stopped playing after message: " + message);
+    }
+
+    private static MarkerColor getMyMarkerColor(final String playerName, final ServerResponse response) {
+        if (response.getRedPlayerName().equals(playerName)) {
+            return MarkerColor.RED;
+        }
+        return MarkerColor.YELLOW;
     }
 
     private static void sleep(final long time) {
