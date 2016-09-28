@@ -1,9 +1,11 @@
 package fourinarowbot.server;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import fourinarowbot.board.BoardImpl;
 import fourinarowbot.domain.MarkerColor;
+import fourinarowbot.server.response.GameStatistics;
 
 public class Game {
 
@@ -11,8 +13,9 @@ public class Game {
     private final String name;
     private final String redPlayerName;
     private       String yellowPlayerName;
-    private final BoardImpl board           = new BoardImpl();
-    private       Boolean   isRedPlayerTurn = true;
+    private final BoardImpl      board           = new BoardImpl();
+    private final AtomicBoolean  isRedPlayerTurn = new AtomicBoolean(true);
+    private final GameStatistics gameStatistics  = new GameStatistics();
 
     public Game(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
         this.id = id;
@@ -53,24 +56,24 @@ public class Game {
         return yellowPlayerName;
     }
 
+    public GameStatistics getGameStatistics() {
+        return gameStatistics;
+    }
+
     public void waitForMyTurn(final String playerName) throws InterruptedException {
         final MarkerColor playerColor = getPlayerColor(playerName);
         while (true) {
-            synchronized (isRedPlayerTurn) {
-                if (playerColor.equals(MarkerColor.RED) && isRedPlayerTurn) {
-                    break;
-                }
-                else if (playerColor.equals(MarkerColor.YELLOW) && !isRedPlayerTurn) {
-                    break;
-                }
+            if (playerColor.equals(MarkerColor.RED) && isRedPlayerTurn.get()) {
+                break;
             }
-            Thread.sleep(100);
+            else if (playerColor.equals(MarkerColor.YELLOW) && !isRedPlayerTurn.get()) {
+                break;
+            }
+            Thread.sleep(20);
         }
     }
 
     public void finishMyTurn() {
-        synchronized (isRedPlayerTurn) {
-            isRedPlayerTurn = !isRedPlayerTurn;
-        }
+        isRedPlayerTurn.set(!isRedPlayerTurn.get());
     }
 }

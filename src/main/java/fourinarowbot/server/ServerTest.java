@@ -3,8 +3,7 @@ package fourinarowbot.server;
 import fourinarowbot.board.BoardImpl;
 import fourinarowbot.domain.Coordinates;
 import fourinarowbot.gameengine.MyN00bGameEngine;
-import fourinarowbot.server.response.GetBoardResponse;
-import fourinarowbot.server.response.PlaceMarkerResponse;
+import fourinarowbot.server.response.ServerResponse;
 
 public class ServerTest {
 
@@ -29,7 +28,7 @@ public class ServerTest {
         String message = null;
         while (true) {
             //            System.out.println(playerName + " getting board state...");
-            final GetBoardResponse boardStateResponse = server.getBoardState(playerName, gameName);
+            final ServerResponse boardStateResponse = server.getBoardState(playerName, gameName);
             if (boardStateResponse.getMessage() != null) {
                 message = boardStateResponse.getMessage();
                 break;
@@ -40,7 +39,7 @@ public class ServerTest {
             final BoardImpl   board       = new BoardImpl(boardStateResponse.getBoardState().getMarkers());
             final Coordinates coordinates = playerEngine.getCoordinatesForNextMakerToPlace(board);
             //            System.out.println(playerName + " placing marker...");
-            final PlaceMarkerResponse placeMarkerResponse = server.placeMarker(playerName, gameName, coordinates.getX(), coordinates.getY());
+            final ServerResponse placeMarkerResponse = server.placeMarker(playerName, gameName, coordinates.getX(), coordinates.getY());
             System.out.println(playerName + " placed marker");
             if (placeMarkerResponse.getMessage() != null) {
                 board.print(); // TODO: REMOVE

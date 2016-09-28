@@ -6,18 +6,17 @@ import fourinarowbot.board.BoardImpl;
 import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.Coordinates;
 import fourinarowbot.gameengine.GameEngine;
-import fourinarowbot.server.response.GetBoardResponse;
-import fourinarowbot.server.response.PlaceMarkerResponse;
+import fourinarowbot.server.response.ServerResponse;
 
 public class RemoteGame {
 
     private static final String SERVER_ADDRESS = "127.0.0.1:8080";
 
     public static void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
-        final String message;
-        BoardState   finalBoardState = null;
+        final String     message;
+        final BoardState finalBoardState;
         while (true) {
-            final GetBoardResponse boardStateResponse = getBoardState(gameName, playerName);
+            final ServerResponse boardStateResponse = getBoardState(gameName, playerName);
             if (boardStateResponse.getMessage() != null) {
                 message = boardStateResponse.getMessage();
                 finalBoardState = boardStateResponse.getBoardState();
@@ -27,7 +26,7 @@ public class RemoteGame {
             final BoardImpl   board       = new BoardImpl(boardStateResponse.getBoardState().getMarkers());
             final Coordinates coordinates = gameEngine.getCoordinatesForNextMakerToPlace(board);
 
-            final PlaceMarkerResponse placeMarkerResponse = placeMarker(gameName, playerName, coordinates);
+            final ServerResponse placeMarkerResponse = placeMarker(gameName, playerName, coordinates);
             if (placeMarkerResponse.getMessage() != null) {
                 finalBoardState = placeMarkerResponse.getBoardState();
                 message = placeMarkerResponse.getMessage();
@@ -41,15 +40,15 @@ public class RemoteGame {
         }
     }
 
-    private static GetBoardResponse getBoardState(final String gameName, final String playerName) {
+    private static ServerResponse getBoardState(final String gameName, final String playerName) {
         final RestTemplate restTemplate = new RestTemplate();
         final String       url          = "http://" + SERVER_ADDRESS + "/getBoard?gameName=" + gameName + "&playerName=" + playerName;
-        return restTemplate.getForObject(url, GetBoardResponse.class);
+        return restTemplate.getForObject(url, ServerResponse.class);
     }
 
-    private static PlaceMarkerResponse placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
+    private static ServerResponse placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
         final RestTemplate restTemplate = new RestTemplate();
         final String       url          = "http://" + SERVER_ADDRESS + "/placeMarker?gameName=" + gameName + "&playerName=" + playerName + "&x=" + coordinates.getX() + "&y=" + coordinates.getY();
-        return restTemplate.getForObject(url, PlaceMarkerResponse.class);
+        return restTemplate.getForObject(url, ServerResponse.class);
     }
 }
