@@ -1,6 +1,7 @@
 package fourinarowbot.server.response;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import fourinarowbot.SearchResult;
@@ -16,6 +17,7 @@ public class GameStatistics {
     private final List<BoardState> boardStates = new ArrayList<>();
     private long redPlayerGameTime;
     private long yellowPlayerGameTime;
+    private final Date gameStartDate = new Date();
 
     // For JSON-serialization
     public int getDraws() {
@@ -64,6 +66,10 @@ public class GameStatistics {
 
     public void setYellowPlayerGameTime(final long yellowPlayerGameTime) {
         this.yellowPlayerGameTime = yellowPlayerGameTime;
+    }
+
+    public Date getGameStartDate() {
+        return gameStartDate;
     }
 
     public void print(final String redPlayerName, final String yellowPlayerName) {
