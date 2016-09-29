@@ -1,11 +1,14 @@
 package fourinarowbot.server;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameRepository {
 
-    private final ConcurrentHashMap<String, Game> games = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Game> games         = new ConcurrentHashMap<>();
+    private final List<Game>                      finishedGames = new ArrayList<>();
 
     public Game getOrCreateGame(final String gameName, final String playerName) throws InterruptedException {
         synchronized (games) {
@@ -28,7 +31,13 @@ public class GameRepository {
 
     public void killGame(final String gameName) {
         synchronized (games) {
+            final Game game = games.get(gameName);
+            finishedGames.add(game);
             games.remove(gameName);
         }
+    }
+
+    public List<Game> getFinishedGames() {
+        return finishedGames;
     }
 }

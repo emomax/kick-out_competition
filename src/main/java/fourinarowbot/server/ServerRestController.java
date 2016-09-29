@@ -1,5 +1,8 @@
 package fourinarowbot.server;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -8,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import fourinarowbot.board.BoardImpl;
 import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.Coordinates;
-import fourinarowbot.server.response.GameStatistics;
+import fourinarowbot.server.response.GameSummaryResponse;
 import fourinarowbot.server.response.ServerResponse;
 
 @RestController
@@ -86,8 +89,22 @@ public class ServerRestController {
     }
 
     @CrossOrigin(origins = "http://localhost:8000")
-    @RequestMapping("/test")
-    public GameStatistics test() {
-        return new GameStatistics();
+    @RequestMapping("/gameSummary")
+    public List<GameSummaryResponse> getGameSummaries() {
+        final List<Game>                games     = gameHandler.getFinishedGames();
+        final List<GameSummaryResponse> summaries = new ArrayList<>();
+        for (final Game game : games) {
+            final GameSummaryResponse response = new GameSummaryResponse();
+            response.setUuid(game.getId());
+            response.setDraws(game.getGameStatistics().getDraws());
+            response.setRedWins(game.getGameStatistics().getRedWins());
+            response.setYellowWins(game.getGameStatistics().getYellowWins());
+            response.setBoardStates(game.getGameStatistics().getBoardStates());
+            response.setRedPlayerGameTime(game.getGameStatistics().getRedPlayerGameTime());
+            response.setYellowPlayerGameTime(game.getGameStatistics().getYellowPlayerGameTime());
+            response.setGameStartDate(game.getGameStartTime().toString());
+            summaries.add(response);
+        }
+        return summaries;
     }
 }

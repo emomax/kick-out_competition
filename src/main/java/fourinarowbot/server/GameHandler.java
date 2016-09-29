@@ -1,5 +1,7 @@
 package fourinarowbot.server;
 
+import java.util.List;
+
 import fourinarowbot.BoardSearcher;
 import fourinarowbot.SearchResult;
 import fourinarowbot.board.BoardImpl;
@@ -47,5 +49,9 @@ public class GameHandler {
 
     public void killGame(final String gameName) {
         gameRepository.killGame(gameName);
+    }
+
+    public List<Game> getFinishedGames() {
+        return gameRepository.getFinishedGames();
     }
 }

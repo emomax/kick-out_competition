@@ -1,5 +1,6 @@
 package fourinarowbot.server;
 
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +24,7 @@ public class Game {
     private final GameStatistics gameStatistics        = new GameStatistics();
     private final AtomicInteger  numberOfFinishedGames = new AtomicInteger();
     private final GameTimer      gameTimer             = new GameTimer();
+    private final Date           gameStartTime         = new Date();
 
     public Game(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
         this.id = id;
@@ -101,5 +103,9 @@ public class Game {
     public void updateGameStatisticsWithGameTime() {
         gameStatistics.setRedPlayerGameTime(gameTimer.getGameTime(redPlayerName));
         gameStatistics.setYellowPlayerGameTime(gameTimer.getGameTime(yellowPlayerName));
+    }
+
+    public Date getGameStartTime() {
+        return gameStartTime;
     }
 }
