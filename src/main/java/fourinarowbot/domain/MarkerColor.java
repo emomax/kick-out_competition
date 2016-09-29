@@ -1,6 +1,8 @@
 package fourinarowbot.domain;
 
-public enum MarkerColor {
+import java.io.Serializable;
+
+public enum MarkerColor implements Serializable {
 
     RED,
     YELLOW

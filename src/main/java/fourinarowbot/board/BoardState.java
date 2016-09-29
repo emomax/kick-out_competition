@@ -1,8 +1,10 @@
 package fourinarowbot.board;
 
+import java.io.Serializable;
+
 import fourinarowbot.domain.Marker;
 
-public class BoardState {
+public class BoardState implements Serializable {
 
     private Marker[][] markers;
 

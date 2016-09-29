@@ -1,10 +1,12 @@
 package fourinarowbot.board;
 
+import java.io.Serializable;
+
 import fourinarowbot.domain.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
-public class BoardImpl implements Board {
+public class BoardImpl implements Board, Serializable {
 
     private static final int NUMBER_OF_ROWS = 6;
     private static final int NUMBER_OF_COLS = 7;

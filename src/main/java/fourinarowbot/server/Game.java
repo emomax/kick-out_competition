@@ -1,5 +1,6 @@
 package fourinarowbot.server;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,7 +12,7 @@ import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.server.response.GameStatistics;
 
-public class Game {
+public class Game implements Serializable {
 
     private static final int NUMBER_OF_ROUNDS = 10;
 

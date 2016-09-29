@@ -1,6 +1,8 @@
 package fourinarowbot.domain;
 
-public class Marker {
+import java.io.Serializable;
+
+public class Marker implements Serializable {
 
     private MarkerColor color;
     private Coordinates coordinates;

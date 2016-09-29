@@ -1,9 +1,10 @@
 package fourinarowbot.server;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GameTimer {
+public class GameTimer implements Serializable {
 
     private final Map<String, Long> totalGameTimes = new HashMap<>();
     private final Map<String, Long> lastStartTimes = new HashMap<>();

@@ -1,5 +1,6 @@
 package fourinarowbot.server.response;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import fourinarowbot.board.BoardImpl;
 import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.MarkerColor;
 
-public class GameStatistics {
+public class GameStatistics implements Serializable {
 
     private int draws;
     private int redWins;
