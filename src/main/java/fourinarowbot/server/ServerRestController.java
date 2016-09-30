@@ -88,7 +88,7 @@ public class ServerRestController {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:8000")
+    @CrossOrigin
     @RequestMapping("/gameSummary")
     public List<GameSummaryResponse> getGameSummaries() {
         final List<Game>                games     = gameHandler.getFinishedGames();
