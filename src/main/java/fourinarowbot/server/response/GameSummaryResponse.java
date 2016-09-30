@@ -9,6 +9,8 @@ import fourinarowbot.board.BoardState;
 public class GameSummaryResponse {
 
     private UUID uuid;
+    private String redPlayerName;
+    private String yellowPlayerName;
     private int  draws;
     private int  redWins;
     private int  yellowWins;
@@ -16,8 +18,6 @@ public class GameSummaryResponse {
     private long   redPlayerGameTime;
     private long   yellowPlayerGameTime;
     private String gameStartDate;
-    private String redPlayerName;
-    private String yellowPlayerName;
 
     public UUID getUuid() {
         return uuid;
@@ -25,6 +25,22 @@ public class GameSummaryResponse {
 
     public void setUuid(final UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public String getRedPlayerName() {
+        return redPlayerName;
+    }
+
+    public void setRedPlayerName(final String redPlayerName) {
+        this.redPlayerName = redPlayerName;
+    }
+
+    public String getYellowPlayerName() {
+        return yellowPlayerName;
+    }
+
+    public void setYellowPlayerName(final String yellowPlayerName) {
+        this.yellowPlayerName = yellowPlayerName;
     }
 
     public int getDraws() {
@@ -81,21 +97,5 @@ public class GameSummaryResponse {
 
     public void setGameStartDate(final String gameStartDate) {
         this.gameStartDate = gameStartDate;
-    }
-
-    public String getRedPlayerName() {
-        return redPlayerName;
-    }
-
-    public void setRedPlayerName(final String redPlayerName) {
-        this.redPlayerName = redPlayerName;
-    }
-
-    public String getYellowPlayerName() {
-        return yellowPlayerName;
-    }
-
-    public void setYellowPlayerName(final String yellowPlayerName) {
-        this.yellowPlayerName = yellowPlayerName;
     }
 }
