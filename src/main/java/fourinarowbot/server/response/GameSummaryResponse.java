@@ -9,6 +9,7 @@ import fourinarowbot.board.BoardState;
 public class GameSummaryResponse {
 
     private UUID uuid;
+    private String gameName;
     private String redPlayerName;
     private String yellowPlayerName;
     private int  draws;
@@ -25,6 +26,14 @@ public class GameSummaryResponse {
 
     public void setUuid(final UUID uuid) {
         this.uuid = uuid;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(final String gameName) {
+        this.gameName = gameName;
     }
 
     public String getRedPlayerName() {

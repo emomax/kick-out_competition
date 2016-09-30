@@ -96,6 +96,7 @@ public class ServerRestController {
         for (final Game game : games) {
             final GameSummaryResponse response = new GameSummaryResponse();
             response.setUuid(game.getId());
+            response.setGameName(game.getName());
             response.setRedPlayerName(game.getRedPlayerName());
             response.setYellowPlayerName(game.getYellowPlayerName());
             response.setDraws(game.getGameStatistics().getDraws());
