@@ -16,6 +16,8 @@ public class GameSummaryResponse {
     private long   redPlayerGameTime;
     private long   yellowPlayerGameTime;
     private String gameStartDate;
+    private String redPlayerName;
+    private String yellowPlayerName;
 
     public UUID getUuid() {
         return uuid;
@@ -79,5 +81,21 @@ public class GameSummaryResponse {
 
     public void setGameStartDate(final String gameStartDate) {
         this.gameStartDate = gameStartDate;
+    }
+
+    public String getRedPlayerName() {
+        return redPlayerName;
+    }
+
+    public void setRedPlayerName(final String redPlayerName) {
+        this.redPlayerName = redPlayerName;
+    }
+
+    public String getYellowPlayerName() {
+        return yellowPlayerName;
+    }
+
+    public void setYellowPlayerName(final String yellowPlayerName) {
+        this.yellowPlayerName = yellowPlayerName;
     }
 }
