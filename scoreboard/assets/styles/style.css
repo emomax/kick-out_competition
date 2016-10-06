@@ -1,0 +1,21 @@
+body, html, div {
+	background-color: #000;
+	color: #fff;
+}
+
+input {
+	background-color: #333;
+	color: #fff;
+}
+
+td.Y {
+	background-color: #8c851c;
+}
+
+td.R {
+	background-color: #8c1c1c;
+}
+
+.result-row td {
+	border: 1px solid #888;
+}
