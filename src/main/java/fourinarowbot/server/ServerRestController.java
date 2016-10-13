@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import commons.gameengine.Coordinate;
 import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.board.BoardState;
-import commons.gameengine.Coordinates;
 import fourinarowbot.server.response.GameSummaryResponse;
 import fourinarowbot.server.response.ServerResponse;
 
@@ -61,7 +61,7 @@ public class ServerRestController {
             @RequestParam(value = "gameName") final String gameName,
             @RequestParam(value = "x") final Integer x,
             @RequestParam(value = "y") final Integer y) {
-        final Coordinates coordinates = new Coordinates(x, y);
+        final Coordinate coordinates = new Coordinate(x, y);
         try {
             final FourInARowbotGame game = gameHandler.placeMarker(gameName, playerName, coordinates);
             if (game.isGameOver()) {

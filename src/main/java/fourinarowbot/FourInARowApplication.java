@@ -1,8 +1,8 @@
 package fourinarowbot;
 
 import commons.Logger;
+import commons.gameengine.Coordinate;
 import fourinarowbot.board.FourInARowbotBoard;
-import commons.gameengine.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.GameEngine;
@@ -133,11 +133,11 @@ public class FourInARowApplication {
 
     private Marker getNextMarkerToPlace(final boolean isRedPlayerTurn) {
         if (isRedPlayerTurn) {
-            final Coordinates coordinates = redGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.RED);
+            final Coordinate coordinates = redGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.RED);
             return new Marker(MarkerColor.RED, coordinates);
         }
         else {
-            final Coordinates coordinates = yellowGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.YELLOW);
+            final Coordinate coordinates = yellowGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.YELLOW);
             return new Marker(MarkerColor.YELLOW, coordinates);
         }
     }

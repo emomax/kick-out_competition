@@ -6,7 +6,7 @@ import commons.server.GameRepository;
 import fourinarowbot.BoardSearcher;
 import fourinarowbot.SearchResult;
 import fourinarowbot.board.FourInARowbotBoard;
-import commons.gameengine.Coordinates;
+import commons.gameengine.Coordinate;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
@@ -30,7 +30,7 @@ public class GameHandler {
         return gameRepository.getGame(gameName);
     }
 
-    public FourInARowbotGame placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
+    public FourInARowbotGame placeMarker(final String gameName, final String playerName, final Coordinate coordinates) {
         final FourInARowbotGame game = gameRepository.getGame(gameName);
         game.getTimer().stop(playerName);
         final FourInARowbotBoard board         = game.getBoard();

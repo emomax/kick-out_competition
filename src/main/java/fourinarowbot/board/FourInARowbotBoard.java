@@ -2,7 +2,7 @@ package fourinarowbot.board;
 
 import java.io.Serializable;
 
-import commons.gameengine.Coordinates;
+import commons.gameengine.Coordinate;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
@@ -45,7 +45,7 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
 
     private void verifyCoordinatesInsideBoard(final int x, final int y) {
         if (isOutsideBoard(x, y)) {
-            throw new IllegalArgumentException("Coordinates outside fourinarow.board: [" + x + ", " + y + "]");
+            throw new IllegalArgumentException("Coordinate outside fourinarow.board: [" + x + ", " + y + "]");
         }
     }
 
@@ -110,7 +110,7 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
 
     public static void main(final String[] args) {
         final FourInARowbotBoard board = new FourInARowbotBoard();
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(3, 5)));
+        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 5)));
         board.print();
     }
 }

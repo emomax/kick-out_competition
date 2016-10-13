@@ -2,8 +2,8 @@ package fourinarowbot.client;
 
 import org.springframework.web.client.RestTemplate;
 
+import commons.gameengine.Coordinate;
 import fourinarowbot.board.FourInARowbotBoard;
-import commons.gameengine.Coordinates;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.server.response.ServerResponse;
@@ -27,7 +27,7 @@ public class FourInARowRemoteGameImpl implements RemoteGame {
                 return serverResponse;
             }
 
-            final Coordinates coordinates = getCoordinatesForNextMarkerToPlace(playerName, gameEngine, serverResponse);
+            final Coordinate coordinates = getCoordinatesForNextMarkerToPlace(playerName, gameEngine, serverResponse);
             serverResponse = placeMarker(gameName, playerName, coordinates);
             if (serverResponse.getMessage() != null) {
                 return serverResponse;
@@ -35,7 +35,7 @@ public class FourInARowRemoteGameImpl implements RemoteGame {
         }
     }
 
-    private static Coordinates getCoordinatesForNextMarkerToPlace(final String playerName, final GameEngine gameEngine, final ServerResponse response) {
+    private static Coordinate getCoordinatesForNextMarkerToPlace(final String playerName, final GameEngine gameEngine, final ServerResponse response) {
         final FourInARowbotBoard board         = new FourInARowbotBoard(response.getBoardState().getMarkers());
         final MarkerColor        myMarkerColor = getMyMarkerColor(playerName, response);
         return gameEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
@@ -61,7 +61,7 @@ public class FourInARowRemoteGameImpl implements RemoteGame {
         return restTemplate.getForObject(url, ServerResponse.class);
     }
 
-    private static ServerResponse placeMarker(final String gameName, final String playerName, final Coordinates coordinates) {
+    private static ServerResponse placeMarker(final String gameName, final String playerName, final Coordinate coordinates) {
         final RestTemplate restTemplate = new RestTemplate();
         final String       url          = "http://" + SERVER_ADDRESS + "/placeMarker?gameName=" + gameName + "&playerName=" + playerName + "&x=" + coordinates.getX() + "&y=" + coordinates.getY();
         return restTemplate.getForObject(url, ServerResponse.class);

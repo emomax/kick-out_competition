@@ -2,16 +2,16 @@ package commons.gameengine;
 
 import java.io.Serializable;
 
-public class Coordinates implements Serializable {
+public class Coordinate implements Serializable {
 
     private int x;
     private int y;
 
-    private Coordinates() {
+    private Coordinate() {
         // For JSON-serialization
     }
 
-    public Coordinates(final int x, final int y) {
+    public Coordinate(final int x, final int y) {
         this.x = x;
         this.y = y;
     }
@@ -26,7 +26,7 @@ public class Coordinates implements Serializable {
 
     @Override
     public String toString() {
-        return "Coordinates{" +
+        return "Coordinate{" +
                "x=" + x +
                ", y=" + y +
                '}';

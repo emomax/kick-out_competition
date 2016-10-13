@@ -1,9 +1,9 @@
 package fourinarowbot;
 
 import commons.Logger;
+import commons.gameengine.Coordinate;
 import fourinarowbot.board.BoardGameBoard;
 import fourinarowbot.board.FourInARowbotBoard;
-import commons.gameengine.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
@@ -242,32 +242,32 @@ public class BoardSearcher {
         final BoardSearcher      boardSearcher = new BoardSearcher(board);
 
         // Find left -> righr diagonal when starting from "left side"
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(0, 0)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(1, 2)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(2, 3)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(3, 4)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(4, 5)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(0, 0)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(1, 2)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(2, 3)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 4)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(4, 5)));
         //        System.out.println("Is winner found: " + boardSearcher.searchForLeftToRightDiagonalWinner().isWinnerFound());
 
         // Find left -> right when starting from "top side"
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(3, 2)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(4, 3)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(5, 4)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(6, 5)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 2)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(4, 3)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(5, 4)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(6, 5)));
         //        System.out.println("Is winner found: " + boardSearcher.searchForLeftToRightDiagonalWinner().isWinnerFound());
 
         // Find right -> left diagonal when starting from "right side"
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(6, 1)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(5, 2)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(4, 3)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(3, 4)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(6, 1)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(5, 2)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(4, 3)));
+        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 4)));
         //        System.out.println("Is winner found: " + boardSearcher.searchForRightToLeftDiagonalWinner().isWinnerFound());
 
         // Find right -> left when starting from "top side"
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(3, 1)));
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(2, 2)));
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(1, 3)));
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(0, 4)));
+        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 1)));
+        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(2, 2)));
+        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(1, 3)));
+        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(0, 4)));
         System.out.println("Is winner found: " + boardSearcher.searchForRightToLeftDiagonalWinner().isWinnerFound());
         board.print();
     }
