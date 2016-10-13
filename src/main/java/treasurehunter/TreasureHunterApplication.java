@@ -2,14 +2,12 @@ package treasurehunter;
 
 import commons.Logger;
 import commons.board.Board;
+import commons.gameengine.Action;
 import commons.gameengine.GameEngine;
 import treasurehunter.board.PlayerColor;
 import treasurehunter.board.TreasureHunterBoard;
 import treasurehunter.gameengine.TreasureHunterGameEngine;
 
-/**
- * Created by maxjonsson on 2016-10-13.
- */
 public class TreasureHunterApplication {
     final GameEngine     redGameEngine;
     final GameEngine     yellowGameEngine;
@@ -117,7 +115,20 @@ public class TreasureHunterApplication {
     }
 
     private void playNextRound(final boolean isRedPlayerTurn) {
+        Action nextMoveToMake = getNextMoveToMake(isRedPlayerTurn);
+
+        PlayerColor currentPlayer = isRedPlayerTurn ? PlayerColor.RED : PlayerColor.YELLOW;
+
         // TODO implement
+    }
+
+    private Action getNextMoveToMake(boolean isRedPlayerTurn) {
+        if (isRedPlayerTurn) {
+            return redGameEngine.getNextMove(board);
+        }
+        else {
+            return yellowGameEngine.getNextMove(board);
+        }
     }
 
     public static void main(final String[] args) throws InterruptedException {
