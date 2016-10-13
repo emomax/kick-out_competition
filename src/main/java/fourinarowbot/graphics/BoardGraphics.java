@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 
-import fourinarowbot.board.Board;
+import fourinarowbot.board.BoardGameBoard;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
@@ -17,14 +17,14 @@ class BoardGraphics extends JComponent {
     private static final int CELL_SIZE    = 80;
     private static final int BOARD_MARGIN = 15;
 
-    private final Board board;
+    private final BoardGameBoard board;
     private final List<Marker> redMarkers    = new ArrayList<>();
     private final List<Marker> yellowMarkers = new ArrayList<>();
 
     private final int boardWidth;
     private final int boardHeight;
 
-    public BoardGraphics(final Board board) {
+    public BoardGraphics(final BoardGameBoard board) {
         this.board = board;
         boardWidth = board.getNumberOfCols() * CELL_SIZE + BOARD_MARGIN * 2;
         boardHeight = board.getNumberOfRows() * CELL_SIZE + BOARD_MARGIN * 2;

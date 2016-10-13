@@ -1,7 +1,7 @@
 package fourinarowbot.server;
 
-import fourinarowbot.board.BoardImpl;
-import fourinarowbot.domain.Coordinates;
+import fourinarowbot.board.FourInARowbotBoard;
+import commons.gameengine.Coordinates;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 import fourinarowbot.server.response.ServerResponse;
@@ -37,9 +37,9 @@ public class ServerTest {
 
             System.out.println(playerName + " got board");
 
-            final BoardImpl   board         = new BoardImpl(boardStateResponse.getBoardState().getMarkers());
-            final MarkerColor myMarkerColor = getMyMarkerColor(playerName, boardStateResponse);
-            final Coordinates coordinates   = playerEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
+            final FourInARowbotBoard board         = new FourInARowbotBoard(boardStateResponse.getBoardState().getMarkers());
+            final MarkerColor        myMarkerColor = getMyMarkerColor(playerName, boardStateResponse);
+            final Coordinates        coordinates   = playerEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
             //            System.out.println(playerName + " placing marker...");
             final ServerResponse placeMarkerResponse = server.placeMarker(playerName, gameName, coordinates.getX(), coordinates.getY());
             System.out.println(playerName + " placed marker");

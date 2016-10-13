@@ -2,11 +2,11 @@ package fourinarowbot.board;
 
 import java.io.Serializable;
 
-import fourinarowbot.domain.Coordinates;
+import commons.gameengine.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
-public class BoardImpl implements Board, Serializable {
+public class FourInARowbotBoard implements BoardGameBoard, Serializable {
 
     private static final int NUMBER_OF_ROWS = 6;
     private static final int NUMBER_OF_COLS = 7;
@@ -17,11 +17,11 @@ public class BoardImpl implements Board, Serializable {
         return board;
     }
 
-    public BoardImpl() {
+    public FourInARowbotBoard() {
         this.board = new Marker[NUMBER_OF_COLS][NUMBER_OF_ROWS];
     }
 
-    public BoardImpl(final Marker[][] board) {
+    public FourInARowbotBoard(final Marker[][] board) {
         this.board = board;
     }
 
@@ -109,7 +109,7 @@ public class BoardImpl implements Board, Serializable {
     }
 
     public static void main(final String[] args) {
-        final BoardImpl board = new BoardImpl();
+        final FourInARowbotBoard board = new FourInARowbotBoard();
         board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(3, 5)));
         board.print();
     }

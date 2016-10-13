@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fourinarowbot.SearchResult;
-import fourinarowbot.board.BoardImpl;
+import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.MarkerColor;
 
@@ -69,8 +69,8 @@ public class GameStatistics implements Serializable {
 
     public void print(final String redPlayerName, final String yellowPlayerName) {
         boardStates.stream()
-                .map(boardState -> new BoardImpl(boardState.getMarkers()))
-                .forEach(BoardImpl::print);
+                .map(boardState -> new FourInARowbotBoard(boardState.getMarkers()))
+                .forEach(FourInARowbotBoard::print);
         System.out.println("___________________________________");
         System.out.println("");
         System.out.println(" " + redWins + "  " + redPlayerName + " (Red) wins");

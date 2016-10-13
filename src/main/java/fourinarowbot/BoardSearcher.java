@@ -1,16 +1,17 @@
 package fourinarowbot;
 
-import fourinarowbot.board.Board;
-import fourinarowbot.board.BoardImpl;
-import fourinarowbot.domain.Coordinates;
+import commons.Logger;
+import fourinarowbot.board.BoardGameBoard;
+import fourinarowbot.board.FourInARowbotBoard;
+import commons.gameengine.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 
 public class BoardSearcher {
 
-    private final Board board;
+    private final BoardGameBoard board;
 
-    public BoardSearcher(final Board board) {
+    public BoardSearcher(final BoardGameBoard board) {
         this.board = board;
     }
 
@@ -237,8 +238,8 @@ public class BoardSearcher {
     }
 
     public static void main(final String[] args) {
-        final BoardImpl     board         = new BoardImpl();
-        final BoardSearcher boardSearcher = new BoardSearcher(board);
+        final FourInARowbotBoard board         = new FourInARowbotBoard();
+        final BoardSearcher      boardSearcher = new BoardSearcher(board);
 
         // Find left -> righr diagonal when starting from "left side"
         //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinates(0, 0)));

@@ -1,4 +1,4 @@
-package fourinarowbot.server;
+package commons.server;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import fourinarowbot.server.FourInARowbotGame;
+
 
 public class GameDao {
 
@@ -20,7 +22,7 @@ public class GameDao {
 
     private final String workerFileSaveDir = Paths.get("").toAbsolutePath().normalize().toString();
 
-    public void writeGames(final List<Game> games) {
+    public void writeGames(final List<FourInARowbotGame> games) {
         LOG.info("About to write " + games.size() + " games");
 
         final long startTime = System.currentTimeMillis();
@@ -37,10 +39,10 @@ public class GameDao {
         LOG.info("Done writing to file in  " + (System.currentTimeMillis() - startTime) + " ms.");
     }
 
-    public List<Game> readGames() {
+    public List<FourInARowbotGame> readGames() {
         final long startTime = System.currentTimeMillis();
         try {
-            final List<Game> games = readGamesFromFile(workerFileSaveDir, FILE_NAME);
+            final List<FourInARowbotGame> games = readGamesFromFile(workerFileSaveDir, FILE_NAME);
             LOG.info("Done reading from file in " + (System.currentTimeMillis() - startTime) + " ms.");
             return games;
         }
@@ -55,10 +57,10 @@ public class GameDao {
         }
     }
 
-    private List<Game> readGamesFromFile(final String currentDir, final String fileName) throws IOException, ClassNotFoundException {
-        final FileInputStream   fileInputStream   = new FileInputStream(currentDir + "/" + fileName);
-        final ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-        final List<Game>        games             = (List<Game>) objectInputStream.readObject();
+    private List<FourInARowbotGame> readGamesFromFile(final String currentDir, final String fileName) throws IOException, ClassNotFoundException {
+        final FileInputStream         fileInputStream   = new FileInputStream(currentDir + "/" + fileName);
+        final ObjectInputStream       objectInputStream = new ObjectInputStream(fileInputStream);
+        final List<FourInARowbotGame> games             = (List<FourInARowbotGame>) objectInputStream.readObject();
         objectInputStream.close();
         return games;
     }

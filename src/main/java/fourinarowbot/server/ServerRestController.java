@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fourinarowbot.board.BoardImpl;
+import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.board.BoardState;
-import fourinarowbot.domain.Coordinates;
+import commons.gameengine.Coordinates;
 import fourinarowbot.server.response.GameSummaryResponse;
 import fourinarowbot.server.response.ServerResponse;
 
@@ -35,15 +35,15 @@ public class ServerRestController {
     }
 
     private ServerResponse getBoardStateResponse(final @RequestParam(value = "playerName") String playerName, final @RequestParam(value = "gameName") String gameName) throws InterruptedException {
-        final BoardImpl      board      = gameHandler.getBoard(gameName, playerName);
-        final BoardState     boardState = new BoardState(board.getBoard());
-        final Game           game       = gameHandler.getGame(gameName);
-        final ServerResponse response   = new ServerResponse();
+        final FourInARowbotBoard board      = gameHandler.getBoard(gameName, playerName);
+        final BoardState         boardState = new BoardState(board.getBoard());
+        final FourInARowbotGame  game       = gameHandler.getGame(gameName);
+        final ServerResponse     response   = new ServerResponse();
         response.setRedPlayerName(game.getRedPlayerName());
         response.setYellowPlayerName(game.getYellowPlayerName());
 
         if (game.isGameOver()) {
-            response.setMessage("Game over!");
+            response.setMessage("FourInARowbotGame over!");
             game.updateGameStatisticsWithGameTime();
             response.setGameStatistics(game.getGameStatistics());
             gameHandler.killGame(gameName);
@@ -63,10 +63,10 @@ public class ServerRestController {
             @RequestParam(value = "y") final Integer y) {
         final Coordinates coordinates = new Coordinates(x, y);
         try {
-            final Game game = gameHandler.placeMarker(gameName, playerName, coordinates);
+            final FourInARowbotGame game = gameHandler.placeMarker(gameName, playerName, coordinates);
             if (game.isGameOver()) {
                 final ServerResponse response = new ServerResponse();
-                response.setMessage("Game over!");
+                response.setMessage("FourInARowbotGame over!");
                 game.updateGameStatisticsWithGameTime();
                 response.setGameStatistics(game.getGameStatistics());
                 response.setRedPlayerName(game.getRedPlayerName());
@@ -78,8 +78,8 @@ public class ServerRestController {
             }
         }
         catch (final Exception e) {
-            final Game       game       = gameHandler.getGame(gameName);
-            final BoardState boardState = new BoardState(game.getBoard().getBoard());
+            final FourInARowbotGame game       = gameHandler.getGame(gameName);
+            final BoardState        boardState = new BoardState(game.getBoard().getBoard());
             gameHandler.killGame(gameName);
             final ServerResponse response = new ServerResponse();
             response.setBoardState(boardState);
@@ -91,9 +91,9 @@ public class ServerRestController {
     @CrossOrigin
     @RequestMapping("/gameSummary")
     public List<GameSummaryResponse> getGameSummaries() {
-        final List<Game>                games     = gameHandler.getFinishedGames();
+        final List<FourInARowbotGame>   games     = gameHandler.getFinishedGames();
         final List<GameSummaryResponse> summaries = new ArrayList<>();
-        for (final Game game : games) {
+        for (final FourInARowbotGame game : games) {
             final GameSummaryResponse response = new GameSummaryResponse();
             response.setUuid(game.getId());
             response.setGameName(game.getName());

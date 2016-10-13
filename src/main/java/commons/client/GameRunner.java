@@ -1,8 +1,9 @@
-package fourinarowbot.client;
+package commons.client;
 
+import fourinarowbot.client.FourInARowRemoteGameImpl;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.gameengine.MyN00bGameEngine;
-import kickoutcompetition.client.RemoteGame;
+import commons.client.RemoteGame;
 
 public class GameRunner {
 

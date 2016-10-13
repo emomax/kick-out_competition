@@ -32,7 +32,7 @@
     </build>
 
     <properties>
-        <start-class>fourinarowbot.server.ServerApplication</start-class>
+        <start-class>commons.server.ServerApplication</start-class>
         <java.version>1.8</java.version>
     </properties>
 

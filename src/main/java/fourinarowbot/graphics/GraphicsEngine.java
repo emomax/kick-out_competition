@@ -5,7 +5,7 @@ import javax.swing.JApplet;
 import javax.swing.JFrame;
 
 import fourinarowbot.FourInARowApplication;
-import fourinarowbot.board.Board;
+import fourinarowbot.board.BoardGameBoard;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 
@@ -13,7 +13,7 @@ public class GraphicsEngine extends JApplet {
 
     private final BoardGraphics boardGraphics;
 
-    public GraphicsEngine(final Board board) {
+    public GraphicsEngine(final BoardGameBoard board) {
         boardGraphics = new BoardGraphics(board);
 
         this.setLayout(new BorderLayout());

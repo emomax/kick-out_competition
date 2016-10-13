@@ -1,4 +1,4 @@
-package fourinarowbot.server;
+package commons.server;
 
 import java.io.Serializable;
 import java.util.HashMap;

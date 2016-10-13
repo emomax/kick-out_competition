@@ -1,4 +1,4 @@
-package fourinarowbot.domain;
+package commons.gameengine;
 
 import java.io.Serializable;
 

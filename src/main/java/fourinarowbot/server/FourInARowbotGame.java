@@ -6,13 +6,15 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import commons.server.Game;
+import commons.server.GameTimer;
 import fourinarowbot.SearchResult;
-import fourinarowbot.board.BoardImpl;
+import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.board.BoardState;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.server.response.GameStatistics;
 
-public class Game implements Serializable {
+public class FourInARowbotGame implements Game, Serializable {
 
     private static final int NUMBER_OF_ROUNDS = 10;
 
@@ -20,14 +22,14 @@ public class Game implements Serializable {
     private final String name;
     private final String redPlayerName;
     private       String yellowPlayerName;
-    private final BoardImpl      board                 = new BoardImpl();
-    private final AtomicBoolean  isRedPlayerTurn       = new AtomicBoolean(true);
-    private final GameStatistics gameStatistics        = new GameStatistics();
-    private final AtomicInteger  numberOfFinishedGames = new AtomicInteger();
-    private final GameTimer      gameTimer             = new GameTimer();
-    private final Date           gameStartTime         = new Date();
+    private final FourInARowbotBoard board                 = new FourInARowbotBoard();
+    private final AtomicBoolean      isRedPlayerTurn       = new AtomicBoolean(true);
+    private final GameStatistics     gameStatistics        = new GameStatistics();
+    private final AtomicInteger      numberOfFinishedGames = new AtomicInteger();
+    private final GameTimer          gameTimer             = new GameTimer();
+    private final Date               gameStartTime         = new Date();
 
-    public Game(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
+    public FourInARowbotGame(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
         this.id = id;
         this.name = name;
         this.redPlayerName = redPlayerName;
@@ -41,7 +43,7 @@ public class Game implements Serializable {
         return name;
     }
 
-    public synchronized BoardImpl getBoard() {
+    public synchronized FourInARowbotBoard getBoard() {
         return board;
     }
 
@@ -91,7 +93,7 @@ public class Game implements Serializable {
         return numberOfFinishedGames.get() == NUMBER_OF_ROUNDS;
     }
 
-    public synchronized void setRoundOver(final SearchResult gameStatusAfterPlacing, final BoardImpl board) {
+    public synchronized void setRoundOver(final SearchResult gameStatusAfterPlacing, final FourInARowbotBoard board) {
         gameStatistics.updateStatistics(gameStatusAfterPlacing, new BoardState(board.getBoard()));
         numberOfFinishedGames.incrementAndGet();
         this.board.reset();

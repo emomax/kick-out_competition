@@ -1,4 +1,4 @@
-package fourinarowbot;
+package commons;
 
 public class Logger {
 

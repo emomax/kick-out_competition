@@ -1,10 +1,10 @@
 package fourinarowbot.gameengine;
 
-import fourinarowbot.board.Board;
-import fourinarowbot.domain.Coordinates;
+import fourinarowbot.board.BoardGameBoard;
+import commons.gameengine.Coordinates;
 import fourinarowbot.domain.MarkerColor;
 
 public interface GameEngine {
 
-    Coordinates getCoordinatesForNextMakerToPlace(Board board, MarkerColor myColor);
+    Coordinates getCoordinatesForNextMakerToPlace(BoardGameBoard board, MarkerColor myColor);
 }

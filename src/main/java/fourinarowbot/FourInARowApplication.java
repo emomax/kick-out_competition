@@ -1,7 +1,8 @@
 package fourinarowbot;
 
-import fourinarowbot.board.BoardImpl;
-import fourinarowbot.domain.Coordinates;
+import commons.Logger;
+import fourinarowbot.board.FourInARowbotBoard;
+import commons.gameengine.Coordinates;
 import fourinarowbot.domain.Marker;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.GameEngine;
@@ -10,17 +11,17 @@ import fourinarowbot.graphics.GraphicsEngine;
 
 public class FourInARowApplication {
 
-    final GameEngine     redGameEngine;
-    final GameEngine     yellowGameEngine;
-    final BoardImpl      board;
-    final GraphicsEngine graphicsEngine;
-    final BoardSearcher  boardSearcher;
-    final boolean        graphicsEnabled;
+    final GameEngine         redGameEngine;
+    final GameEngine         yellowGameEngine;
+    final FourInARowbotBoard board;
+    final GraphicsEngine     graphicsEngine;
+    final BoardSearcher      boardSearcher;
+    final boolean            graphicsEnabled;
 
     public FourInARowApplication(final GameEngine redGameEngine) {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new MyN00bGameEngine();
-        this.board = new BoardImpl();
+        this.board = new FourInARowbotBoard();
         this.boardSearcher = new BoardSearcher(board);
         this.graphicsEngine = new GraphicsEngine(board);
         this.graphicsEnabled = false;
@@ -30,7 +31,7 @@ public class FourInARowApplication {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new MyN00bGameEngine();
         //        this.yellowGameEngine = new ClosestGameEngine(MarkerColor.YELLOW);
-        this.board = new BoardImpl();
+        this.board = new FourInARowbotBoard();
         this.boardSearcher = new BoardSearcher(board);
         this.graphicsEnabled = graphicsEnabled;
         if (graphicsEnabled) {

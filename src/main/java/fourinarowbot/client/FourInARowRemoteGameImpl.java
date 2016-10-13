@@ -2,16 +2,16 @@ package fourinarowbot.client;
 
 import org.springframework.web.client.RestTemplate;
 
-import fourinarowbot.board.BoardImpl;
-import fourinarowbot.domain.Coordinates;
+import fourinarowbot.board.FourInARowbotBoard;
+import commons.gameengine.Coordinates;
 import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.server.response.ServerResponse;
-import kickoutcompetition.client.RemoteGame;
+import commons.client.RemoteGame;
 
 public class FourInARowRemoteGameImpl implements RemoteGame {
 
-    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // Game server
+    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // FourInARowbotGame server
     //    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
 
     public void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
@@ -36,8 +36,8 @@ public class FourInARowRemoteGameImpl implements RemoteGame {
     }
 
     private static Coordinates getCoordinatesForNextMarkerToPlace(final String playerName, final GameEngine gameEngine, final ServerResponse response) {
-        final BoardImpl   board         = new BoardImpl(response.getBoardState().getMarkers());
-        final MarkerColor myMarkerColor = getMyMarkerColor(playerName, response);
+        final FourInARowbotBoard board         = new FourInARowbotBoard(response.getBoardState().getMarkers());
+        final MarkerColor        myMarkerColor = getMyMarkerColor(playerName, response);
         return gameEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
     }
 

@@ -1,4 +1,4 @@
-package kickoutcompetition.client;
+package commons.client;
 
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.server.response.ServerResponse;
