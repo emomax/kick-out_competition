@@ -8,4 +8,7 @@ public interface Board {
     int getNumberOfCols();
 
     boolean isOutsideBoard(final int x, final int y);
+
+    void print();
+    void reset();
 }

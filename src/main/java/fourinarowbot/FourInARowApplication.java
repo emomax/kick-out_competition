@@ -125,6 +125,7 @@ public class FourInARowApplication {
 
     private void playNextRound(final boolean isRedPlayerTurn) {
         final Marker nextMarkerToPlace = getNextMarkerToPlace(isRedPlayerTurn);
+
         board.placeMarker(nextMarkerToPlace);
         if (graphicsEnabled) {
             graphicsEngine.repaintGraphics(nextMarkerToPlace);
