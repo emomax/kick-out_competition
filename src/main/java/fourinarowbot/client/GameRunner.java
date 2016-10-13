@@ -2,6 +2,7 @@ package fourinarowbot.client;
 
 import fourinarowbot.gameengine.GameEngine;
 import fourinarowbot.gameengine.MyN00bGameEngine;
+import kickoutcompetition.client.RemoteGame;
 
 public class GameRunner {
 
@@ -10,6 +11,7 @@ public class GameRunner {
         final String     gameName     = "MyGame1";
         final GameEngine myGameEngine = new MyN00bGameEngine();
 
-        RemoteGame.startGame(playerName, gameName, myGameEngine);
+        RemoteGame gameInstance = new FourInARowRemoteGameImpl();
+        gameInstance.startGame(playerName, gameName, myGameEngine);
     }
 }
