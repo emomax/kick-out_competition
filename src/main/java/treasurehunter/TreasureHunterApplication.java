@@ -2,31 +2,29 @@ package treasurehunter;
 
 import commons.Logger;
 import commons.board.Board;
-import commons.gameengine.Action;
 import commons.gameengine.GameEngine;
-import treasurehunter.board.PlayerColor;
+import commons.board.PlayerColor;
 import treasurehunter.board.TreasureHunterBoard;
-import treasurehunter.gameengine.TreasureHunterGameEngine;
+import treasurehunter.domain.TreasureHunterAction;
+import treasurehunter.gameengine.MyN00bTreasureHunterGameEngine;
+import treasurehunter.gameengine.SmartRandomTreasureHunterGameEngine;
 
 public class TreasureHunterApplication {
-    final GameEngine     redGameEngine;
-    final GameEngine     yellowGameEngine;
-    final Board          board;
-    final boolean        graphicsEnabled;
+    private final GameEngine     redGameEngine;
+    private final GameEngine     yellowGameEngine;
+    private final Board          board;
+    private final boolean        graphicsEnabled;
 
     public TreasureHunterApplication(final GameEngine redGameEngine) {
-        this.redGameEngine = redGameEngine;
-        this.yellowGameEngine = new TreasureHunterGameEngine();
-        this.board = new TreasureHunterBoard();
-        this.graphicsEnabled = false;
+        this(redGameEngine, false);
     }
 
     public TreasureHunterApplication(final GameEngine redGameEngine, final boolean graphicsEnabled) {
         this.redGameEngine = redGameEngine;
-        this.yellowGameEngine = new TreasureHunterGameEngine();
-        //        this.yellowGameEngine = new ClosestGameEngine(MarkerColor.YELLOW);
+        this.yellowGameEngine = new SmartRandomTreasureHunterGameEngine();
         this.board = new TreasureHunterBoard();
         this.graphicsEnabled = graphicsEnabled;
+
         if (graphicsEnabled) {
             // TODO add graphics
         }
@@ -36,13 +34,12 @@ public class TreasureHunterApplication {
     }
 
     public void runGameOnce() {
-        final boolean printBoardEveryRound = false;
-        int           draws                = 0;
-        int           redWins              = 0;
-        int           yellowWins           = 0;
+        System.out.println("Running game, once!");
+        final boolean printBoardEveryRound = true;
         final GameResult searchResult         = startGame(printBoardEveryRound);
 
-        board.print();
+        searchResult.printScore();
+        System.out.println("The winner is: " + searchResult.getWinnerColor());
     }
 
     public void runGameMultipleGames(final int numberOfGames) {
@@ -76,12 +73,9 @@ public class TreasureHunterApplication {
     private GameResult startGame(final boolean printBoardEveryRound) {
         boolean      isRedPlayerTurn = true;
         GameResult gameResult = GameResult.ResultWithoutWinner();
-        while (!gameResult.isGameOver()) {
+        while (!gameResult.noMoreTreasures()) {
             try {
                 playNextRound(isRedPlayerTurn);
-            }
-            catch (final NullPointerException exception) {
-                throw new RuntimeException("Null is not a good place to be.", exception);
             }
             catch (final Exception e) {
                 if (isRedPlayerTurn) {
@@ -98,12 +92,13 @@ public class TreasureHunterApplication {
 
             // Print to console, for development
             if (printBoardEveryRound) {
+                gameResult.printScore();
                 board.print();
             }
 
             // A nice pace =o)
             try {
-                Thread.sleep(300);
+                Thread.sleep(60L);
             }
             catch (final InterruptedException e) {
                 e.printStackTrace();
@@ -115,26 +110,26 @@ public class TreasureHunterApplication {
     }
 
     private void playNextRound(final boolean isRedPlayerTurn) {
-        Action nextMoveToMake = getNextMoveToMake(isRedPlayerTurn);
+        TreasureHunterAction nextMoveToMake = getNextMoveToMake(isRedPlayerTurn);
+        PlayerColor          currentPlayer  = isRedPlayerTurn ? PlayerColor.RED : PlayerColor.YELLOW;
 
-        PlayerColor currentPlayer = isRedPlayerTurn ? PlayerColor.RED : PlayerColor.YELLOW;
-
-        // TODO implement
+        ((TreasureHunterBoard) board).movePlayer(currentPlayer, nextMoveToMake);
     }
 
-    private Action getNextMoveToMake(boolean isRedPlayerTurn) {
+    private TreasureHunterAction getNextMoveToMake(boolean isRedPlayerTurn) {
         if (isRedPlayerTurn) {
-            return redGameEngine.getNextMove(board);
+            return (TreasureHunterAction) redGameEngine.getNextMove(board, PlayerColor.RED);
         }
         else {
-            return yellowGameEngine.getNextMove(board);
+            return (TreasureHunterAction) yellowGameEngine.getNextMove(board, PlayerColor.YELLOW);
         }
     }
 
     public static void main(final String[] args) throws InterruptedException {
         Logger.setDebugLogOn(false);
-        final TreasureHunterApplication application = new TreasureHunterApplication(new TreasureHunterGameEngine());
+        final TreasureHunterApplication application = new TreasureHunterApplication(new MyN00bTreasureHunterGameEngine());
+
         //        application.runGameOnce();
-        application.runGameMultipleGames(100);
+        //application.runGameMultipleGames(100);
     }
 }

@@ -3,9 +3,6 @@ package commons.server;
 import java.util.Date;
 import java.util.UUID;
 
-/**
- * Created by maxjonsson on 2016-10-13.
- */
 public interface Game {
     UUID getId();
     String getName();

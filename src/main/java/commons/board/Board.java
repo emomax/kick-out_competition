@@ -1,13 +1,12 @@
 package commons.board;
 
-/**
- * Created by maxjonsson on 2016-10-13.
- */
+import commons.gameengine.Coordinate;
+
 public interface Board {
     int getNumberOfRows();
     int getNumberOfCols();
 
-    boolean isOutsideBoard(final int x, final int y);
+    boolean isOutsideBoard(Coordinate coordinate);
 
     void print();
     void reset();
