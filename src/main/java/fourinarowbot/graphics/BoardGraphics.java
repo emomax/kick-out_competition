@@ -9,22 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 
-import fourinarowbot.board.BoardGameBoard;
+import commons.gameengine.board.PlayerColor;
+import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.domain.Marker;
-import fourinarowbot.domain.MarkerColor;
 
 class BoardGraphics extends JComponent {
     private static final int CELL_SIZE    = 80;
     private static final int BOARD_MARGIN = 15;
 
-    private final BoardGameBoard board;
+    private final FourInARowbotBoard board;
     private final List<Marker> redMarkers    = new ArrayList<>();
     private final List<Marker> yellowMarkers = new ArrayList<>();
 
     private final int boardWidth;
     private final int boardHeight;
 
-    public BoardGraphics(final BoardGameBoard board) {
+    public BoardGraphics(final FourInARowbotBoard board) {
         this.board = board;
         boardWidth = board.getNumberOfCols() * CELL_SIZE + BOARD_MARGIN * 2;
         boardHeight = board.getNumberOfRows() * CELL_SIZE + BOARD_MARGIN * 2;
@@ -33,7 +33,7 @@ class BoardGraphics extends JComponent {
     }
 
     public void addNextMarkerToPaint(final Marker nextMarkerToPlace) {
-        if (nextMarkerToPlace.getColor() == MarkerColor.RED) {
+        if (nextMarkerToPlace.getColor() == PlayerColor.RED) {
             redMarkers.add(nextMarkerToPlace);
         }
         else {
@@ -66,7 +66,7 @@ class BoardGraphics extends JComponent {
                 final int circleCenterX          = circleUpperLeftCornerX + diameter / 2;
                 final int circleCenterY          = circleUpperLeftCornerY + diameter / 2;
 
-                final Marker marker = board.getMarker(col, row);
+                final Marker marker = board.get(col, row);
                 if (marker != null) {
                     paintMarker(g2, diameter, circleUpperLeftCornerX, circleUpperLeftCornerY, marker);
                     paintMarkerNumber(g2, circleCenterX, circleCenterY, marker);
@@ -80,13 +80,13 @@ class BoardGraphics extends JComponent {
 
     private void paintMarker(final Graphics2D g2, final int diameter, final int circleUpperLeftCornerX,
             final int circleUpperLeftCornerY, final Marker marker) {
-        final Color color = convertMarkerColorToAwt(marker.getColor());
+        final Color color = convertPlayerColorToAwt(marker.getColor());
         g2.setColor(color);
         g2.fillOval(circleUpperLeftCornerX, circleUpperLeftCornerY, diameter, diameter);
     }
 
     private void paintMarkerNumber(final Graphics2D g2, final int circleCenterX, final int circleCenterY, final Marker marker) {
-        if (marker.getColor() == MarkerColor.RED) {
+        if (marker.getColor() == PlayerColor.RED) {
             g2.setColor(Color.WHITE);
             final String markerNumber = String.valueOf(redMarkers.indexOf(marker) + 1);
             g2.drawString(String.valueOf(markerNumber), circleCenterX, circleCenterY);
@@ -98,8 +98,8 @@ class BoardGraphics extends JComponent {
         }
     }
 
-    private Color convertMarkerColorToAwt(final MarkerColor markerColor) {
-        if (markerColor == MarkerColor.RED) {
+    private Color convertPlayerColorToAwt(final PlayerColor markerColor) {
+        if (markerColor == PlayerColor.RED) {
             return Color.RED;
         }
         else {

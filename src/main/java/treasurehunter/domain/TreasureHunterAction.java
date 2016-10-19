@@ -1,28 +1,22 @@
 package treasurehunter.domain;
 
 import commons.gameengine.Action;
-import commons.gameengine.Coordinate;
-import treasurehunter.domain.Move;
 
-public class TreasureHunterAction implements Action {
-    Coordinate                 coordinate;
-    treasurehunter.domain.Move move;
+public class TreasureHunterAction implements Action<Move> {
+    Move move;
+
+    public TreasureHunterAction(Move move) {
+        this.move = move;
+        System.out.println("Move is now: " + move.toString());
+    }
 
     @Override
-    public Coordinate getCoordinates() {
-        return coordinate;
+    public Move get() {
+        return move;
     }
 
     @Override
     public String getMethod() {
         return "move";
-    }
-
-    public void setMove(Move direction) {
-        this.move = direction;
-    }
-
-    public Move getMove() {
-        return move;
     }
 }

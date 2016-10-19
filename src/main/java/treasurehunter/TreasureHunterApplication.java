@@ -1,36 +1,22 @@
 package treasurehunter;
 
 import commons.Logger;
-import commons.board.Board;
-import commons.gameengine.GameEngine;
-import commons.board.PlayerColor;
+import commons.gameengine.board.PlayerColor;
 import treasurehunter.board.TreasureHunterBoard;
-import treasurehunter.domain.TreasureHunterAction;
+import treasurehunter.domain.Move;
 import treasurehunter.gameengine.MyN00bTreasureHunterGameEngine;
 import treasurehunter.gameengine.SmartRandomTreasureHunterGameEngine;
+import treasurehunter.gameengine.TreasureHunterGameEngine;
 
 public class TreasureHunterApplication {
-    private final GameEngine     redGameEngine;
-    private final GameEngine     yellowGameEngine;
-    private final Board          board;
-    private final boolean        graphicsEnabled;
+    private final TreasureHunterGameEngine redGameEngine;
+    private final TreasureHunterGameEngine yellowGameEngine;
+    private final TreasureHunterBoard      board;
 
-    public TreasureHunterApplication(final GameEngine redGameEngine) {
-        this(redGameEngine, false);
-    }
-
-    public TreasureHunterApplication(final GameEngine redGameEngine, final boolean graphicsEnabled) {
+    public TreasureHunterApplication(final TreasureHunterGameEngine redGameEngine) {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new SmartRandomTreasureHunterGameEngine();
         this.board = new TreasureHunterBoard();
-        this.graphicsEnabled = graphicsEnabled;
-
-        if (graphicsEnabled) {
-            // TODO add graphics
-        }
-        else {
-            // TODO omit graphics
-        }
     }
 
     public void runGameOnce() {
@@ -39,7 +25,7 @@ public class TreasureHunterApplication {
         final GameResult searchResult         = startGame(printBoardEveryRound);
 
         searchResult.printScore();
-        System.out.println("The winner is: " + searchResult.getWinnerColor());
+        System.out.println("The winner is: " + searchResult.getWinnerPlayerColor());
     }
 
     public void runGameMultipleGames(final int numberOfGames) {
@@ -54,8 +40,8 @@ public class TreasureHunterApplication {
                 draws++;
             }
             else {
-                System.out.println(i + ". " + searchResult.getWinnerColor());
-                if (searchResult.getWinnerColor() == PlayerColor.RED) {
+                System.out.println(i + ". " + searchResult.getWinnerPlayerColor());
+                if (searchResult.getWinnerPlayerColor() == PlayerColor.RED) {
                     redWins++;
                 }
                 else {
@@ -110,18 +96,18 @@ public class TreasureHunterApplication {
     }
 
     private void playNextRound(final boolean isRedPlayerTurn) {
-        TreasureHunterAction nextMoveToMake = getNextMoveToMake(isRedPlayerTurn);
-        PlayerColor          currentPlayer  = isRedPlayerTurn ? PlayerColor.RED : PlayerColor.YELLOW;
+        Move        nextMoveToMake = getNextMoveToMake(isRedPlayerTurn);
+        PlayerColor currentPlayer  = isRedPlayerTurn ? PlayerColor.RED : PlayerColor.YELLOW;
 
-        ((TreasureHunterBoard) board).movePlayer(currentPlayer, nextMoveToMake);
+        board.movePlayer(currentPlayer, nextMoveToMake);
     }
 
-    private TreasureHunterAction getNextMoveToMake(boolean isRedPlayerTurn) {
+    private Move getNextMoveToMake(boolean isRedPlayerTurn) {
         if (isRedPlayerTurn) {
-            return (TreasureHunterAction) redGameEngine.getNextMove(board, PlayerColor.RED);
+            return redGameEngine.getNextMove(board, PlayerColor.RED).get();
         }
         else {
-            return (TreasureHunterAction) yellowGameEngine.getNextMove(board, PlayerColor.YELLOW);
+            return yellowGameEngine.getNextMove(board, PlayerColor.YELLOW).get();
         }
     }
 
@@ -129,7 +115,7 @@ public class TreasureHunterApplication {
         Logger.setDebugLogOn(false);
         final TreasureHunterApplication application = new TreasureHunterApplication(new MyN00bTreasureHunterGameEngine());
 
-        //        application.runGameOnce();
+                application.runGameOnce();
         //application.runGameMultipleGames(100);
     }
 }

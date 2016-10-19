@@ -4,17 +4,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import commons.gameengine.board.BoardState;
+import commons.gameengine.board.PlayerColor;
 import fourinarowbot.SearchResult;
 import fourinarowbot.board.FourInARowbotBoard;
-import fourinarowbot.board.BoardState;
-import fourinarowbot.domain.MarkerColor;
+import fourinarowbot.domain.Marker;
 
 public class GameStatistics implements Serializable {
 
     private int draws;
     private int redWins;
     private int yellowWins;
-    private final List<BoardState> boardStates = new ArrayList<>();
+    private final List<BoardState<Marker>> boardStates = new ArrayList<>();
     private long redPlayerGameTime;
     private long yellowPlayerGameTime;
 
@@ -34,15 +35,15 @@ public class GameStatistics implements Serializable {
     }
 
     // For JSON-serialization only
-    public List<BoardState> getBoardStates() {
+    public List<BoardState<Marker>> getBoardStates() {
         return boardStates;
     }
 
-    public void updateStatistics(final SearchResult searchResult, final BoardState boardState) {
+    public void updateStatistics(final SearchResult searchResult, final BoardState<Marker> boardState) {
         if (searchResult.isDraw()) {
             draws++;
         }
-        else if (searchResult.getWinnerMarkerColor() == MarkerColor.RED) {
+        else if (searchResult.getWinnerPlayerColor() == PlayerColor.RED) {
             redWins++;
         }
         else {
@@ -69,7 +70,7 @@ public class GameStatistics implements Serializable {
 
     public void print(final String redPlayerName, final String yellowPlayerName) {
         boardStates.stream()
-                .map(boardState -> new FourInARowbotBoard(boardState.getMarkers()))
+                .map(boardState -> new FourInARowbotBoard(boardState.getCells()))
                 .forEach(FourInARowbotBoard::print);
         System.out.println("___________________________________");
         System.out.println("");

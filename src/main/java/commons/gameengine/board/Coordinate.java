@@ -1,4 +1,4 @@
-package commons.gameengine;
+package commons.gameengine.board;
 
 import java.io.Serializable;
 

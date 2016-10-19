@@ -6,12 +6,12 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import commons.server.Game;
-import commons.server.GameTimer;
+import commons.gameengine.board.BoardState;
+import commons.gameengine.board.PlayerColor;
+import commons.network.server.Game;
+import commons.network.server.GameTimer;
 import fourinarowbot.SearchResult;
 import fourinarowbot.board.FourInARowbotBoard;
-import fourinarowbot.board.BoardState;
-import fourinarowbot.domain.MarkerColor;
 import fourinarowbot.server.response.GameStatistics;
 
 public class FourInARowbotGame implements Game, Serializable {
@@ -20,7 +20,7 @@ public class FourInARowbotGame implements Game, Serializable {
 
     private final UUID   id;
     private final String name;
-    private final String redPlayerName;
+    private       String redPlayerName;
     private       String yellowPlayerName;
     private final FourInARowbotBoard board                 = new FourInARowbotBoard();
     private final AtomicBoolean      isRedPlayerTurn       = new AtomicBoolean(true);
@@ -47,13 +47,17 @@ public class FourInARowbotGame implements Game, Serializable {
         return board;
     }
 
-    public MarkerColor getPlayerColor(final String playerName) {
+    public PlayerColor getPlayerColor(final String playerName) {
         if (redPlayerName.equals(playerName)) {
-            return MarkerColor.RED;
+            return PlayerColor.RED;
         }
         else {
-            return MarkerColor.YELLOW;
+            return PlayerColor.YELLOW;
         }
+    }
+
+    public void setRedPlayerName(String redPlayerName) {
+        this.redPlayerName = redPlayerName;
     }
 
     public String getRedPlayerName() {
@@ -73,12 +77,12 @@ public class FourInARowbotGame implements Game, Serializable {
     }
 
     public void waitForMyTurn(final String playerName) throws InterruptedException {
-        final MarkerColor playerColor = getPlayerColor(playerName);
+        final PlayerColor playerColor = getPlayerColor(playerName);
         while (true) {
-            if (playerColor.equals(MarkerColor.RED) && isRedPlayerTurn.get()) {
+            if (playerColor.equals(PlayerColor.RED) && isRedPlayerTurn.get()) {
                 break;
             }
-            else if (playerColor.equals(MarkerColor.YELLOW) && !isRedPlayerTurn.get()) {
+            else if (playerColor.equals(PlayerColor.YELLOW) && !isRedPlayerTurn.get()) {
                 break;
             }
             Thread.sleep(20);
@@ -94,7 +98,7 @@ public class FourInARowbotGame implements Game, Serializable {
     }
 
     public synchronized void setRoundOver(final SearchResult gameStatusAfterPlacing, final FourInARowbotBoard board) {
-        gameStatistics.updateStatistics(gameStatusAfterPlacing, new BoardState(board.getBoard()));
+        gameStatistics.updateStatistics(gameStatusAfterPlacing, new BoardState<>(board.getBoard()));
         numberOfFinishedGames.incrementAndGet();
         this.board.reset();
     }

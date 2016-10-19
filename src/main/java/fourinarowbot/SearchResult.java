@@ -1,18 +1,18 @@
 package fourinarowbot;
 
-import fourinarowbot.domain.MarkerColor;
+import commons.gameengine.board.PlayerColor;
 
 public class SearchResult {
-    private final MarkerColor winnerMarkerColor;
+    private final PlayerColor winnerPlayerColor;
     private final boolean     draw;
 
-    public SearchResult(final MarkerColor winnerMarkerColor, final boolean draw) {
-        this.winnerMarkerColor = winnerMarkerColor;
+    public SearchResult(final PlayerColor winnerPlayerColor, final boolean draw) {
+        this.winnerPlayerColor = winnerPlayerColor;
         this.draw = draw;
     }
 
-    public static SearchResult resultWithWinner(final MarkerColor winnerMarkerColor) {
-        return new SearchResult(winnerMarkerColor, false);
+    public static SearchResult resultWithWinner(final PlayerColor winnerPlayerColor) {
+        return new SearchResult(winnerPlayerColor, false);
     }
 
     public static SearchResult resultWithoutWinner() {
@@ -24,11 +24,11 @@ public class SearchResult {
     }
 
     public boolean isWinnerFound() {
-        return winnerMarkerColor != null;
+        return winnerPlayerColor != null;
     }
 
-    public MarkerColor getWinnerMarkerColor() {
-        return winnerMarkerColor;
+    public PlayerColor getWinnerPlayerColor() {
+        return winnerPlayerColor;
     }
 
     public boolean isDraw() {

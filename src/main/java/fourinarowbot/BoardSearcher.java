@@ -1,17 +1,16 @@
 package fourinarowbot;
 
 import commons.Logger;
-import commons.gameengine.Coordinate;
-import fourinarowbot.board.BoardGameBoard;
+import commons.gameengine.board.Coordinate;
+import commons.gameengine.board.PlayerColor;
 import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.domain.Marker;
-import fourinarowbot.domain.MarkerColor;
 
 public class BoardSearcher {
 
-    private final BoardGameBoard board;
+    private final FourInARowbotBoard board;
 
-    public BoardSearcher(final BoardGameBoard board) {
+    public BoardSearcher(final FourInARowbotBoard board) {
         this.board = board;
     }
 
@@ -31,7 +30,7 @@ public class BoardSearcher {
     private boolean isBoardFull() {
         for (int row = 0; row < board.getNumberOfRows(); row++) {
             for (int col = 0; col < board.getNumberOfCols(); col++) {
-                if (board.getMarker(col, row) == null) {
+                if (board.get(col, row) == null) {
                     return false;
                 }
             }
@@ -65,13 +64,13 @@ public class BoardSearcher {
             int redInARow    = 0;
             int yellowInARow = 0;
             for (int col = 0; col < board.getNumberOfCols(); col++) {
-                final Marker marker = board.getMarker(col, row);
+                final Marker marker = board.get(col, row);
                 if (marker == null) {
                     redInARow = 0;
                     yellowInARow = 0;
                     continue;
                 }
-                if (marker.getColor() == MarkerColor.RED) {
+                if (marker.getColor() == PlayerColor.RED) {
                     redInARow++;
                     yellowInARow = 0;
                 }
@@ -80,10 +79,10 @@ public class BoardSearcher {
                     redInARow = 0;
                 }
                 if (redInARow == 4) {
-                    return SearchResult.resultWithWinner(MarkerColor.RED);
+                    return SearchResult.resultWithWinner(PlayerColor.RED);
                 }
                 else if (yellowInARow == 4) {
-                    return SearchResult.resultWithWinner(MarkerColor.YELLOW);
+                    return SearchResult.resultWithWinner(PlayerColor.YELLOW);
                 }
             }
         }
@@ -95,13 +94,13 @@ public class BoardSearcher {
             int redInARow    = 0;
             int yellowInARow = 0;
             for (int row = 0; row < board.getNumberOfRows(); row++) {
-                final Marker marker = board.getMarker(col, row);
+                final Marker marker = board.get(col, row);
                 if (marker == null) {
                     redInARow = 0;
                     yellowInARow = 0;
                     continue;
                 }
-                if (marker.getColor() == MarkerColor.RED) {
+                if (marker.getColor() == PlayerColor.RED) {
                     redInARow++;
                     yellowInARow = 0;
                 }
@@ -110,10 +109,10 @@ public class BoardSearcher {
                     redInARow = 0;
                 }
                 if (redInARow == 4) {
-                    return SearchResult.resultWithWinner(MarkerColor.RED);
+                    return SearchResult.resultWithWinner(PlayerColor.RED);
                 }
                 else if (yellowInARow == 4) {
-                    return SearchResult.resultWithWinner(MarkerColor.YELLOW);
+                    return SearchResult.resultWithWinner(PlayerColor.YELLOW);
                 }
             }
         }
@@ -151,14 +150,14 @@ public class BoardSearcher {
             if (board.isOutsideBoard(col, row)) {
                 break;
             }
-            final Marker marker = board.getMarker(col, row);
+            final Marker marker = board.get(col, row);
             if (marker == null) {
                 redInARow = 0;
                 yellowInARow = 0;
                 row++;
                 continue;
             }
-            if (marker.getColor() == MarkerColor.RED) {
+            if (marker.getColor() == PlayerColor.RED) {
                 redInARow++;
                 yellowInARow = 0;
             }
@@ -167,10 +166,10 @@ public class BoardSearcher {
                 redInARow = 0;
             }
             if (redInARow == 4) {
-                return SearchResult.resultWithWinner(MarkerColor.RED);
+                return SearchResult.resultWithWinner(PlayerColor.RED);
             }
             else if (yellowInARow == 4) {
-                return SearchResult.resultWithWinner(MarkerColor.YELLOW);
+                return SearchResult.resultWithWinner(PlayerColor.YELLOW);
             }
 
             row++;
@@ -209,14 +208,14 @@ public class BoardSearcher {
             if (board.isOutsideBoard(col, row)) {
                 break;
             }
-            final Marker marker = board.getMarker(col, row);
+            final Marker marker = board.get(col, row);
             if (marker == null) {
                 redInARow = 0;
                 yellowInARow = 0;
                 row++;
                 continue;
             }
-            if (marker.getColor() == MarkerColor.RED) {
+            if (marker.getColor() == PlayerColor.RED) {
                 redInARow++;
                 yellowInARow = 0;
             }
@@ -226,10 +225,10 @@ public class BoardSearcher {
             }
             if (redInARow == 4) {
                 System.out.println("" + row + " " + col);
-                return SearchResult.resultWithWinner(MarkerColor.RED);
+                return SearchResult.resultWithWinner(PlayerColor.RED);
             }
             else if (yellowInARow == 4) {
-                return SearchResult.resultWithWinner(MarkerColor.YELLOW);
+                return SearchResult.resultWithWinner(PlayerColor.YELLOW);
             }
 
             row++;
@@ -242,32 +241,32 @@ public class BoardSearcher {
         final BoardSearcher      boardSearcher = new BoardSearcher(board);
 
         // Find left -> righr diagonal when starting from "left side"
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(0, 0)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(1, 2)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(2, 3)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 4)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(4, 5)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(0, 0)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(1, 2)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(2, 3)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(3, 4)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(4, 5)));
         //        System.out.println("Is winner found: " + boardSearcher.searchForLeftToRightDiagonalWinner().isWinnerFound());
 
         // Find left -> right when starting from "top side"
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 2)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(4, 3)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(5, 4)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(6, 5)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(3, 2)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(4, 3)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(5, 4)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(6, 5)));
         //        System.out.println("Is winner found: " + boardSearcher.searchForLeftToRightDiagonalWinner().isWinnerFound());
 
         // Find right -> left diagonal when starting from "right side"
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(6, 1)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(5, 2)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(4, 3)));
-        //        fourinarowbot.board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 4)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(6, 1)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(5, 2)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(4, 3)));
+        //        fourinarowbot.board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(3, 4)));
         //        System.out.println("Is winner found: " + boardSearcher.searchForRightToLeftDiagonalWinner().isWinnerFound());
 
         // Find right -> left when starting from "top side"
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 1)));
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(2, 2)));
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(1, 3)));
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(0, 4)));
+        board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(3, 1)));
+        board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(2, 2)));
+        board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(1, 3)));
+        board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(0, 4)));
         System.out.println("Is winner found: " + boardSearcher.searchForRightToLeftDiagonalWinner().isWinnerFound());
         board.print();
     }

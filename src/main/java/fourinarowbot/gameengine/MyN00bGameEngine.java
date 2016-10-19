@@ -1,14 +1,14 @@
 package fourinarowbot.gameengine;
 
-import commons.gameengine.Coordinate;
+import commons.gameengine.board.Coordinate;
+import commons.gameengine.board.PlayerColor;
 import fourinarowbot.FourInARowApplication;
-import fourinarowbot.board.BoardGameBoard;
-import fourinarowbot.domain.MarkerColor;
+import fourinarowbot.board.FourInARowbotBoard;
 
-public class MyN00bGameEngine implements GameEngine {
+public class MyN00bGameEngine extends FourInARowbotGameEngine {
 
     @Override
-    public Coordinate getCoordinatesForNextMakerToPlace(final BoardGameBoard board, final MarkerColor myColor) {
+    public Coordinate getCoordinatesForNextMakerToPlace(final FourInARowbotBoard board, final PlayerColor myColor) {
         // TODO This is where your bad-ass SkyNet 2.0 logic goes.
 
         for (int i = 0; i < 7; i++) {

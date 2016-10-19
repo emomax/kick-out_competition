@@ -1,8 +1,10 @@
 package commons.gameengine;
 
-import commons.board.Board;
-import commons.board.PlayerColor;
+import commons.gameengine.Action;
+import commons.network.server.Parameterable;
+import commons.gameengine.board.Board;
+import commons.gameengine.board.PlayerColor;
 
 public interface GameEngine {
-    Action getNextMove(Board board, PlayerColor color);
+    Action<? extends Parameterable> getNextMove(Board board, PlayerColor color);
 }

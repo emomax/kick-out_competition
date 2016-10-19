@@ -1,20 +1,22 @@
 package fourinarowbot.server.response;
 
-import fourinarowbot.board.BoardState;
+import commons.gameengine.board.BoardState;
+import commons.network.server.Response.ServerResponseBase;
+import fourinarowbot.domain.Marker;
 
-public class ServerResponse {
+public class ServerResponse extends ServerResponseBase {
 
-    private BoardState     boardState;
+    private BoardState<Marker> boardState;
     private String         message;
     private GameStatistics gameStatistics;
     private String         redPlayerName;
     private String         yellowPlayerName;
 
-    public BoardState getBoardState() {
+    public BoardState<Marker> getBoardState() {
         return boardState;
     }
 
-    public void setBoardState(final BoardState boardState) {
+    public void setBoardState(final BoardState<Marker> boardState) {
         this.boardState = boardState;
     }
 

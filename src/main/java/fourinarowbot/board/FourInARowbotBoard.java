@@ -2,16 +2,22 @@ package fourinarowbot.board;
 
 import java.io.Serializable;
 
-import commons.gameengine.Coordinate;
+import commons.gameengine.board.Board;
+import commons.gameengine.board.Coordinate;
+import commons.gameengine.board.PlayerColor;
 import fourinarowbot.domain.Marker;
-import fourinarowbot.domain.MarkerColor;
 
-public class FourInARowbotBoard implements BoardGameBoard, Serializable {
+public class FourInARowbotBoard implements Board<Marker>, Serializable {
 
     private static final int NUMBER_OF_ROWS = 6;
     private static final int NUMBER_OF_COLS = 7;
 
     private Marker[][] board;
+
+    @Override
+    public Marker[][] getCells() {
+        return board;
+    }
 
     public Marker[][] getBoard() {
         return board;
@@ -33,14 +39,14 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
         return NUMBER_OF_COLS;
     }
 
-    public Marker getMarker(final int x, final int y) {
+    public Marker get(final int x, final int y) {
         verifyCoordinatesInsideBoard(x, y);
         return board[x][y];
     }
 
     public boolean isAnyMarkerAt(final int x, final int y) {
         verifyCoordinatesInsideBoard(x, y);
-        return getMarker(x, y) != null;
+        return get(x, y) != null;
     }
 
     private void verifyCoordinatesInsideBoard(final int x, final int y) {
@@ -71,6 +77,11 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
         return !isAnyMarkerAt(x, y + 1);
     }
 
+    @Override
+    public boolean isOutsideBoard(Coordinate coordinate) {
+        return isOutsideBoard(coordinate.getX(), coordinate.getY());
+    }
+
     public boolean isOutsideBoard(final int x, final int y) {
         if (x < 0 || x > (NUMBER_OF_COLS - 1)) {
             return true;
@@ -80,6 +91,7 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
         }
         return false;
     }
+
 
     public void reset() {
         board = new Marker[NUMBER_OF_COLS][NUMBER_OF_ROWS];
@@ -95,7 +107,7 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
                 if (marker == null) {
                     result += "O";
                 }
-                else if (marker.getColor() == MarkerColor.RED) {
+                else if (marker.getColor() == PlayerColor.RED) {
                     result += "R";
                 }
                 else {
@@ -110,7 +122,7 @@ public class FourInARowbotBoard implements BoardGameBoard, Serializable {
 
     public static void main(final String[] args) {
         final FourInARowbotBoard board = new FourInARowbotBoard();
-        board.placeMarker(new Marker(MarkerColor.RED, new Coordinate(3, 5)));
+        board.placeMarker(new Marker(PlayerColor.RED, new Coordinate(3, 5)));
         board.print();
     }
 }

@@ -1,10 +1,8 @@
-package commons.server;
+package fourinarowbot.server;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import fourinarowbot.server.FourInARowbotGame;
 
 public class GameRepository {
 

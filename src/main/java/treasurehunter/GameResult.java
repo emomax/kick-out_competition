@@ -1,40 +1,34 @@
 package treasurehunter;
 
-import commons.board.PlayerColor;
+import commons.gameengine.board.PlayerColor;
+import treasurehunter.board.Tile;
+import treasurehunter.board.TreasureHunterBoard;
 
 public class GameResult {
     public static GameResult ResultWithoutWinner() {
         return new GameResult();
     }
 
-    private static int redTreasures = 0;
-    private static int yellowTreasures = 0;
-    private static int treasuresLeft = 11; // Always odd number, to guarantee a winner
+    private int redTreasures = 0;
+    private int yellowTreasures = 0;
+    private int treasuresLeft = 9; // Always odd number, to guarantee a winner
 
-    public static void collectTreasure(PlayerColor player) {
-        if (player == PlayerColor.RED) {
-            redTreasures++;
-        }
-        else if (player == PlayerColor.YELLOW) {
-            yellowTreasures++;
-        }
-        else {
-            throw new RuntimeException("Unknown player color: " + player);
-        }
+    public GameResult() {}
 
-        treasuresLeft--;
+    public GameResult(TreasureHunterBoard board) {
+
     }
 
     public boolean noMoreTreasures() {
         return (getTreasuresLeft() == 0);
     }
 
-    public static int getTreasuresLeft() {
+    public int getTreasuresLeft() {
         return treasuresLeft;
     }
 
 
-    public PlayerColor getWinnerColor() {
+    public PlayerColor getWinnerPlayerColor() {
         if (redTreasures > yellowTreasures) {
             return PlayerColor.RED;
         }
@@ -45,6 +39,24 @@ public class GameResult {
 
     public boolean isDraw() {
         return false;
+    }
+
+    public static boolean isGameOver(TreasureHunterBoard board) {
+        return getTreasuresLeft(board) == 0;
+    }
+
+    public static int getTreasuresLeft(TreasureHunterBoard board) {
+        int treasures = 0;
+
+        for (int x = 0; x < board.getNumberOfCols(); x++) {
+            for (int y = 0; y < board.getNumberOfRows(); y++) {
+                if ( board.getCells()[x][y].getState() == Tile.TileState.TREASURE) {
+                    treasures++;
+                }
+            }
+        }
+
+        return treasures;
     }
 
     public GameResult getGameStatus() {

@@ -1,7 +1,14 @@
 package treasurehunter.domain;
 
-public enum Move {
+import commons.network.server.Parameterable;
+
+public enum Move implements Parameterable {
     MOVE_FORWARD,
     ROTATE_RIGHT,
-    ROTATE_LEFT
+    ROTATE_LEFT;
+
+    @Override
+    public String toGetValueString() {
+        return "move=" + this.toString();
+    }
 }

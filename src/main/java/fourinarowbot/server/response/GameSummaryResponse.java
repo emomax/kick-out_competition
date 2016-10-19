@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import fourinarowbot.board.BoardState;
+import commons.gameengine.board.BoardState;
+import fourinarowbot.domain.Marker;
 
 public class GameSummaryResponse {
 
-    private UUID uuid;
-    private String gameName;
-    private String redPlayerName;
-    private String yellowPlayerName;
-    private int  draws;
-    private int  redWins;
-    private int  yellowWins;
-    private List<BoardState> boardStates = new ArrayList<>();
+    private UUID                     uuid;
+    private String                   gameName;
+    private String                   redPlayerName;
+    private String                   yellowPlayerName;
+    private int                      draws;
+    private int                      redWins;
+    private int                      yellowWins;
+    private List<BoardState<Marker>> boardStates = new ArrayList<>();
     private long   redPlayerGameTime;
     private long   yellowPlayerGameTime;
     private String gameStartDate;
@@ -76,11 +77,11 @@ public class GameSummaryResponse {
         this.yellowWins = yellowWins;
     }
 
-    public List<BoardState> getBoardStates() {
+    public List<BoardState<Marker>> getBoardStates() {
         return boardStates;
     }
 
-    public void setBoardStates(final List<BoardState> boardStates) {
+    public void setBoardStates(final List<BoardState<Marker>> boardStates) {
         this.boardStates = boardStates;
     }
 

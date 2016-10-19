@@ -1,4 +1,4 @@
-package commons.server;
+package commons.network.server;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,11 +15,11 @@ public class GameTimer implements Serializable {
 
     public void stop(final String playerName) {
         final long duration      = System.currentTimeMillis() - lastStartTimes.get(playerName);
-        final Long totalGameTime = duration + totalGameTimes.getOrDefault(playerName, 0l);
+        final Long totalGameTime = duration + totalGameTimes.getOrDefault(playerName, 0L);
         totalGameTimes.put(playerName, totalGameTime);
     }
 
     public long getGameTime(final String playerName) {
-        return totalGameTimes.getOrDefault(playerName, 0l);
+        return totalGameTimes.getOrDefault(playerName, 0L);
     }
 }

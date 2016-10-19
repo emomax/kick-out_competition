@@ -1,8 +1,9 @@
 package fourinarowbot.server;
 
+import commons.gameengine.board.PlayerColor;
+import commons.network.server.ServerRestController;
 import fourinarowbot.board.FourInARowbotBoard;
-import commons.gameengine.Coordinate;
-import fourinarowbot.domain.MarkerColor;
+import commons.gameengine.board.Coordinate;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 import fourinarowbot.server.response.ServerResponse;
 
@@ -26,9 +27,8 @@ public class ServerTest {
     }
 
     private static void startPlaying(final ServerRestController server, final String gameName, final String playerName, final MyN00bGameEngine playerEngine) {
-        String message = null;
+        String message;
         while (true) {
-            //            System.out.println(playerName + " getting board state...");
             final ServerResponse boardStateResponse = server.getBoardState(playerName, gameName);
             if (boardStateResponse.getMessage() != null) {
                 message = boardStateResponse.getMessage();
@@ -37,10 +37,9 @@ public class ServerTest {
 
             System.out.println(playerName + " got board");
 
-            final FourInARowbotBoard board         = new FourInARowbotBoard(boardStateResponse.getBoardState().getMarkers());
-            final MarkerColor        myMarkerColor = getMyMarkerColor(playerName, boardStateResponse);
-            final Coordinate         coordinates   = playerEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
-            //            System.out.println(playerName + " placing marker...");
+            final FourInARowbotBoard board         = new FourInARowbotBoard(boardStateResponse.getBoardState().getCells());
+            final PlayerColor        myPlayerColor = getMyPlayerColor(playerName, boardStateResponse);
+            final Coordinate         coordinates   = playerEngine.getCoordinatesForNextMakerToPlace(board, myPlayerColor);
             final ServerResponse placeMarkerResponse = server.placeMarker(playerName, gameName, coordinates.getX(), coordinates.getY());
             System.out.println(playerName + " placed marker");
             if (placeMarkerResponse.getMessage() != null) {
@@ -53,11 +52,11 @@ public class ServerTest {
         System.out.println(playerName + " stopped playing after message: " + message);
     }
 
-    private static MarkerColor getMyMarkerColor(final String playerName, final ServerResponse response) {
+    private static PlayerColor getMyPlayerColor(final String playerName, final ServerResponse response) {
         if (response.getRedPlayerName().equals(playerName)) {
-            return MarkerColor.RED;
+            return PlayerColor.RED;
         }
-        return MarkerColor.YELLOW;
+        return PlayerColor.YELLOW;
     }
 
     private static void sleep(final long time) {

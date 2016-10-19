@@ -2,40 +2,60 @@ package treasurehunter.board;
 
 import java.util.Random;
 
-import commons.board.Board;
+import commons.gameengine.board.Board;
 import static treasurehunter.board.Tile.TileState;
 
-import commons.board.PlayerColor;
-import commons.gameengine.Coordinate;
-import treasurehunter.GameResult;
+import commons.gameengine.board.PlayerColor;
+import commons.gameengine.board.Coordinate;
+import treasurehunter.domain.Move;
 import treasurehunter.domain.Orientation;
-import treasurehunter.domain.TreasureHunterAction;
 
-public class TreasureHunterBoard implements Board {
+public class TreasureHunterBoard implements Board<Tile> {
     private int numberOfColumns = 10;
     private int numberOfRows = 8;
 
+    private int totalTreasures;
+
     private Tile[][] board;
 
-    public Tile[][] getBoard() {
+    @Override
+    public Tile[][] getCells() {
         return board;
     }
 
     public TreasureHunterBoard() {
-        this.board = new Tile[numberOfColumns][numberOfRows];
+        this(new Random().nextInt(10) * 2 + 1);
+    }
 
-        generateMap();
+    public TreasureHunterBoard(int amountOfTreasures) {
+        this.board = new Tile[numberOfColumns][numberOfRows];
+        this.totalTreasures = amountOfTreasures;
+
+        generateMap(amountOfTreasures);
     }
 
     public TreasureHunterBoard(final Tile[][] board) {
         this.board = board;
+        this.totalTreasures = calcTreasuresLeft();
+    }
+
+    private int calcTreasuresLeft() {
+        int treasures = 0;
+        for (int x = 0; x < numberOfColumns; x++) {
+            for (int y = 0; y < numberOfRows; y++) {
+                if (board[x][y].getState() == TileState.TREASURE) {
+                    treasures++;
+                }
+            }
+        }
+        return treasures;
     }
 
     public Tile getTile(final int x, final int y) {
         return board[x][y];
     }
 
-    public void movePlayer(PlayerColor player, TreasureHunterAction playerAction) {
+    public void movePlayer(PlayerColor player, Move playerMove) {
         Coordinate  playerTile = findPlayer(player);
 
         int x = playerTile.getX();
@@ -43,7 +63,7 @@ public class TreasureHunterBoard implements Board {
 
         Orientation playerDirection = board[x][y].getOrientation();
 
-        switch (playerAction.getMove()) {
+        switch (playerMove) {
             case MOVE_FORWARD:
                 int newX = x + playerDirection.xDirection();
                 int newY = y + playerDirection.yDirection();
@@ -55,7 +75,6 @@ public class TreasureHunterBoard implements Board {
 
                     switch (nextTile.getState()) {
                         case TREASURE:
-                            GameResult.collectTreasure(player);
                             // Deliberate fallthrough
                         case EMPTY:
                             board[x][y].setState(TileState.EMPTY);
@@ -105,7 +124,7 @@ public class TreasureHunterBoard implements Board {
                 return;
 
             default:
-                throw new RuntimeException("Undefined player move! - " + playerAction.getMove().toString());
+                throw new RuntimeException("Undefined player move! - " + playerMove.toString());
         }
     }
 
@@ -113,7 +132,7 @@ public class TreasureHunterBoard implements Board {
         for (int i = 0; i < numberOfColumns; i++) {
             for (int j = 0; j < numberOfRows; j++) {
                 if (board[i][j].getState().toString().equals(player.toString())) {
-                    return board[i][j].getCoordinate();
+                    return board[i][j].getCoordinates();
                 }
             }
         }
@@ -131,6 +150,10 @@ public class TreasureHunterBoard implements Board {
         return numberOfColumns;
     }
 
+    public int getTotalTreasures() {
+        return totalTreasures;
+    }
+
     @Override
     public boolean isOutsideBoard(Coordinate coordinate) {
         final int x = coordinate.getX();
@@ -143,7 +166,7 @@ public class TreasureHunterBoard implements Board {
     }
 
     public void reset() {
-        generateMap();
+        generateMap(totalTreasures);
     }
 
     private void clear() {
@@ -154,7 +177,7 @@ public class TreasureHunterBoard implements Board {
         }
     }
 
-    private void generateMap() {
+    private void generateMap(int amountOfTreasures) {
         clear();
 
         board[0][0].setState(TileState.RED);
@@ -165,7 +188,7 @@ public class TreasureHunterBoard implements Board {
 
         Random rgn = new Random();
 
-        for (int i = 0; i < GameResult.getTreasuresLeft(); i++) {
+        for (int i = 0; i < amountOfTreasures; i++) {
             int x;
             int y;
 
@@ -184,6 +207,8 @@ public class TreasureHunterBoard implements Board {
             }
         }
 
+
+        
     }
 
     @Override

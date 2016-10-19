@@ -2,24 +2,37 @@ package fourinarowbot.client;
 
 import org.springframework.web.client.RestTemplate;
 
-import commons.gameengine.Coordinate;
+import commons.gameengine.board.Coordinate;
+import commons.gameengine.board.PlayerColor;
+import commons.network.client.RemoteGame;
+import commons.network.server.Response.ServerResponseBase;
+import commons.gameengine.Action;
+import commons.gameengine.GameEngine;
 import fourinarowbot.board.FourInARowbotBoard;
-import fourinarowbot.domain.MarkerColor;
-import fourinarowbot.gameengine.GameEngine;
+import fourinarowbot.domain.Marker;
+import fourinarowbot.gameengine.FourInARowbotGameEngine;
 import fourinarowbot.server.response.ServerResponse;
-import commons.client.RemoteGame;
 
 public class FourInARowRemoteGameImpl implements RemoteGame {
 
-    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // FourInARowbotGame server
+    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // TreasureHunterGame server
     //    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
 
-    public void startGame(final String playerName, final String gameName, final GameEngine gameEngine) {
-        final ServerResponse serverResponse = runGame(playerName, gameName, gameEngine);
-        printGameResult(serverResponse);
+    @Override
+    public void printGameResult(ServerResponseBase response) {
+        System.out.println(response.getMessage());
+
+        if (((ServerResponse) response).getGameStatistics() != null) {
+            ((ServerResponse) response).getGameStatistics().print(response.getRedPlayerName(), response.getYellowPlayerName());
+        }
     }
 
-    public ServerResponse runGame(final String playerName, final String gameName, final GameEngine gameEngine) {
+    @Override
+    public ServerResponseBase runGame(final String playerName, final String gameName, final GameEngine gameEngine) {
+        if (!(gameEngine instanceof FourInARowbotGameEngine)) {
+            throw new RuntimeException("Error: Four-in-a-row game initiated, but a different engine was specified.");
+        }
+
         ServerResponse serverResponse;
         while (true) {
             serverResponse = getBoardState(gameName, playerName);
@@ -27,7 +40,7 @@ public class FourInARowRemoteGameImpl implements RemoteGame {
                 return serverResponse;
             }
 
-            final Coordinate coordinates = getCoordinatesForNextMarkerToPlace(playerName, gameEngine, serverResponse);
+            final Coordinate coordinates = getCoordinatesForNextMarkerToPlace(playerName, (FourInARowbotGameEngine) gameEngine, serverResponse);
             serverResponse = placeMarker(gameName, playerName, coordinates);
             if (serverResponse.getMessage() != null) {
                 return serverResponse;
@@ -35,25 +48,21 @@ public class FourInARowRemoteGameImpl implements RemoteGame {
         }
     }
 
-    private static Coordinate getCoordinatesForNextMarkerToPlace(final String playerName, final GameEngine gameEngine, final ServerResponse response) {
-        final FourInARowbotBoard board         = new FourInARowbotBoard(response.getBoardState().getMarkers());
-        final MarkerColor        myMarkerColor = getMyMarkerColor(playerName, response);
-        return gameEngine.getCoordinatesForNextMakerToPlace(board, myMarkerColor);
+    private static Coordinate getCoordinatesForNextMarkerToPlace(final String playerName, final FourInARowbotGameEngine gameEngine, final ServerResponse response) {
+        final FourInARowbotBoard board         = new FourInARowbotBoard(response.getBoardState().getCells());
+        final PlayerColor        myMarkerColor = getMyPlayerColor(playerName, response);
+        final Action<Marker>     myAction      = gameEngine.getNextMove(board, myMarkerColor);
+
+        return myAction.get().getCoordinates();
     }
 
-    private static MarkerColor getMyMarkerColor(final String playerName, final ServerResponse response) {
+    private static PlayerColor getMyPlayerColor(final String playerName, final ServerResponse response) {
         if (response.getRedPlayerName().equals(playerName)) {
-            return MarkerColor.RED;
+            return PlayerColor.RED;
         }
-        return MarkerColor.YELLOW;
+        return PlayerColor.YELLOW;
     }
 
-    public void printGameResult(final ServerResponse response) {
-        System.out.println(response.getMessage());
-        if (response.getGameStatistics() != null) {
-            response.getGameStatistics().print(response.getRedPlayerName(), response.getYellowPlayerName());
-        }
-    }
 
     public ServerResponse getBoardState(final String gameName, final String playerName) {
         final RestTemplate restTemplate = new RestTemplate();

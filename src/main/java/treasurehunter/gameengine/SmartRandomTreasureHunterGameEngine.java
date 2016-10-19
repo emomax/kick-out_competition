@@ -2,33 +2,29 @@ package treasurehunter.gameengine;
 
 import java.util.Random;
 
-import commons.board.Board;
-import commons.board.PlayerColor;
-import commons.gameengine.Action;
-import commons.gameengine.Coordinate;
-import commons.gameengine.GameEngine;
+import commons.gameengine.board.PlayerColor;
+import commons.gameengine.board.Coordinate;
 import treasurehunter.TreasureHunterApplication;
 import treasurehunter.board.Tile;
 import treasurehunter.board.TreasureHunterBoard;
 import treasurehunter.domain.Move;
 import treasurehunter.domain.Orientation;
-import treasurehunter.domain.TreasureHunterAction;
 
 import static treasurehunter.board.Tile.TileState;
 
-public class SmartRandomTreasureHunterGameEngine implements GameEngine {
+public class SmartRandomTreasureHunterGameEngine extends TreasureHunterGameEngine {
     @Override
-    public Action getNextMove(final Board board, final PlayerColor myColor) {
-        final TreasureHunterBoard gameBoard = (TreasureHunterBoard) board;
-        Tile me = findMe(gameBoard, myColor);
-
-        return getRandomAction(me, gameBoard);
+    public Move getNextMove(final TreasureHunterBoard board, final PlayerColor myColor) {
+        Tile me = findMe(board, myColor);
+        return getRandomMove(me, board);
     }
 
     private Tile findMe(TreasureHunterBoard board, PlayerColor myColor) {
+        System.out.println("Looking for my color! - " + myColor.toString());
         for (int i = 0; i < board.getNumberOfCols(); i++) {
             for (int j = 0; j < board.getNumberOfRows(); j++) {
                 if (board.getTile(i, j).getState() == TileState.valueOf(myColor.toString())) {
+                    System.out.println("Found me!");
                     return board.getTile(i, j);
                 }
             }
@@ -37,12 +33,12 @@ public class SmartRandomTreasureHunterGameEngine implements GameEngine {
         return null;
     }
 
-    public Action getRandomAction(Tile me, TreasureHunterBoard board) {
-        TreasureHunterAction action      = new TreasureHunterAction();
+    public Move getRandomMove(Tile me, TreasureHunterBoard board) {
         Orientation          myDirection = me.getOrientation();
+
         Coordinate nextPosition = new Coordinate(
-                me.getCoordinate().getX() + myDirection.xDirection(),
-                me.getCoordinate().getY() + myDirection.yDirection());
+                me.getCoordinates().getX() + myDirection.xDirection(),
+                me.getCoordinates().getY() + myDirection.yDirection());
 
         Random  rng           = new Random();
         int     selection     = rng.nextInt(6);
@@ -50,26 +46,24 @@ public class SmartRandomTreasureHunterGameEngine implements GameEngine {
 
 
         if (shouldGoForth) {
-            action.setMove(Move.MOVE_FORWARD);
+            return Move.MOVE_FORWARD;
         }
         else if (selection == 0) {
-            action.setMove(Move.ROTATE_LEFT);
+            return Move.ROTATE_LEFT;
         }
         else if (selection == 1) {
-            action.setMove(Move.ROTATE_RIGHT);
+            return Move.ROTATE_RIGHT;
         }
         else {
-            action.setMove(Move.ROTATE_LEFT);
+            return Move.ROTATE_LEFT;
         }
-
-        return action;
     }
 
     // Run this main to start the game
     public static void main(final String[] args) {
-        final TreasureHunterApplication fourInARowApplication = new TreasureHunterApplication(new SmartRandomTreasureHunterGameEngine());
+        final TreasureHunterApplication treasureHunterApplication = new TreasureHunterApplication(new SmartRandomTreasureHunterGameEngine());
 
         // Run game once
-        fourInARowApplication.runGameOnce();
+        treasureHunterApplication.runGameOnce();
     }
 }

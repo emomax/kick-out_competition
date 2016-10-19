@@ -1,24 +1,24 @@
 package fourinarowbot;
 
 import commons.Logger;
-import commons.gameengine.Coordinate;
+import commons.gameengine.board.Coordinate;
+import commons.gameengine.board.PlayerColor;
 import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.domain.Marker;
-import fourinarowbot.domain.MarkerColor;
-import fourinarowbot.gameengine.GameEngine;
+import fourinarowbot.gameengine.FourInARowbotGameEngine;
 import fourinarowbot.gameengine.MyN00bGameEngine;
 import fourinarowbot.graphics.GraphicsEngine;
 
 public class FourInARowApplication {
 
-    final GameEngine         redGameEngine;
-    final GameEngine         yellowGameEngine;
+    final FourInARowbotGameEngine         redGameEngine;
+    final FourInARowbotGameEngine         yellowGameEngine;
     final FourInARowbotBoard board;
     final GraphicsEngine     graphicsEngine;
     final BoardSearcher      boardSearcher;
     final boolean            graphicsEnabled;
 
-    public FourInARowApplication(final GameEngine redGameEngine) {
+    public FourInARowApplication(final FourInARowbotGameEngine redGameEngine) {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new MyN00bGameEngine();
         this.board = new FourInARowbotBoard();
@@ -27,10 +27,10 @@ public class FourInARowApplication {
         this.graphicsEnabled = false;
     }
 
-    public FourInARowApplication(final GameEngine redGameEngine, final boolean graphicsEnabled) {
+    public FourInARowApplication(final FourInARowbotGameEngine redGameEngine, final boolean graphicsEnabled) {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new MyN00bGameEngine();
-        //        this.yellowGameEngine = new ClosestGameEngine(MarkerColor.YELLOW);
+        //        this.yellowGameEngine = new ClosestGameEngine(PlayerColor.YELLOW);
         this.board = new FourInARowbotBoard();
         this.boardSearcher = new BoardSearcher(board);
         this.graphicsEnabled = graphicsEnabled;
@@ -49,7 +49,7 @@ public class FourInARowApplication {
             System.out.println("It's a draw!");
         }
         else {
-            System.out.println("The winner is " + searchResult.getWinnerMarkerColor() + "!!!");
+            System.out.println("The winner is " + searchResult.getWinnerPlayerColor() + "!!!");
         }
         board.print();
     }
@@ -66,8 +66,8 @@ public class FourInARowApplication {
                 draws++;
             }
             else {
-                System.out.println(i + ". " + searchResult.getWinnerMarkerColor());
-                if (searchResult.getWinnerMarkerColor() == MarkerColor.RED) {
+                System.out.println(i + ". " + searchResult.getWinnerPlayerColor());
+                if (searchResult.getWinnerPlayerColor() == PlayerColor.RED) {
                     redWins++;
                 }
                 else {
@@ -134,18 +134,19 @@ public class FourInARowApplication {
 
     private Marker getNextMarkerToPlace(final boolean isRedPlayerTurn) {
         if (isRedPlayerTurn) {
-            final Coordinate coordinates = redGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.RED);
-            return new Marker(MarkerColor.RED, coordinates);
+            final Coordinate coordinates = redGameEngine.getCoordinatesForNextMakerToPlace(board, PlayerColor.RED);
+            return new Marker(PlayerColor.RED, coordinates);
         }
         else {
-            final Coordinate coordinates = yellowGameEngine.getCoordinatesForNextMakerToPlace(board, MarkerColor.YELLOW);
-            return new Marker(MarkerColor.YELLOW, coordinates);
+            final Coordinate coordinates = yellowGameEngine.getCoordinatesForNextMakerToPlace(board, PlayerColor.YELLOW);
+            return new Marker(PlayerColor.YELLOW, coordinates);
         }
     }
 
     public static void main(final String[] args) throws InterruptedException {
         Logger.setDebugLogOn(false);
         final FourInARowApplication application = new FourInARowApplication(new MyN00bGameEngine());
+
         //        application.runGameOnce();
         application.runGameMultipleGames(100);
     }

@@ -2,12 +2,13 @@ package treasurehunter.board;
 
 import java.io.Serializable;
 
-import commons.gameengine.Coordinate;
+import commons.gameengine.board.Coordinate;
+import commons.gameengine.Positionable;
 import treasurehunter.domain.Orientation;
 
-public class Tile implements Serializable {
+public class Tile implements Serializable, Positionable {
     private TileState   state;
-    private Coordinate  coordinate;
+    private Coordinate  coordinates;
     private Orientation direction = Orientation.UP;
 
     private Tile() {
@@ -19,7 +20,7 @@ public class Tile implements Serializable {
     }
 
     public Tile(Coordinate coordinate, TileState state) {
-        this.coordinate = coordinate;
+        this.coordinates = coordinate;
         this.state = state;
     }
 
@@ -39,9 +40,11 @@ public class Tile implements Serializable {
         return direction;
     }
 
-    public Coordinate getCoordinate() {
-        return coordinate;
+    @Override
+    public Coordinate getCoordinates() {
+        return coordinates;
     }
+
 
 
     public enum TileState

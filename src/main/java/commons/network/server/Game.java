@@ -1,13 +1,21 @@
-package commons.server;
+package commons.network.server;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public interface Game {
+import commons.gameengine.board.Board;
+
+public interface Game extends Serializable {
     UUID getId();
     String getName();
     String getRedPlayerName();
     String getYellowPlayerName();
+
+    void setRedPlayerName(String redPlayerName);
+    void setYellowPlayerName(String redPlayerName);
+
+    Board getBoard();
 
     void waitForMyTurn(final String playerName) throws InterruptedException;
     void finishMyTurn();
