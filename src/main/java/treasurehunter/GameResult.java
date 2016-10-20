@@ -9,14 +9,14 @@ public class GameResult {
         return new GameResult();
     }
 
-    private int redTreasures = 0;
-    private int yellowTreasures = 0;
-    private int treasuresLeft = 9; // Always odd number, to guarantee a winner
+    private static int redTreasures = 0;
+    private static int yellowTreasures = 0;
+    private int treasuresLeft; // Always odd number, to guarantee a winner
 
     public GameResult() {}
 
     public GameResult(TreasureHunterBoard board) {
-
+        treasuresLeft = getTreasuresLeft(board);
     }
 
     public boolean noMoreTreasures() {
@@ -34,6 +34,18 @@ public class GameResult {
         }
         else  {
             return PlayerColor.YELLOW;
+        }
+    }
+
+    public static void playerCollected(PlayerColor player) {
+        if (player == PlayerColor.RED) {
+            redTreasures++;
+        }
+        else if (player == PlayerColor.YELLOW) {
+            yellowTreasures++;
+        }
+        else {
+            throw new RuntimeException("Unknown PlayerColor: " + player);
         }
     }
 

@@ -28,38 +28,10 @@ public class TreasureHunterApplication {
         System.out.println("The winner is: " + searchResult.getWinnerPlayerColor());
     }
 
-    public void runGameMultipleGames(final int numberOfGames) {
-        final boolean printBoardEveryRound = false;
-        int           draws                = 0;
-        int           redWins              = 0;
-        int           yellowWins           = 0;
-        for (int i = 0; i < numberOfGames; i++) {
-            final GameResult searchResult = startGame(printBoardEveryRound);
-            if (searchResult.isDraw()) {
-                System.out.println(i + ". " + "Draw");
-                draws++;
-            }
-            else {
-                System.out.println(i + ". " + searchResult.getWinnerPlayerColor());
-                if (searchResult.getWinnerPlayerColor() == PlayerColor.RED) {
-                    redWins++;
-                }
-                else {
-                    yellowWins++;
-                }
-            }
-            board.reset();
-        }
-        System.out.println("\nResult:");
-        System.out.println("   " + draws + " draws");
-        System.out.println("   " + redWins + " red wins");
-        System.out.println("   " + yellowWins + " yellow wins");
-    }
-
     private GameResult startGame(final boolean printBoardEveryRound) {
         boolean      isRedPlayerTurn = true;
         GameResult gameResult = GameResult.ResultWithoutWinner();
-        while (!gameResult.noMoreTreasures()) {
+        while (!gameResult.isGameOver(board)) {
             try {
                 playNextRound(isRedPlayerTurn);
             }
@@ -84,7 +56,7 @@ public class TreasureHunterApplication {
 
             // A nice pace =o)
             try {
-                Thread.sleep(60L);
+                Thread.sleep(200L);
             }
             catch (final InterruptedException e) {
                 e.printStackTrace();

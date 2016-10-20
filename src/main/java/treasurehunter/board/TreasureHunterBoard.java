@@ -7,6 +7,7 @@ import static treasurehunter.board.Tile.TileState;
 
 import commons.gameengine.board.PlayerColor;
 import commons.gameengine.board.Coordinate;
+import treasurehunter.GameResult;
 import treasurehunter.domain.Move;
 import treasurehunter.domain.Orientation;
 
@@ -75,6 +76,7 @@ public class TreasureHunterBoard implements Board<Tile> {
 
                     switch (nextTile.getState()) {
                         case TREASURE:
+                            GameResult.playerCollected(player);
                             // Deliberate fallthrough
                         case EMPTY:
                             board[x][y].setState(TileState.EMPTY);
