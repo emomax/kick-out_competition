@@ -3,6 +3,9 @@ package treasurehunter.server.response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import commons.gameengine.board.BoardState;
+import treasurehunter.board.Tile;
 import treasurehunter.domain.PlayerMove;
 
 public class GameSummaryResponse {
@@ -13,6 +16,7 @@ public class GameSummaryResponse {
     private int  totalTreasures;
     private long   redPlayerGameTime;
     private long   yellowPlayerGameTime;
+    private BoardState<Tile> boardState;
     private List<PlayerMove> playerMoves = new ArrayList<>();
     private String gameStartDate;
     private String gameName;
@@ -73,6 +77,14 @@ public class GameSummaryResponse {
 
     public void setYellowPlayerName(final String yellowPlayerName) {
         this.yellowPlayerName = yellowPlayerName;
+    }
+
+    public void setBoardState(BoardState<Tile> boardState) {
+        this.boardState = boardState;
+    }
+
+    public BoardState<Tile> getBoardState() {
+        return boardState;
     }
 
     public List<PlayerMove> getPlayerMoves() {
