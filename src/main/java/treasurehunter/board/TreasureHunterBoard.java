@@ -12,8 +12,8 @@ import treasurehunter.domain.Move;
 import treasurehunter.domain.Orientation;
 
 public class TreasureHunterBoard implements Board<Tile> {
-    private int numberOfColumns = 10;
-    private int numberOfRows = 8;
+    private int numberOfColumns = 18;
+    private int numberOfRows = 16;
 
     private int totalTreasures;
 

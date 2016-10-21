@@ -1,6 +1,8 @@
 package treasurehunter.domain;
 
-public enum Orientation {
+import java.io.Serializable;
+
+public enum Orientation implements Serializable {
     UP(0, -1),
     DOWN(0, 1),
     LEFT(-1, 0),
@@ -20,5 +22,10 @@ public enum Orientation {
 
     public int yDirection() {
         return yDirection;
+    }
+
+    // For serialization
+    public String getOrientation() {
+        return this.toString();
     }
 }
