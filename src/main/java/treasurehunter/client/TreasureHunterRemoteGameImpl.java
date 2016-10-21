@@ -30,6 +30,9 @@ public class TreasureHunterRemoteGameImpl implements RemoteGame {
                 return serverResponse;
             }
 
+            TreasureHunterBoard board = new TreasureHunterBoard(serverResponse.getBoardState().getCells());
+            board.print();
+
             final Move move = getActionForNextMove(playerName, (TreasureHunterGameEngine) gameEngine, serverResponse);
             serverResponse = movePlayer(playerName, gameName, new TreasureHunterAction(move));
             if (serverResponse.getMessage() != null) {

@@ -25,7 +25,7 @@ public class TreasureHunterBoard implements Board<Tile> {
     }
 
     public TreasureHunterBoard() {
-        this(new Random().nextInt(10) * 2 + 1);
+        this(new Random().nextInt(10) * 2 + 5);
     }
 
     public TreasureHunterBoard(int amountOfTreasures) {
