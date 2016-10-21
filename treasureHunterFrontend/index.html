@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Friday Kick-Out Competition!</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="assets/styles/bootstrap.min.css">
+        <link rel="stylesheet" href="assets/styles/style.css">
+        <script src="assets/scripts/jquery.min.js"></script>
+        <script src="assets/scripts/bootstrap.min.js"></script>
+
+        <script>
+            $(function() {
+                updateScoreboard();
+                setInterval(updateScoreboard, 10000);
+            });
+
+			var gameSummaries = {};
+			var currentGameShowing = '';
+
+            var updateScoreboard = function() {
+                $.getJSON ("//10.46.1.193:8080/treasureHunterGameSummary.json", function(gameSummary) {
+
+                    console.log(gameSummary[0]);
+                    $('.table tr').remove();
+
+                    var headerRow = buildHeader(gameSummary);
+                    var contentRow;
+
+                    for (var game in gameSummary) {
+                         contentRow = $('<tr>');
+
+                        for (var data in gameSummary[game]) {
+                            var value = gameSummary[game][data];
+
+                            if (data === 'gameStartDate') {
+                               value = epochToDate(value);
+                            }
+							else if (data === 'playerMoves') {
+									value = '<input type="button" value="Play match"></input>'
+									gameSummaries[gameSummary[game]['uuid']] = gameSummary[game][data];
+							}
+							else if (data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime') {
+								value /= 1000.0;
+							}
+                            else if (/*data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime' ||*/ data === 'uuid') {
+								value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">'
+                            }
+                            contentRow.append($('<td>').html(value));
+                        }
+
+						contentRow.find('input').click(showSummary);
+
+                        $('.table tbody').append(contentRow);
+                    }
+
+                    $('.table thead').append(headerRow);
+                    $(".table tbody").each(function(elem,index){
+                              var arr = $.makeArray($("tr",this).detach());
+                              arr.reverse();
+                              $(this).append(arr);
+                        });
+
+					if (currentGameShowing != '') {
+						console.log('currentGameShowing')
+						$('input[value=' + currentGameShowing + ']').closest('tr').find('input[type=button]').click();
+					}
+                });
+            }
+
+            var buildHeader = function(gameSummary) {
+                var headerRow = $('<tr>');
+				var translationTable = {
+					'redPlayerName': 'Player Red',
+					'yellowPlayerName': 'Player Yellow',
+					'redPlayerGameTime': 'Red computation time',
+					'yellowPlayerGameTime': 'Yellow computation time',
+					'gameName': 'Name of the Game',
+					'draws': 'Draws',
+					'redWins': 'Red victories',
+					'yellowWins': 'Yellow victories',
+					'boardStates': 'Results',
+					'gameStartDate': 'Battle took place',
+					'uuid': ''
+				};
+
+                for (var data in firstGame = gameSummary[0]) {
+					console.log(data);
+                    headerRow.append($('<th>').text(data));
+                }
+                return headerRow;
+            }
+
+			var showSummary = function(e) {
+				var theRow = $(this).closest('tr');
+				var uuid = theRow.find('input[type=hidden]').val();
+				var result = gameSummaries[uuid];
+
+				console.log(result);
+
+				$('.result-row').remove();
+				if (result.length == 0) {
+					return;
+				}
+				else if (theRow.hasClass('showing')) {
+					$('.showing').removeClass('showing');
+					currentGameShowing = '';
+					return;
+				}
+				$('.showing').removeClass('showing');
+
+				theRow.addClass('showing');
+
+				currentGameShowing = uuid;
+
+				var resultRow = $('<tr class="result-row">');
+				var resultCell = $('<td colspan="12">');
+
+				for (var gameData in result) {
+
+					var game = [[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
+								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
+								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
+								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
+								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
+								[' ', ' ', ' ', ' ' ,' ' ,' ', ' ']];
+
+
+					var markers = result[gameData]['cells'];
+					for (var col in markers) {
+						for (var row in markers[col]) {
+							if (markers[col][row] == null) {
+								continue;
+							}
+
+							var player = markers[col][row]['color'];
+							var coord = markers[col][row]['coordinates'];
+
+							game[+row][+col] = player.charAt(0);
+						}
+					}
+
+					var currRow = '';
+
+					var gameTable = $('<table style="width: 150px; height: 150px; margin-right: 30px; margin-bottom: 30px; float: left;">');
+
+					for (var row = 0; row < game.length; row++) {
+						var tableRow = $('<tr>');
+
+						for (var col = 0; col < game[row].length; col++) {
+							var tableCell = $('<td style="width: 15px;">');//.html(game[row][col])
+
+							if (game[row][col] != ' ') tableCell.addClass(game[row][col]);
+							//currRow += game[row][col] + " ";
+							tableRow.append(tableCell);
+						}
+
+						gameTable.append(tableRow);
+					}
+
+					resultCell.append(gameTable);
+				}
+
+				//$('#dummy').append(resultRow);
+				theRow.after(resultRow.append(resultCell));
+			}
+
+            var formatTime = function(timeString) {
+                return (+timeString < 10) ? "0" + timeString : timeString;
+            }
+
+            var epochToDate = function(epochTime) {
+                var dateObject = new Date(epochTime);
+                return formatTime(dateObject.getUTCHours()) + ':' + formatTime(dateObject.getUTCMinutes()) + ' - ' + dateObject.getUTCDay() + '/' + (dateObject.getUTCMonth() + 1) + '-' + dateObject.getUTCFullYear();
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row" style>
+                <div class='col-md-4 hidden-xs hidden-sm hidden-md' >
+                    <img style="height: 120px; float: right;" src="/assets/img/TorchPillarFlaming.gif" alt="Olympic Robocop flame.">
+                </div>
+                <div class='col-md-4' style="text-align: center">
+                    <h2>Four-in-a-rowbot scoreboard</h2>
+                </div>
+                <div class='col-md-4 hidden-xs hidden-sm hidden-md'>
+                     <img style="height: 120px; float: left;" src="/assets/img/TorchPillarFlaming.gif" alt="Olympic Robocop flame.">
+                </div>
+            </div>
+            <p style="text-align: center">This is the current scoreboard over the played games:</p>
+			<div id='dummy'> </div>
+            <table class="table">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </body>
+</html>
