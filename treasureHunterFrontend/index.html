@@ -1,199 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Friday Kick-Out Competition!</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="assets/styles/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/styles/style.css">
-        <script src="assets/scripts/jquery.min.js"></script>
-        <script src="assets/scripts/bootstrap.min.js"></script>
+	<head>
+		<title>Friday Kick-Out Competition!</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="assets/styles/bootstrap.min.css">
+		<link rel="stylesheet" href="assets/styles/style.css">
+		<script src="assets/scripts/jquery.min.js"></script>
+		<script src="assets/scripts/bootstrap.min.js"></script>
 
-        <script>
-            $(function() {
-                updateScoreboard();
-                setInterval(updateScoreboard, 10000);
-            });
+		<script>
+			var fromJSON = function(jsonString) {
+				return JSON.parse(jsonString);
+			}
 
+			var toJSON = function(item) {
+				return JSON.stringify(item);
+			}
+
+			var imgs = {
+				"EMPTY": "/assets/img/empty.png",
+				"TREASURE": "/assets/img/chest.png",
+				"WALL": "/assets/img/wall.png",
+				"RED_UP": "/assets/img/imp_red_up.png",
+				"RED_DOWN": "/assets/img/imp_red_down.png",
+				"RED_LEFT": "/assets/img/imp_red_left.png",
+				"RED_RIGHT": "/assets/img/imp_red_right.png",
+				"YELLOW_UP": "/assets/img/imp_yellow_up.png",
+				"YELLOW_DOWN": "/assets/img/imp_yellow_down.png",
+				"YELLOW_LEFT": "/assets/img/imp_yellow_left.png",
+				"YELLOW_RIGHT": "/assets/img/imp_yellow_right.png"
+			}
+
+			$(function() {
+				updateScoreboard();
+
+				setInterval(updateScoreboard, 10000);
+				//loadAssets();
+			});
+
+			var currentFrameShowing = 0;
 			var gameSummaries = {};
-			var currentGameShowing = '';
+			var playedGames = fromJSON(localStorage.getItem('playedGames'));
 
-            var updateScoreboard = function() {
-                $.getJSON ("//10.46.1.193:8080/treasureHunterGameSummary.json", function(gameSummary) {
+			if (playedGames == null) playedGames = {};
+			var currentMatchShowing = '';
 
-                    console.log(gameSummary[0]);
-                    $('.table tr').remove();
+			var updateScoreboard = function() {
+				if (currentMatchShowing != '') {
+					return;
+				}
 
-                    var headerRow = buildHeader(gameSummary);
-                    var contentRow;
+				$.getJSON ("//localhost:8080/treasureHunterGameSummary.json", function(gameSummary) {
+					$('.table tr').remove();
 
-                    for (var game in gameSummary) {
-                         contentRow = $('<tr>');
+					var headerRow = buildHeader(gameSummary);
+					var contentRow;
 
-                        for (var data in gameSummary[game]) {
-                            var value = gameSummary[game][data];
+					for (var game in gameSummary) {
+						 contentRow = $('<tr>');
 
-                            if (data === 'gameStartDate') {
-                               value = epochToDate(value);
-                            }
+						var playButton;
+
+						if (gameSummaries[gameSummary[game['uuid']]] != undefined) {
+							return;
+						}
+
+						if (playedGames[gameSummary[game]['uuid']] == undefined) {
+							// This is an unplayed game. Add a play button.
+							gameSummaries[gameSummary[game]['uuid']] = gameSummary[game];
+
+							var value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">'
+					 		playButton = '<input type="button" value="Play"></input>';
+
+							contentRow.append($('<td colspan="11">').html(value + playButton));
+
+							contentRow.find('input[type=button]').click(playGame);
+							$('.table tbody').append(contentRow);
+
+							continue;
+						}
+
+						for (var data in gameSummary[game]) {
+							var value = gameSummary[game][data];
+
+							if (data === 'gameStartDate') {
+								//value = epochToDate(value);
+							}
 							else if (data === 'playerMoves') {
-									value = '<input type="button" value="Play match"></input>'
-									gameSummaries[gameSummary[game]['uuid']] = gameSummary[game][data];
+								value = '<input type="button" value="Replay match"></input>';
+							}
+							else if (data === 'boardStates') {
+								gameSummaries[gameSummary[game]['uuid']] = gameSummary[game];
+								value = '<input type="button" value="Replay match"></input>';
 							}
 							else if (data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime') {
 								value /= 1000.0;
 							}
-                            else if (/*data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime' ||*/ data === 'uuid') {
+							else if (/*data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime' ||*/ data === 'uuid') {
 								value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">'
-                            }
-                            contentRow.append($('<td>').html(value));
-                        }
+							}
+							contentRow.append($('<td>').html(value));
+						}
 
-						contentRow.find('input').click(showSummary);
-
-                        $('.table tbody').append(contentRow);
-                    }
-
-                    $('.table thead').append(headerRow);
-                    $(".table tbody").each(function(elem,index){
-                              var arr = $.makeArray($("tr",this).detach());
-                              arr.reverse();
-                              $(this).append(arr);
-                        });
-
-					if (currentGameShowing != '') {
-						console.log('currentGameShowing')
-						$('input[value=' + currentGameShowing + ']').closest('tr').find('input[type=button]').click();
+						contentRow.find('input[type=button]').click(playGame);
+						$('.table tbody').append(contentRow);
 					}
-                });
-            }
 
-            var buildHeader = function(gameSummary) {
-                var headerRow = $('<tr>');
+					$('.table thead').append(headerRow);
+					$(".table tbody").each(function(elem,index){
+						  var arr = $.makeArray($("tr",this).detach());
+						  arr.reverse();
+						  $(this).append(arr);
+					});
+
+				});
+			}
+
+			var buildHeader = function(games) {
+				var headerRow = $('<tr>');
 				var translationTable = {
 					'redPlayerName': 'Player Red',
-					'yellowPlayerName': 'Player Yellow',
+					'redPlayerTreasures' : 'Red score',
 					'redPlayerGameTime': 'Red computation time',
+					'yellowPlayerName': 'Player Yellow',
+					'yellowPlayerTreasures' : 'Yellow score',
 					'yellowPlayerGameTime': 'Yellow computation time',
+					'totalTreasures': 'Total treasures',
 					'gameName': 'Name of the Game',
+					'playerMoves': 'Replay',
 					'draws': 'Draws',
 					'redWins': 'Red victories',
 					'yellowWins': 'Yellow victories',
-					'boardStates': 'Results',
+					'boardState': '',
 					'gameStartDate': 'Battle took place',
 					'uuid': ''
 				};
 
-                for (var data in firstGame = gameSummary[0]) {
-					console.log(data);
-                    headerRow.append($('<th>').text(data));
-                }
-                return headerRow;
-            }
-
-			var showSummary = function(e) {
-				var theRow = $(this).closest('tr');
-				var uuid = theRow.find('input[type=hidden]').val();
-				var result = gameSummaries[uuid];
-
-				console.log(result);
-
-				$('.result-row').remove();
-				if (result.length == 0) {
-					return;
+				for (var data in firstGame = games[0]) {
+					headerRow.append($('<th>').text(translationTable[data]));
 				}
-				else if (theRow.hasClass('showing')) {
-					$('.showing').removeClass('showing');
-					currentGameShowing = '';
-					return;
-				}
-				$('.showing').removeClass('showing');
-
-				theRow.addClass('showing');
-
-				currentGameShowing = uuid;
-
-				var resultRow = $('<tr class="result-row">');
-				var resultCell = $('<td colspan="12">');
-
-				for (var gameData in result) {
-
-					var game = [[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
-								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
-								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
-								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
-								[' ', ' ', ' ', ' ' ,' ' ,' ', ' '],
-								[' ', ' ', ' ', ' ' ,' ' ,' ', ' ']];
-
-
-					var markers = result[gameData]['cells'];
-					for (var col in markers) {
-						for (var row in markers[col]) {
-							if (markers[col][row] == null) {
-								continue;
-							}
-
-							var player = markers[col][row]['color'];
-							var coord = markers[col][row]['coordinates'];
-
-							game[+row][+col] = player.charAt(0);
-						}
-					}
-
-					var currRow = '';
-
-					var gameTable = $('<table style="width: 150px; height: 150px; margin-right: 30px; margin-bottom: 30px; float: left;">');
-
-					for (var row = 0; row < game.length; row++) {
-						var tableRow = $('<tr>');
-
-						for (var col = 0; col < game[row].length; col++) {
-							var tableCell = $('<td style="width: 15px;">');//.html(game[row][col])
-
-							if (game[row][col] != ' ') tableCell.addClass(game[row][col]);
-							//currRow += game[row][col] + " ";
-							tableRow.append(tableCell);
-						}
-
-						gameTable.append(tableRow);
-					}
-
-					resultCell.append(gameTable);
-				}
-
-				//$('#dummy').append(resultRow);
-				theRow.after(resultRow.append(resultCell));
+				return headerRow;
 			}
 
-            var formatTime = function(timeString) {
-                return (+timeString < 10) ? "0" + timeString : timeString;
-            }
+			var currentReplay;
 
-            var epochToDate = function(epochTime) {
-                var dateObject = new Date(epochTime);
-                return formatTime(dateObject.getUTCHours()) + ':' + formatTime(dateObject.getUTCMinutes()) + ' - ' + dateObject.getUTCDay() + '/' + (dateObject.getUTCMonth() + 1) + '-' + dateObject.getUTCFullYear();
-            }
-        </script>
-    </head>
-    <body>
-        <div class="container">
-            <div class="row" style>
-                <div class='col-md-4 hidden-xs hidden-sm hidden-md' >
-                    <img style="height: 120px; float: right;" src="/assets/img/TorchPillarFlaming.gif" alt="Olympic Robocop flame.">
-                </div>
-                <div class='col-md-4' style="text-align: center">
-                    <h2>Four-in-a-rowbot scoreboard</h2>
-                </div>
-                <div class='col-md-4 hidden-xs hidden-sm hidden-md'>
-                     <img style="height: 120px; float: left;" src="/assets/img/TorchPillarFlaming.gif" alt="Olympic Robocop flame.">
-                </div>
-            </div>
-            <p style="text-align: center">This is the current scoreboard over the played games:</p>
+			var playGame = function(e) {
+				var currentRow = $(this).closest('tr');
+				var uuid = currentRow.find('input[type=hidden]').val();
+				var result = gameSummaries[uuid]['boardStates'];
+			
+				var resultRow = $('<tr class="result-row">');
+				var resultCell = $('<td colspan="12">');
+			
+				currentRow.after(resultRow.append(resultCell));
+				currentFrameShowing = 0;
+				currentMatchShowing = uuid;
+			
+				currentReplay = setInterval(function() {
+					resultCell.empty();	
+					resultCell.append(showNextFrame());
+				}, 100);
+			}
+
+			var showNextFrame = function() {
+				var rounds = gameSummaries[currentMatchShowing]['boardStates'];
+
+				if (currentFrameShowing >= rounds.length) {
+					endPreview();
+					return;
+				}
+
+				var gameField = $('<table><tbody></tbody></table>');
+			
+				var columnLength = rounds[0].length;
+				var rowLength = rounds[0][0].length;
+				var playField = create2DArray(columnLength);
+			
+			
+				for (var row = 0; row < rowLength; row++) {
+					var rowElement = $('<tr></tr>');
+			
+					for (var column = 0; column < columnLength; column++) {
+						var state = rounds[currentFrameShowing][column][row];
+						var url;
+						url = imgs[state];
+			
+						var tile = $('<td style="width: 32px; height: 32px; margin: 0px; padding: 0px; border: none;"></td>').css('background-image', 'url(' + url + ')');
+						rowElement.append(tile);
+					}
+					gameField.append(rowElement);
+				}
+				currentFrameShowing++;
+			
+				return gameField;
+			}
+
+			var create2DArray = function(columns) {
+				var arr = [];
+				for (var i = 0; i < columns; i++) {
+					arr[i] = [];
+				}
+				return arr;
+			}
+			
+			var endPreview = function() {
+				clearInterval(currentReplay);
+
+				var newPlayedGames = fromJSON(localStorage.getItem('playedGames'));
+				if (newPlayedGames == null) newPlayedGames = {};
+
+				newPlayedGames[currentMatchShowing] = 'PLAYED';
+				localStorage.setItem('playedGames', toJSON(newPlayedGames));
+
+				playedGames = fromJSON(localStorage.getItem('playedGames'));
+				currentMatchShowing = '';
+				updateScoreboard();
+
+				$('.result-row').remove();
+			}
+
+			var formatTime = function(timeString) {
+				return (+timeString < 10) ? "0" + timeString : timeString;
+			}
+
+			var epochToDate = function(epochTime) {
+				var dateObject = new Date(epochTime);
+				return formatTime(dateObject.getUTCHours()) + ':' + formatTime(dateObject.getUTCMinutes()) + ' - ' + dateObject.getUTCDay() + '/' + (dateObject.getUTCMonth() + 1) + '-' + dateObject.getUTCFullYear();
+			}
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row" style>
+				<div class='col-md-4 hidden-xs hidden-sm hidden-md' >
+					<img style="height: 120px; float: right;" src="/assets/img/TorchPillarFlaming.gif" alt="Olympic Robocop flame.">
+				</div>
+				<div class='col-md-4' style="text-align: center">
+					<h2>Treasure Hunter scoreboard</h2>
+				</div>
+				<div class='col-md-4 hidden-xs hidden-sm hidden-md'>
+					 <img style="height: 120px; float: left;" src="/assets/img/TorchPillarFlaming.gif" alt="Olympic Robocop flame.">
+				</div>
+			</div>
+			<p style="text-align: center">This is the current scoreboard over the played games:</p>
 			<div id='dummy'> </div>
-            <table class="table">
-                <thead></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </body>
+			<table class="table">
+				<thead></thead>
+				<tbody></tbody>
+			</table>
+		</div>
+	</body>
 </html>

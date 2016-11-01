@@ -2,6 +2,7 @@ package treasurehunter.server;
 
 import java.util.List;
 
+import commons.gameengine.board.BoardState;
 import commons.gameengine.board.PlayerColor;
 import treasurehunter.GameResult;
 import treasurehunter.board.TreasureHunterBoard;
@@ -38,7 +39,7 @@ public class GameHandler {
 
         game.getTimer().stop(playerName);
         board.movePlayer(playerColor, move);
-        game.addPlayerMove(new PlayerMove(playerColor, move));
+        game.addBoardState(new BoardState<>(board.getCells()));
 
         if (treasuresLeft > GameResult.getTreasuresLeft(board)) {
             // Player picked up a treasure

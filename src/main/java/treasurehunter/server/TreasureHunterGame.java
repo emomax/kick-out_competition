@@ -8,12 +8,13 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import commons.gameengine.board.BoardState;
 import commons.gameengine.board.PlayerColor;
 import commons.network.server.Game;
 import commons.network.server.GameTimer;
 import treasurehunter.GameResult;
+import treasurehunter.board.Tile;
 import treasurehunter.board.TreasureHunterBoard;
-import treasurehunter.domain.PlayerMove;
 
 public class TreasureHunterGame implements Game, Serializable {
     private final UUID   id;
@@ -23,9 +24,9 @@ public class TreasureHunterGame implements Game, Serializable {
     private       long redPlayerGameTime;
     private       long yellowPlayerGameTime;
 
-    private final TreasureHunterBoard initialBoard;
+    private final List<String[][]>       boardStatesAsStrings = new ArrayList<>();
+    private final List<BoardState<Tile>> boardStates          = new ArrayList<>();
     private final TreasureHunterBoard board;
-    private       List<PlayerMove>    playerMoves           = new ArrayList<>();
     private final AtomicBoolean       isRedPlayerTurn       = new AtomicBoolean(true);
     private       AtomicInteger       yellowPlayerTreasures = new AtomicInteger(0);
     private       AtomicInteger       numberOfTreasures;
@@ -39,9 +40,8 @@ public class TreasureHunterGame implements Game, Serializable {
         this.redPlayerName = redPlayerName;
 
         this.board = new TreasureHunterBoard();
-        this.initialBoard = new TreasureHunterBoard(board.getCells());
 
-        this.numberOfTreasures = new AtomicInteger(initialBoard.getTotalTreasures());
+        this.numberOfTreasures = new AtomicInteger(board.getTotalTreasures());
     }
 
     public int getNumberOfTreasures() {
@@ -73,16 +73,42 @@ public class TreasureHunterGame implements Game, Serializable {
         return name;
     }
 
-    public TreasureHunterBoard getInitialBoard() {
-        return initialBoard;
+    public void addBoardState(BoardState<Tile> currentState) {
+
+        //boardStates.add(currentState);
+        boardStatesAsStrings.add(cellsAsStrings(currentState));
+    }
+
+    public String[][] cellsAsStrings(BoardState<Tile> boardState) {
+        final String[][] cellsAsStrings = new String[boardState.getCells().length][boardState.getCells()[0].length];
+
+        for (int x = 0; x < boardState.getCells().length; x++) {
+            for (int y = 0; y < boardState.getCells()[0].length; y++) {
+                Tile currentTile = boardState.getCells()[x][y];
+                String tileString = currentTile.getState().toString();
+
+                if ( currentTile.getState() == Tile.TileState.RED || currentTile.getState() == Tile.TileState.YELLOW) {
+                    tileString += "_" + currentTile.getOrientation().toString();
+                }
+
+                cellsAsStrings[x][y] = tileString;
+            }
+        }
+
+        return cellsAsStrings;
+    }
+
+    public List<String[][]> getBoardStatesAsStrings() {
+        return boardStatesAsStrings;
+    }
+
+
+    public List<BoardState<Tile>> getBoardStates() {
+        return boardStates;
     }
 
     public synchronized TreasureHunterBoard getBoard() {
         return board;
-    }
-
-    public List<PlayerMove> getPlayerMoves() {
-        return playerMoves;
     }
 
     public PlayerColor getPlayerColor(final String playerName) {
@@ -128,10 +154,6 @@ public class TreasureHunterGame implements Game, Serializable {
             }
             Thread.sleep(20);
         }
-    }
-
-    public void addPlayerMove(PlayerMove playerMove) {
-        this.playerMoves.add(playerMove);
     }
 
     public void finishMyTurn() {

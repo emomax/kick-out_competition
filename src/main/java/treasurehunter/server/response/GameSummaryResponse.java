@@ -10,14 +10,13 @@ import treasurehunter.domain.PlayerMove;
 
 public class GameSummaryResponse {
 
-    private UUID uuid;
-    private int  redPlayerTreasures;
-    private int  yellowPlayerTreasures;
-    private int  totalTreasures;
-    private long   redPlayerGameTime;
-    private long   yellowPlayerGameTime;
-    private BoardState<Tile> boardState;
-    private List<PlayerMove> playerMoves = new ArrayList<>();
+    private UUID             uuid;
+    private int              redPlayerTreasures;
+    private int              yellowPlayerTreasures;
+    private int              totalTreasures;
+    private long             redPlayerGameTime;
+    private long             yellowPlayerGameTime;
+    private List<String[][]> boardStates;
     private String gameStartDate;
     private String gameName;
     private String redPlayerName;
@@ -79,20 +78,12 @@ public class GameSummaryResponse {
         this.yellowPlayerName = yellowPlayerName;
     }
 
-    public void setBoardState(BoardState<Tile> boardState) {
-        this.boardState = boardState;
+    public void setBoardStates(List<String[][]> boardStates) {
+        this.boardStates = boardStates;
     }
 
-    public BoardState<Tile> getBoardState() {
-        return boardState;
-    }
-
-    public List<PlayerMove> getPlayerMoves() {
-        return playerMoves;
-    }
-
-    public void setPlayerMoves(final List<PlayerMove> playerMoves) {
-        this.playerMoves = playerMoves;
+    public List<String[][]> getBoardStates() {
+        return boardStates;
     }
 
     public long getRedPlayerGameTime() {

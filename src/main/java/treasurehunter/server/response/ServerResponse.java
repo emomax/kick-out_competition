@@ -6,7 +6,7 @@ import treasurehunter.board.Tile;
 
 public class ServerResponse extends ServerResponseBase {
 
-    private BoardState<Tile> boardState;//BoardState<Tile> boardState;
+    private BoardState<Tile> boardState;
 
     public BoardState<Tile> getBoardState() {
         return boardState;
