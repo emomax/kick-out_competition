@@ -33,6 +33,7 @@ public class TreasureHunterApplication {
         GameResult gameResult = GameResult.ResultWithoutWinner();
         while (!gameResult.isGameOver(board)) {
             try {
+                GameResult.incrementTurns();
                 playNextRound(isRedPlayerTurn);
             }
             catch (final Exception e) {
@@ -56,7 +57,7 @@ public class TreasureHunterApplication {
 
             // A nice pace =o)
             try {
-                Thread.sleep(200L);
+                Thread.sleep(60L);
             }
             catch (final InterruptedException e) {
                 e.printStackTrace();
