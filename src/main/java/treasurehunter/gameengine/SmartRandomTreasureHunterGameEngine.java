@@ -15,6 +15,7 @@ import static treasurehunter.board.Tile.TileState;
 public class SmartRandomTreasureHunterGameEngine extends TreasureHunterGameEngine {
     @Override
     public Move getNextMove(final TreasureHunterBoard board, final PlayerColor myColor) {
+
         Tile me = findMe(board, myColor);
 
         if (!nextIsOK(me, board)) {

@@ -160,6 +160,10 @@ public class TreasureHunterGame implements Game, Serializable {
         isRedPlayerTurn.set(!isRedPlayerTurn.get());
     }
 
+    public synchronized void incrementTurns() {
+        GameResult.incrementTurns();
+    }
+
     public synchronized boolean isGameOver() {
         return GameResult.isGameOver(board);
     }

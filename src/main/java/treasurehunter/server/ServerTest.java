@@ -16,7 +16,7 @@ public class ServerTest {
 
     public static void main(final String[] args) {
         //final ServerRestController server   = new ServerRestController();
-        final String               gameName = "myGame1";
+        final String               gameName = "myGame2";
 
         new Thread(() -> {
             String                               playerName   = "Player1";

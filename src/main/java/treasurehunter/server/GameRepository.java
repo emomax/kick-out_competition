@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import treasurehunter.GameResult;
+
 public class GameRepository {
 
     private final ConcurrentHashMap<String, TreasureHunterGame> games = new ConcurrentHashMap<>();
@@ -24,6 +26,8 @@ public class GameRepository {
                 final UUID              id   = UUID.randomUUID();
                 final TreasureHunterGame game = new TreasureHunterGame(id, gameName, playerName);
                 games.put(game.getName(), game);
+
+                GameResult.resetTurns();
                 return game;
             }
         }

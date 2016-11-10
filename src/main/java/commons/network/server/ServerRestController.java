@@ -139,7 +139,7 @@ public class ServerRestController {
 
     private ServerResponseBase getTreasureHunterBoardStateResponse(final @RequestParam(value = "playerName") String playerName, final @RequestParam(value = "gameName") String gameName) throws InterruptedException {
         final TreasureHunterBoard                           board      = treasureHunterGameHandler.getBoard(gameName, playerName);
-        final BoardState<Tile>                      boardState = new BoardState<>(board.getCells());
+        final BoardState<Tile>                              boardState = new BoardState<>(board.getCells());
         final TreasureHunterGame                            game       = treasureHunterGameHandler.getGame(gameName);
         final treasurehunter.server.response.ServerResponse response   = new treasurehunter.server.response.ServerResponse();
         response.setRedPlayerName(game.getRedPlayerName());
@@ -166,6 +166,8 @@ public class ServerRestController {
         final Move move = Move.valueOf(responseMove);
         try {
             final TreasureHunterGame game = treasureHunterGameHandler.move(gameName, playerName, move);
+            game.incrementTurns();
+
             if (game.isGameOver()) {
                 final treasurehunter.server.response.ServerResponse response = new treasurehunter.server.response.ServerResponse();
                 response.setMessage("TreasureHunterGame over!");

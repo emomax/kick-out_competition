@@ -7,7 +7,6 @@ import commons.gameengine.board.PlayerColor;
 import treasurehunter.GameResult;
 import treasurehunter.board.TreasureHunterBoard;
 import treasurehunter.domain.Move;
-import treasurehunter.domain.PlayerMove;
 
 public class GameHandler {
 
