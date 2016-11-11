@@ -24,6 +24,12 @@ public class Tile implements Serializable, Positionable {
         this.state = state;
     }
 
+    public Tile(Coordinate coordinate, TileState state, Orientation direction) {
+        this.coordinates = coordinate;
+        this.state = state;
+        this.direction = direction;
+    }
+
     public TileState getState() {
         return state;
     }
@@ -45,7 +51,9 @@ public class Tile implements Serializable, Positionable {
         return coordinates;
     }
 
-
+    public Tile clone() {
+        return new Tile(coordinates, state, direction);
+    }
 
     public enum TileState
     {

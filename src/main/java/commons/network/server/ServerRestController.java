@@ -205,7 +205,8 @@ public class ServerRestController {
             response.setRedPlayerName(game.getRedPlayerName());
             response.setYellowPlayerName(game.getYellowPlayerName());
 
-            response.setBoardStates(game.getBoardStatesAsStrings());//.getInitialBoard().getCells()));
+            response.setInitialBoardState(game.getInitialBoardStateAsString());
+            response.setBoardStateUpdates(game.getBoardUpdatesAsStrings());
 
             response.setRedPlayerGameTime(game.getRedPlayerGameTime());
             response.setYellowPlayerGameTime(game.getYellowPlayerGameTime());

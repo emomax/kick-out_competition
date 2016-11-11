@@ -5,6 +5,7 @@ import java.util.List;
 import commons.gameengine.board.BoardState;
 import commons.gameengine.board.PlayerColor;
 import treasurehunter.GameResult;
+import treasurehunter.board.BoardStateUpdate;
 import treasurehunter.board.TreasureHunterBoard;
 import treasurehunter.domain.Move;
 
@@ -37,8 +38,14 @@ public class GameHandler {
         final int treasuresLeft = GameResult.getTreasuresLeft(board);
 
         game.getTimer().stop(playerName);
-        board.movePlayer(playerColor, move);
-        game.addBoardState(new BoardState<>(board.getCells()));
+        BoardStateUpdate boardStateUpdate = board.movePlayer(playerColor, move);
+
+        if (!game.initialBoardIsSet()) {
+            game.setInitialBoardState(new BoardState<>(board.getCells()));
+        }
+        else {
+            game.addBoardStateUpdate(boardStateUpdate);
+        }
 
         if (treasuresLeft > GameResult.getTreasuresLeft(board)) {
             // Player picked up a treasure

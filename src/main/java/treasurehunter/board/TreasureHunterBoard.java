@@ -58,18 +58,20 @@ public class TreasureHunterBoard implements Board<Tile> {
         return board[x][y];
     }
 
-    public void movePlayer(PlayerColor player, Move playerMove) {
-        Coordinate  playerTile = findPlayer(player);
+    public BoardStateUpdate movePlayer(PlayerColor player, Move playerMove) {
+        Tile playerTile = findPlayer(player);
 
-        int x = playerTile.getX();
-        int y = playerTile.getY();
+        int x = playerTile.getCoordinates().getX();
+        int y = playerTile.getCoordinates().getY();
+        int newX = x;
+        int newY = y;
 
-        Orientation playerDirection = board[x][y].getOrientation();
+        Orientation playerDirection = playerTile.getOrientation();
 
         switch (playerMove) {
             case MOVE_FORWARD:
-                int newX = x + playerDirection.xDirection();
-                int newY = y + playerDirection.yDirection();
+                newX = x + playerDirection.xDirection();
+                newY = y + playerDirection.yDirection();
 
                 Coordinate possibleNextTile = new Coordinate(newX, newY);
 
@@ -82,8 +84,8 @@ public class TreasureHunterBoard implements Board<Tile> {
                             // Deliberate fallthrough
                         case EMPTY:
                             board[x][y].setState(TileState.EMPTY);
-                            board[x + playerDirection.xDirection()][y + playerDirection.yDirection()].setState(TileState.valueOf(player.toString()));
-                            board[x + playerDirection.xDirection()][y + playerDirection.yDirection()].setOrientation(board[x][y].getOrientation());
+                            board[newX][newY].setState(TileState.valueOf(player.toString()));
+                            board[newX][newY].setOrientation(board[x][y].getOrientation());
                             break;
                         case WALL:
                         case RED:
@@ -95,7 +97,7 @@ public class TreasureHunterBoard implements Board<Tile> {
                 else {
                     // Player moved against outer wall
                 }
-                return;
+                break;
 
             case ROTATE_LEFT:
                 if (playerDirection == Orientation.UP) {
@@ -110,7 +112,7 @@ public class TreasureHunterBoard implements Board<Tile> {
                 else if (playerDirection == Orientation.RIGHT) {
                     board[x][y].setOrientation(Orientation.UP);
                 }
-                return;
+                break;
 
             case ROTATE_RIGHT:
                 if (playerDirection == Orientation.UP) {
@@ -125,18 +127,20 @@ public class TreasureHunterBoard implements Board<Tile> {
                 else if (playerDirection == Orientation.RIGHT) {
                     board[x][y].setOrientation(Orientation.DOWN);
                 }
-                return;
+                break;
 
             default:
                 throw new RuntimeException("Undefined player move! - " + playerMove.toString());
         }
+
+        return new BoardStateUpdate(board[x][y], board[newX][newY]);
     }
 
-    private Coordinate findPlayer(PlayerColor player) {
+    private Tile findPlayer(PlayerColor player) {
         for (int i = 0; i < numberOfColumns; i++) {
             for (int j = 0; j < numberOfRows; j++) {
                 if (board[i][j].getState().toString().equals(player.toString())) {
-                    return board[i][j].getCoordinates();
+                    return board[i][j];
                 }
             }
         }

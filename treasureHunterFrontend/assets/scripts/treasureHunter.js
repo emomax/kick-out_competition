@@ -111,13 +111,17 @@ function updateScoreboard() {
 
 			for (var data in gameSummary[game]) {
 				var value = gameSummary[game][data];
+				var hide = false;
 
 				if (data === 'playerMoves') {
 					value = '<input type="button" value="Replay match">';
 				}
-				else if (data === 'boardStates') {
+				else if (data === 'initialBoardState') {
 					gameSummaries[gameSummary[game]['uuid']] = gameSummary[game];
 					value = '<input type="button" value="Replay match">';
+				}
+				else if (data === 'boardStateUpdates') {
+					hide = true;
 				}
 				else if (data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime') {
 					value /= 1000.0;
@@ -125,7 +129,10 @@ function updateScoreboard() {
 				else if (/*data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime' ||*/ data === 'uuid') {
 					value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">';
 				}
-				contentRow.append($('<td>').html(value));
+
+				if (hide === false) {
+				    contentRow.append($('<td>').html(value));
+				}
 			}
 
 			contentRow.find('input[type=button]').click(playGame);
@@ -157,13 +164,15 @@ function buildHeader(games) {
 		'draws': 'Draws',
 		'redWins': 'Red victories',
 		'yellowWins': 'Yellow victories',
-		'boardState': '',
+		'initialBoardState': '',
 		'gameStartDate': 'Battle took place',
 		'uuid': ''
 	};
 
 	for (var data in games[0]) {
-		headerRow.append($('<th>').text(translationTable[data]));
+		if (translationTable[data] !== undefined) {
+			headerRow.append($('<th>').text(translationTable[data]));
+		}
 	}
 	return headerRow;
 }
@@ -171,14 +180,14 @@ function buildHeader(games) {
 function playGame(e) {
 	var currentRow = $(this).closest('tr');
 	var uuid = currentRow.find('input[type=hidden]').val();
-	var result = gameSummaries[uuid]['boardStates'];
+	var initialBoardState = gameSummaries[uuid]['initialBoardState'];
 
 	var resultRow = $('<tr class="result-row">');
 	var resultCell = $('<td colspan="12" style="text-align: center;">');
 
 	// Set up canvas
-	var numColumns = result[0].length;
-	var numRows = result[0][0].length;
+	var numColumns = initialBoardState.length;
+	var numRows = initialBoardState[0].length;
 
 	var canvas = $('<canvas id="currentGameCanvas"></canvas>');
 	canvas.prop('width', numColumns * 32);
@@ -188,13 +197,29 @@ function playGame(e) {
 
 	currentMatchShowing = uuid;
 
+	var gameField = $('#currentGameCanvas');
+	var context = gameField[0].getContext('2d');
+
+	// Clear screen before drawing initial board
+	context.clearRect(0, 0, gameField.width(), gameField.height());
+
+	for (var row = 0; row < numRows; row++) {
+		for (var column = 0; column < numColumns; column++) {
+			var state = initialBoardState[column][row];
+			var img;
+			img = imgs[state][0];
+
+			context.drawImage(img, column * img.width, row * img.height);
+		}
+	}
+
 	currentReplay = setInterval(function() {
 		drawNextFrame();
 	}, 100);
 }
 
 function drawNextFrame() {
-	var rounds = gameSummaries[currentMatchShowing]['boardStates'];
+	var rounds = gameSummaries[currentMatchShowing]['boardStateUpdates'];
 
 	if (currentFrameShowing >= rounds.length) {
 		showGameBriefing();
@@ -207,18 +232,26 @@ function drawNextFrame() {
 	var gameField = $('#currentGameCanvas');
 	var context = gameField[0].getContext('2d');
 
-	// Clear screen before drawing
-	context.clearRect(0, 0, gameField.width(), gameField.height());
+	var state = rounds[currentFrameShowing];
 
-	for (var row = 0; row < rowLength; row++) {
-		for (var column = 0; column < columnLength; column++) {
-			var state = rounds[currentFrameShowing][column][row];
-			var img;
-			img = imgs[state][0];
+	var regex = /^old-(\d+):(\d+)state(.+)new-(\d+):(\d+)state(.*)$/g;
+	var match = regex.exec(state);
 
-			context.drawImage(img, column * img.width, row * img.height);
-		}
-	}
+	var oldX = match[1];
+	var oldY = match[2];
+	var oldState = match[3];
+
+	var oldImg = imgs[oldState][0];
+	context.clearRect(oldX * oldImg.width, oldY * oldImg.height, oldImg.width, oldImg.height);
+	context.drawImage(oldImg, oldX * oldImg.width, oldY * oldImg.height);
+
+	var newX = match[4];
+	var newY = match[5];
+	var newState = match[6];
+
+	var newImg = imgs[newState][0];
+	context.clearRect(newX * newImg.width, newY * newImg.height, newImg.width, newImg.height);
+	context.drawImage(newImg, newX * newImg.width, newY * newImg.height);
 
 	currentFrameShowing++;
 }
