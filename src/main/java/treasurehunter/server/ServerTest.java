@@ -19,7 +19,7 @@ public class ServerTest {
         final String               gameName = "myGame2";
 
         new Thread(() -> {
-            String                               playerName   = "Player1";
+            String                               playerName   = "Duke Fancypants";
             final SmartRandomTreasureHunterGameEngine playerEngine = new SmartRandomTreasureHunterGameEngine();
             RemoteGame                           gameInstance = new TreasureHunterRemoteGameImpl();
             ServerResponseBase                   gameResult   = gameInstance.runGame(playerName, gameName, playerEngine);
@@ -29,7 +29,7 @@ public class ServerTest {
         }).start();
 
         new Thread(() -> {
-            String                                    playerName   = "Player2";
+            String                                    playerName   = "Sergeant Slick";
             final SmartRandomTreasureHunterGameEngine playerEngine = new SmartRandomTreasureHunterGameEngine();
             RemoteGame         gameInstance = new TreasureHunterRemoteGameImpl();
             ServerResponseBase gameResult   = gameInstance.runGame(playerName, gameName, playerEngine);
