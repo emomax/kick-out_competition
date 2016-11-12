@@ -13,6 +13,7 @@ import commons.gameengine.board.PlayerColor;
 import commons.network.server.Game;
 import commons.network.server.GameTimer;
 import treasurehunter.GameResult;
+import treasurehunter.board.BoardStateUpdate;
 import treasurehunter.board.Tile;
 import treasurehunter.board.TreasureHunterBoard;
 
@@ -24,8 +25,8 @@ public class TreasureHunterGame implements Game, Serializable {
     private       long redPlayerGameTime;
     private       long yellowPlayerGameTime;
 
-    private final List<String[][]>       boardStatesAsStrings = new ArrayList<>();
-    private final List<BoardState<Tile>> boardStates          = new ArrayList<>();
+    private String[][] initialBoardStateAsString;
+    private final List<String> boardStateUpdatesAsStrings = new ArrayList<>();
     private final TreasureHunterBoard board;
     private final AtomicBoolean       isRedPlayerTurn       = new AtomicBoolean(true);
     private       AtomicInteger       yellowPlayerTreasures = new AtomicInteger(0);
@@ -73,10 +74,12 @@ public class TreasureHunterGame implements Game, Serializable {
         return name;
     }
 
-    public void addBoardState(BoardState<Tile> currentState) {
+    public void setInitialBoardState(final BoardState<Tile> boardState) {
+        this.initialBoardStateAsString = cellsAsStrings(boardState);
+    }
 
-        //boardStates.add(currentState);
-        boardStatesAsStrings.add(cellsAsStrings(currentState));
+    public void addBoardStateUpdate(final BoardStateUpdate boardStateUpdate) {
+        boardStateUpdatesAsStrings.add(boardStateUpdate.toString());
     }
 
     public String[][] cellsAsStrings(BoardState<Tile> boardState) {
@@ -98,13 +101,12 @@ public class TreasureHunterGame implements Game, Serializable {
         return cellsAsStrings;
     }
 
-    public List<String[][]> getBoardStatesAsStrings() {
-        return boardStatesAsStrings;
+    public String[][] getInitialBoardStateAsString() {
+        return initialBoardStateAsString;
     }
 
-
-    public List<BoardState<Tile>> getBoardStates() {
-        return boardStates;
+    public List<String> getBoardUpdatesAsStrings() {
+        return boardStateUpdatesAsStrings;
     }
 
     public synchronized TreasureHunterBoard getBoard() {
@@ -166,6 +168,10 @@ public class TreasureHunterGame implements Game, Serializable {
 
     public synchronized boolean isGameOver() {
         return GameResult.isGameOver(board);
+    }
+
+    public synchronized boolean initialBoardIsSet() {
+        return initialBoardStateAsString != null;
     }
 
     public synchronized void playerCollected(final PlayerColor playerColor) {

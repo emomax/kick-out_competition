@@ -16,7 +16,8 @@ public class GameSummaryResponse {
     private int              totalTreasures;
     private long             redPlayerGameTime;
     private long             yellowPlayerGameTime;
-    private List<String[][]> boardStates;
+    private String[][] initialBoardState;
+    private List<String> boardStateUpdates;
     private String gameStartDate;
     private String gameName;
     private String redPlayerName;
@@ -78,12 +79,20 @@ public class GameSummaryResponse {
         this.yellowPlayerName = yellowPlayerName;
     }
 
-    public void setBoardStates(List<String[][]> boardStates) {
-        this.boardStates = boardStates;
+    public void setInitialBoardState(String[][] initialBoardState) {
+        this.initialBoardState = initialBoardState;
     }
 
-    public List<String[][]> getBoardStates() {
-        return boardStates;
+    public String[][] getInitialBoardState() {
+        return initialBoardState;
+    }
+
+    public void setBoardStateUpdates(List<String> boardStateUpdates) {
+        this.boardStateUpdates = boardStateUpdates;
+    }
+
+    public List<String> getBoardStateUpdates() {
+        return boardStateUpdates;
     }
 
     public long getRedPlayerGameTime() {
