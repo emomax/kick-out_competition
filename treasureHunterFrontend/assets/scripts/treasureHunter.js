@@ -70,6 +70,7 @@ var imgs = {
 var currentFrameShowing = 0;
 var currentMatchShowing = '';
 var gameSummaries = {};
+var timeoutEvents = [];
 
 var playedGames = fromJSON(localStorage.getItem('playedGames'));
 if (playedGames === null) playedGames = {};
@@ -111,7 +112,6 @@ function updateScoreboard() {
 
 			for (var data in gameSummary[game]) {
 				var value = gameSummary[game][data];
-				var hide = false;
 
 				if (data === 'playerMoves') {
 					value = '<input type="button" value="Replay match">';
@@ -121,7 +121,7 @@ function updateScoreboard() {
 					value = '<input type="button" value="Replay match">';
 				}
 				else if (data === 'boardStateUpdates') {
-					hide = true;
+					continue;
 				}
 				else if (data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime') {
 					value /= 1000.0;
@@ -130,9 +130,7 @@ function updateScoreboard() {
 					value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">';
 				}
 
-				if (hide === false) {
-				    contentRow.append($('<td>').html(value));
-				}
+				contentRow.append($('<td>').html(value));
 			}
 
 			contentRow.find('input[type=button]').click(playGame);
@@ -178,6 +176,8 @@ function buildHeader(games) {
 }
 
 function playGame(e) {
+	clearExistingGame();
+
 	var currentRow = $(this).closest('tr');
 	var uuid = currentRow.find('input[type=hidden]').val();
 	var initialBoardState = gameSummaries[uuid]['initialBoardState'];
@@ -218,40 +218,48 @@ function playGame(e) {
 	}, 100);
 }
 
-function drawNextFrame() {
-	var rounds = gameSummaries[currentMatchShowing]['boardStateUpdates'];
+function clearExistingGame() {
+	if (typeof currentReplay != 'undefined') {
+		clearInterval(currentReplay);
+	}
 
-	if (currentFrameShowing >= rounds.length) {
+	for (var i = 0; i < timeoutEvents.length; i++) {
+		clearTimeout(timeoutEvents[i]);
+	}
+	timeoutEvents = [];
+
+	$('.result-row').remove();
+	currentMatchShowing = '';
+	currentFrameShowing = 0;
+}
+
+function drawNextFrame() {
+	var boardUpdates = gameSummaries[currentMatchShowing]['boardStateUpdates'];
+
+	if (currentFrameShowing >= boardUpdates.length) {
 		showGameBriefing();
 		return;
 	}
 
-	var columnLength = rounds[0].length;
-	var rowLength = rounds[0][0].length;
-
 	var gameField = $('#currentGameCanvas');
 	var context = gameField[0].getContext('2d');
 
-	var state = rounds[currentFrameShowing];
+	var boardUpdate = fromJSON(boardUpdates[currentFrameShowing]);
 
-	var regex = /^old-(\d+):(\d+)state(.+)new-(\d+):(\d+)state(.*)$/g;
-	var match = regex.exec(state);
+	for (var i = 0; i < boardUpdate['changedTiles'].length; i++) {
+		var tile = boardUpdate['changedTiles'][i];
+		var state = tile.state;
+		if (state === 'RED' || state === 'YELLOW') {
+			state += '_' + tile.direction;
+		}
 
-	var oldX = match[1];
-	var oldY = match[2];
-	var oldState = match[3];
+		var img = imgs[state][0];
+		var x = tile.coordinates.x;
+		var y = tile.coordinates.y;
 
-	var oldImg = imgs[oldState][0];
-	context.clearRect(oldX * oldImg.width, oldY * oldImg.height, oldImg.width, oldImg.height);
-	context.drawImage(oldImg, oldX * oldImg.width, oldY * oldImg.height);
-
-	var newX = match[4];
-	var newY = match[5];
-	var newState = match[6];
-
-	var newImg = imgs[newState][0];
-	context.clearRect(newX * newImg.width, newY * newImg.height, newImg.width, newImg.height);
-	context.drawImage(newImg, newX * newImg.width, newY * newImg.height);
+		context.clearRect(x * img.width, y * img.height, img.width, img.height);
+		context.drawImage(img, x * img.width, y * img.height);
+	}
 
 	currentFrameShowing++;
 }
@@ -276,7 +284,7 @@ function showGameBriefing() {
 		context.fillRect(0, 0, gameField.width, gameField.height);
 		transparency += 0.02;
 
-		setTimeout(fadeToBlack, 50);
+		timeoutEvents.push(setTimeout(fadeToBlack, 50));
 	};
 
 	fadeToBlack();
@@ -304,7 +312,7 @@ function showResultTitle() {
 		context.fillStyle=gradient;
 		context.fillText("RESULTS", gameField.width / 2 - "RESULTS".length * 45 / 2, 100);
 
-		setTimeout(showYellowPlayerTitle, 800);
+		timeoutEvents.push(setTimeout(showYellowPlayerTitle, 800));
 	};
 
 	var showYellowPlayerTitle = function() {
@@ -312,7 +320,7 @@ function showResultTitle() {
 		context.fillStyle = '#F9C02F';
 		context.fillText(yellowPlayerName, gameField.width / 2 - 80 - yellowPlayerName.length * 20, 190);
 
-		setTimeout(showYellowScore, 500);
+		timeoutEvents.push(setTimeout(showYellowScore, 500));
 	};
 
 	var yellowScore = gameSummaries[currentMatchShowing]['yellowPlayerTreasures'];
@@ -320,7 +328,7 @@ function showResultTitle() {
 
 	var showYellowScore = function() {
 		if (yellowScoreIterator > yellowScore) {
-			setTimeout(showRedPlayerTitle, 400);
+			timeoutEvents.push(setTimeout(showRedPlayerTitle, 400));
 			return;
 		}
 
@@ -331,7 +339,7 @@ function showResultTitle() {
 		context.fillStyle = '#fff';
 		context.fillText(yellowScoreIterator, gameField.width / 2 - 80 - (yellowPlayerName.length * 16 / 2) - (2 * 25), 280);
 		yellowScoreIterator++;
-		setTimeout(showYellowScore, 200);
+		timeoutEvents.push(setTimeout(showYellowScore, 200));
 	};
 
 	var showRedPlayerTitle = function() {
@@ -339,7 +347,7 @@ function showResultTitle() {
 		context.fillStyle = '#a90329';
 		context.fillText(redPlayerName, gameField.width / 2 + 80, 190);
 
-		setTimeout(showRedScore, 500);
+		timeoutEvents.push(setTimeout(showRedScore, 500));
 	};
 
 	var redScore = gameSummaries[currentMatchShowing]['redPlayerTreasures'];
@@ -348,7 +356,7 @@ function showResultTitle() {
 	var showRedScore = function() {
 		if (redScoreIterator > redScore) {
 			imgData  = context.getImageData(0, 0, gameField.width, gameField.height);
-			setTimeout(fadeToBlackEnding, 4000);
+			timeoutEvents.push(setTimeout(fadeToBlackEnding, 4000));
 			return;
 		}
 
@@ -359,7 +367,7 @@ function showResultTitle() {
 		context.fillStyle = '#fff';
 		context.fillText(redScoreIterator, gameField.width / 2 + 80 + redPlayerName.length * 15 / 2, 280);
 		redScoreIterator++;
-		setTimeout(showRedScore, 200);
+		timeoutEvents.push(setTimeout(showRedScore, 200));
 	};
 
 	var imgData;
@@ -376,7 +384,7 @@ function showResultTitle() {
 		context.fillRect(0, 0, gameField.width, gameField.height);
 		transparency += 0.02;
 
-		setTimeout(fadeToBlackEnding, 50);
+		timeoutEvents.push(setTimeout(fadeToBlackEnding, 50));
 	};
 
 	showTitle();
@@ -393,11 +401,8 @@ function endPreview() {
 	localStorage.setItem('playedGames', toJSON(newPlayedGames));
 
 	playedGames = fromJSON(localStorage.getItem('playedGames'));
-	currentMatchShowing = '';
-	currentFrameShowing = 0;
+	clearExistingGame();
 	updateScoreboard();
-
-	$('.result-row').remove();
 }
 
 function fromJSON(jsonString) {
