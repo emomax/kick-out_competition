@@ -26,7 +26,7 @@ public class TreasureHunterGame implements Game, Serializable {
     private       long yellowPlayerGameTime;
 
     private String[][] initialBoardStateAsString;
-    private final List<String> boardStateUpdatesAsStrings = new ArrayList<>();
+    private final List<String> boardStateUpdatesAsJsonString = new ArrayList<>();
     private final TreasureHunterBoard board;
     private final AtomicBoolean       isRedPlayerTurn       = new AtomicBoolean(true);
     private       AtomicInteger       yellowPlayerTreasures = new AtomicInteger(0);
@@ -79,7 +79,7 @@ public class TreasureHunterGame implements Game, Serializable {
     }
 
     public void addBoardStateUpdate(final BoardStateUpdate boardStateUpdate) {
-        boardStateUpdatesAsStrings.add(boardStateUpdate.toString());
+        boardStateUpdatesAsJsonString.add(boardStateUpdate.toJSON());
     }
 
     public String[][] cellsAsStrings(BoardState<Tile> boardState) {
@@ -105,8 +105,8 @@ public class TreasureHunterGame implements Game, Serializable {
         return initialBoardStateAsString;
     }
 
-    public List<String> getBoardUpdatesAsStrings() {
-        return boardStateUpdatesAsStrings;
+    public List<String> getBoardUpdatesAsJsonString() {
+        return boardStateUpdatesAsJsonString;
     }
 
     public synchronized TreasureHunterBoard getBoard() {

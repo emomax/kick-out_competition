@@ -59,19 +59,18 @@ public class TreasureHunterBoard implements Board<Tile> {
     }
 
     public BoardStateUpdate movePlayer(PlayerColor player, Move playerMove) {
-        Tile playerTile = findPlayer(player);
+        final BoardStateUpdate boardStateUpdate = new BoardStateUpdate();
+        final Tile playerTile = findPlayer(player);
 
         int x = playerTile.getCoordinates().getX();
         int y = playerTile.getCoordinates().getY();
-        int newX = x;
-        int newY = y;
 
         Orientation playerDirection = playerTile.getOrientation();
 
         switch (playerMove) {
             case MOVE_FORWARD:
-                newX = x + playerDirection.xDirection();
-                newY = y + playerDirection.yDirection();
+                int newX = x + playerDirection.xDirection();
+                int newY = y + playerDirection.yDirection();
 
                 Coordinate possibleNextTile = new Coordinate(newX, newY);
 
@@ -86,6 +85,7 @@ public class TreasureHunterBoard implements Board<Tile> {
                             board[x][y].setState(TileState.EMPTY);
                             board[newX][newY].setState(TileState.valueOf(player.toString()));
                             board[newX][newY].setOrientation(board[x][y].getOrientation());
+                            boardStateUpdate.addChangedTile(board[x][y], board[newX][newY]);
                             break;
                         case WALL:
                         case RED:
@@ -112,6 +112,7 @@ public class TreasureHunterBoard implements Board<Tile> {
                 else if (playerDirection == Orientation.RIGHT) {
                     board[x][y].setOrientation(Orientation.UP);
                 }
+                boardStateUpdate.addChangedTile(board[x][y]);
                 break;
 
             case ROTATE_RIGHT:
@@ -127,13 +128,14 @@ public class TreasureHunterBoard implements Board<Tile> {
                 else if (playerDirection == Orientation.RIGHT) {
                     board[x][y].setOrientation(Orientation.DOWN);
                 }
+                boardStateUpdate.addChangedTile(board[x][y]);
                 break;
 
             default:
                 throw new RuntimeException("Undefined player move! - " + playerMove.toString());
         }
 
-        return new BoardStateUpdate(board[x][y], board[newX][newY]);
+        return boardStateUpdate;
     }
 
     private Tile findPlayer(PlayerColor player) {
