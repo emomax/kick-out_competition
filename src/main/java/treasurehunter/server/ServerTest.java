@@ -15,7 +15,6 @@ import treasurehunter.server.response.ServerResponse;
 public class ServerTest {
 
     public static void main(final String[] args) {
-        //final ServerRestController server   = new ServerRestController();
         final String               gameName = "myGame2";
 
         new Thread(() -> {
@@ -25,7 +24,6 @@ public class ServerTest {
             ServerResponseBase                   gameResult   = gameInstance.runGame(playerName, gameName, playerEngine);
 
             gameInstance.printGameResult(gameResult);
-            //startPlaying(server, gameName, playerName, playerEngine);
         }).start();
 
         new Thread(() -> {
@@ -38,6 +36,10 @@ public class ServerTest {
         }).start();
     }
 
+    /**
+     *   Used to test the server locally, without an actual connection.
+     */
+    @SuppressWarnings("unused")
     private static void startPlaying(final ServerRestController server, final String gameName, final String playerName, final TreasureHunterGameEngine playerEngine) {
         String message;
         while (true) {
