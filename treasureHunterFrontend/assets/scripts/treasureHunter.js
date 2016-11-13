@@ -72,15 +72,19 @@ var currentMatchShowing = '';
 var gameSummaries = {};
 var timeoutEvents = [];
 
+var waitingForAjax = false;
+
 var playedGames = fromJSON(localStorage.getItem('playedGames'));
 if (playedGames === null) playedGames = {};
 
 
 // Do the necessary ajax calls to fetch fresh game data and populate the tables with it.
 function updateScoreboard() {
-	if (currentMatchShowing !== '') {
+	if (currentMatchShowing !== '' || waitingForAjax) {
 		return;
 	}
+
+	waitingForAjax = true;
 
 	$.getJSON ("//localhost:8080/treasureHunterGameSummary.json", function(gameSummary) {
 		$('.table tr').remove();
@@ -138,12 +142,13 @@ function updateScoreboard() {
 		}
 
 		$('.table thead').append(headerRow);
-		$(".table tbody").each(function(elem,index){
+		$(".table tbody").each(function(elem,index) {
 			  var arr = $.makeArray($("tr",this).detach());
 			  arr.reverse();
 			  $(this).append(arr);
 		});
 
+		waitingForAjax = false;
 	});
 }
 
@@ -176,6 +181,11 @@ function buildHeader(games) {
 }
 
 function playGame(e) {
+	if (waitingForAjax) {
+		console.log("Omitting attempt to play game: Ajax still loading.");
+		return;
+	}
+
 	clearExistingGame();
 
 	var currentRow = $(this).closest('tr');
