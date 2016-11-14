@@ -69,6 +69,7 @@ var imgs = {
 
 var currentFrameShowing = 0;
 var currentMatchShowing = '';
+var lastFetchedGameUUID = '';
 var gameSummaries = {};
 var timeoutEvents = [];
 
@@ -82,42 +83,49 @@ function updateScoreboard() {
 		return;
 	}
 
-	$.getJSON ("//localhost:8080/treasureHunterGameSummary.json", function(gameSummary) {
-		$('.table tr').remove();
+	var queryParams = lastFetchedGameUUID === '' ? '' : "?lastSeenUUID=" + lastFetchedGameUUID;
 
-		var headerRow = buildHeader(gameSummary);
-		var contentRow;
+	$.getJSON ("//localhost:8080/treasureHunterGameSummary.json" + queryParams, function(gameSummary) {
 
 		for (var game in gameSummary) {
-			 contentRow = $('<tr>');
+			 var contentRow = $('<tr>');
 
-			if (gameSummaries[gameSummary[game['uuid']]] !== undefined) {
-				return;
-			}
-
-			if (playedGames[gameSummary[game]['uuid']] === undefined) {
-				// This is an unplayed game. Add a play button.
-				gameSummaries[gameSummary[game]['uuid']] = gameSummary[game];
-
-				var value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">';
-		 		var playButton = '<input type="button" value="Play"></input>';
-
-				contentRow.append($('<td colspan="12">').html(value + playButton));
-				contentRow.find('input[type=button]').click(playGame);
-
-				$('.table tbody').append(contentRow);
-
+			if (gameSummaries[gameSummary[game]['uuid']] !== undefined) {
 				continue;
 			}
 
-			for (var data in gameSummary[game]) {
-				var value = gameSummary[game][data];
+			gameSummaries[gameSummary[game]['uuid']] = gameSummary[game];
+			lastFetchedGameUUID = gameSummary[game]['uuid'];
+		}
 
-				if (data === 'playerMoves') {
-					value = '<input type="button" value="Replay match">';
-				}
-				else if (data === 'initialBoardState') {
-					gameSummaries[gameSummary[game]['uuid']] = gameSummary[game];
+		populateGameTable();
+	});
+
+}
+
+function populateGameTable() {
+	$('.table tr').remove();
+	$('.table thead').append(buildHeader(gameSummaries[Object.keys(gameSummaries)[0]]));
+
+	for (var game in gameSummaries) {
+		var contentRow = $('<tr>');
+
+		if (playedGames[gameSummaries[game]["uuid"]] === undefined) {
+			// This is an unplayed game. Add a play button.
+			var value = '<input type="hidden" value="' + gameSummaries[game]["uuid"] + '">';
+			var playButton = '<input type="button" value="Play"></input>';
+
+			contentRow.append($('<td colspan="12">').html(value + playButton));
+			contentRow.find('input[type=button]').click(playGame);
+
+			$('.table tbody').prepend(contentRow);
+			continue;
+		}
+		else {
+			for (var data in gameSummaries[game]) {
+				var value = gameSummaries[game][data];
+
+				if (data === 'playerMoves' || data === 'initialBoardState') {
 					value = '<input type="button" value="Replay match">';
 				}
 				else if (data === 'boardStateUpdates') {
@@ -127,27 +135,20 @@ function updateScoreboard() {
 					value /= 1000.0;
 				}
 				else if (/*data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime' ||*/ data === 'uuid') {
-					value = '<input type="hidden" value="' + gameSummary[game]["uuid"] + '">';
+					value = '<input type="hidden" value="' + gameSummaries[game]["uuid"] + '">';
 				}
 
 				contentRow.append($('<td>').html(value));
 			}
 
 			contentRow.find('input[type=button]').click(playGame);
-			$('.table tbody').append(contentRow);
+			$('.table tbody').prepend(contentRow);
 		}
 
-		$('.table thead').append(headerRow);
-		$(".table tbody").each(function(elem,index){
-			  var arr = $.makeArray($("tr",this).detach());
-			  arr.reverse();
-			  $(this).append(arr);
-		});
-
-	});
+	}
 }
 
-function buildHeader(games) {
+function buildHeader(game) {
 	var headerRow = $('<tr>');
 	var translationTable = {
 		'redPlayerName': 'Player Red',
@@ -167,7 +168,7 @@ function buildHeader(games) {
 		'uuid': ''
 	};
 
-	for (var data in games[0]) {
+	for (var data in game) {
 		if (translationTable[data] !== undefined) {
 			headerRow.append($('<th>').text(translationTable[data]));
 		}
