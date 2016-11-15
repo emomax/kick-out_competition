@@ -1,7 +1,9 @@
 package commons.network.server;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -194,11 +196,20 @@ public class ServerRestController {
 
     @CrossOrigin
     @RequestMapping("/treasureHunterGameSummary")
-    public List<treasurehunter.server.response.GameSummaryResponse> getTreasureHunterGameSummaries() {
+    public List<treasurehunter.server.response.GameSummaryResponse> getTreasureHunterGameSummaries(
+            @RequestParam(value = "lastSeenUUID", required = false) final UUID lastSeenUUID
+    ) {
         System.out.println("/treasureHunterGameSummary");
         final List<TreasureHunterGame>  games     = treasureHunterGameHandler.getFinishedGames();
         final List<treasurehunter.server.response.GameSummaryResponse> summaries = new ArrayList<>();
-        for (final TreasureHunterGame game : games) {
+
+        for (int i = games.size() -1; i >= 0; i--) {
+            final TreasureHunterGame game = games.get(i);
+
+            if (lastSeenUUID != null && lastSeenUUID.equals(game.getId())) {
+                break;
+            }
+
             final treasurehunter.server.response.GameSummaryResponse response = new treasurehunter.server.response.GameSummaryResponse();
             response.setUuid(game.getId());
             response.setGameName(game.getName());
@@ -221,6 +232,8 @@ public class ServerRestController {
             response.setGameStartDate(game.getGameStartTime().toString());
             summaries.add(response);
         }
+
+        Collections.reverse(summaries);
         return summaries;
     }
 }
