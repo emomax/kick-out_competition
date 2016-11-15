@@ -1,8 +1,10 @@
 package treasurehunter.board;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import commons.gameengine.board.Board;
 import static treasurehunter.board.Tile.TileState;
@@ -14,6 +16,8 @@ import treasurehunter.domain.Move;
 import treasurehunter.domain.Orientation;
 
 public class TreasureHunterBoard implements Board<Tile> {
+
+    private float wallDensity = 0.5f;
     private int numberOfColumns = 28;
     private int numberOfRows = 16;
 
@@ -27,7 +31,7 @@ public class TreasureHunterBoard implements Board<Tile> {
     }
 
     public TreasureHunterBoard() {
-        this(new Random().nextInt(40) * 2 + 5);
+        this(new Random().nextInt(20) * 2 + 20);
     }
 
     public TreasureHunterBoard(int amountOfTreasures) {
@@ -190,160 +194,102 @@ public class TreasureHunterBoard implements Board<Tile> {
     private void generateMap(int amountOfTreasures) {
         clear();
 
-        board[numberOfColumns / 2 - 1][numberOfRows / 2].setState(TileState.RED);
-        board[numberOfColumns / 2 - 1][numberOfRows / 2].setOrientation(Orientation.LEFT);
+        final Coordinate redStart = new Coordinate(numberOfColumns / 2 - 1, numberOfRows / 2);
+        final Coordinate yellowStart = new Coordinate(numberOfColumns / 2, numberOfRows / 2);
 
-        board[numberOfColumns / 2][numberOfRows / 2].setState(TileState.YELLOW);
-        board[numberOfColumns / 2][numberOfRows / 2].setOrientation(Orientation.RIGHT);
+        board[redStart.getX()][redStart.getY()].setState(TileState.RED);
+        board[redStart.getX()][redStart.getY()].setOrientation(Orientation.LEFT);
 
-        Random rng = new Random();
+        board[yellowStart.getX()][yellowStart.getY()].setState(TileState.YELLOW);
+        board[yellowStart.getX()][yellowStart.getY()].setOrientation(Orientation.RIGHT);
 
-        int index = rng.nextInt(3);
-        List<Coordinate> walls;
+        final Set<Coordinate> walkableTiles = generateMapPaths(yellowStart);
+        // We add the coordinates surrounding the players to make sure they're not blocking each other at the start
+        walkableTiles.addAll(getSurroundingTileCoords(redStart));
+        walkableTiles.addAll(getSurroundingTileCoords(yellowStart));
 
-        if (index == 0) {
-            walls = getCirclePit();
-        }
-        else if (index == 1) {
-            walls = getJaggedStage();
-        }
-        else {
-            walls = getJaggedStage();
-        }
+        placeWalls(walkableTiles);
+        placeTreasures(walkableTiles, amountOfTreasures);
+    }
 
-        walls.forEach(coord -> board[coord.getX()][coord.getY()].setState(TileState.WALL));
+    // We generate paths by 'walking' randomly, and return the coordinates we've walked
+    private Set<Coordinate> generateMapPaths(final Coordinate pathStart) {
+        final Set<Coordinate> walkedCoordinates = new HashSet<>();
 
-        Random rgn = new Random();
+        final Random rng = new Random();
 
-        for (int i = 0; i < amountOfTreasures; i++) {
-            int x;
-            int y;
+        int currX = pathStart.getX();
+        int currY = pathStart.getY();
 
-            while (true) {
-                x = rgn.nextInt(numberOfColumns);
-                y = rgn.nextInt(numberOfRows);
+        final int targetAmountOfWalkableTiles = (int)((board.length * board[0].length) * (1f - wallDensity));
 
-                TileState state = board[x][y].getState();
+        while (walkedCoordinates.size() < targetAmountOfWalkableTiles) {
+            final boolean moveHorizontally = rng.nextBoolean();
+            final boolean moveTowardsOrigin = rng.nextBoolean();
 
-                if (state != TileState.EMPTY) {
-                    continue;
-                }
+            if (moveHorizontally) {
+                currX += moveTowardsOrigin ? -1 : 1;
+            }
+            else {
+                currY += moveTowardsOrigin ? -1 : 1;
+            }
 
-                board[x][y].setState(TileState.TREASURE);
-                break;
+            if (isOutsideBoard(new Coordinate(currX, currY))) {
+                // We moved out of bounds, go back to start of path
+                currX = pathStart.getX();
+                currY = pathStart.getY();
+            }
+            else {
+                walkedCoordinates.add(new Coordinate(currX, currY));
             }
         }
-
+        return walkedCoordinates;
     }
 
-    private List<Coordinate> getJaggedStage() {
+    private List<Coordinate> getSurroundingTileCoords(final Coordinate sourceCoordinate) {
+        List<Coordinate> resultList = new ArrayList<>();
 
-        return Arrays.asList(
-            new Coordinate(2, 1),
-            new Coordinate(2, 2),
-            new Coordinate(2, 3),
-            new Coordinate(2, 4),
-            new Coordinate(2, 5),
-            new Coordinate(2, 6),
-            new Coordinate(2, 7),
-            new Coordinate(2, 8),
-            new Coordinate(2, 9),
-            new Coordinate(6, numberOfRows - 2),
-            new Coordinate(6, numberOfRows - 3),
-            new Coordinate(6, numberOfRows - 4),
-            new Coordinate(6, numberOfRows - 5),
-            new Coordinate(6, numberOfRows - 6),
-            new Coordinate(6, numberOfRows - 7),
-            new Coordinate(6, numberOfRows - 8),
-            new Coordinate(6, numberOfRows - 9),
-            new Coordinate(6, numberOfRows - 10),
-            new Coordinate(11, 1),
-            new Coordinate(11, 2),
-            new Coordinate(11, 3),
-            new Coordinate(11, 4),
-            new Coordinate(11, 5),
-            new Coordinate(11, 6),
-            new Coordinate(11, 7),
-            new Coordinate(11, 8),
-            new Coordinate(11, 9),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 2),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 3),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 4),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 5),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 6),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 7),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 8),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 9),
-            new Coordinate(numberOfColumns - 3, numberOfRows - 10),
-            new Coordinate(numberOfColumns - 7, 1),
-            new Coordinate(numberOfColumns - 7, 2),
-            new Coordinate(numberOfColumns - 7, 3),
-            new Coordinate(numberOfColumns - 7, 4),
-            new Coordinate(numberOfColumns - 7, 5),
-            new Coordinate(numberOfColumns - 7, 6),
-            new Coordinate(numberOfColumns - 7, 7),
-            new Coordinate(numberOfColumns - 7, 8),
-            new Coordinate(numberOfColumns - 7, 9),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 2),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 3),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 4),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 5),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 6),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 7),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 8),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 9),
-            new Coordinate(numberOfColumns - 12, numberOfRows - 10)
-        );
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                final Coordinate currCoord = new Coordinate(sourceCoordinate.getX() + x, sourceCoordinate.getY() + y);
+
+                if (!isOutsideBoard(currCoord)) {
+                    resultList.add(currCoord);
+                }
+            }
+        }
+        return resultList;
     }
 
-    private List<Coordinate> getCirclePit() {
-        return Arrays.asList(
-                    new Coordinate(1, 4),
-                    new Coordinate(2, 4),
-                    new Coordinate(3, 4),
-                    new Coordinate(4, 4),
-                    new Coordinate(5, 4),
-                    new Coordinate(6, 4),
-                    new Coordinate(1, numberOfRows - 5),
-                    new Coordinate(2, numberOfRows - 5),
-                    new Coordinate(3, numberOfRows - 5),
-                    new Coordinate(4, numberOfRows - 5),
-                    new Coordinate(5, numberOfRows - 5),
-                    new Coordinate(6, numberOfRows - 5),
-                    new Coordinate(numberOfColumns - 2, 4),
-                    new Coordinate(numberOfColumns - 3, 4),
-                    new Coordinate(numberOfColumns - 4, 4),
-                    new Coordinate(numberOfColumns - 5, 4),
-                    new Coordinate(numberOfColumns - 6, 4),
-                    new Coordinate(numberOfColumns - 7, 4),
-                    new Coordinate(numberOfColumns - 2, numberOfRows - 5),
-                    new Coordinate(numberOfColumns - 3, numberOfRows - 5),
-                    new Coordinate(numberOfColumns - 4, numberOfRows - 5),
-                    new Coordinate(numberOfColumns - 5, numberOfRows - 5),
-                    new Coordinate(numberOfColumns - 6, numberOfRows - 5),
-                    new Coordinate(numberOfColumns - 7, numberOfRows - 5),
+    private void placeWalls(final Set<Coordinate> excludedTiles) {
+        for (int x = 0; x < board.length; x++) {
+            for (int y = 0; y < board[0].length; y++) {
+                if (!excludedTiles.contains(new Coordinate(x, y))) {
+                    board[x][y].setState(TileState.WALL);
+                }
+            }
+        }
+    }
 
+    private void placeTreasures(final Set<Coordinate> availableTilesSet, int amountOfTreasuresToPlace) {
+        if (availableTilesSet.size() - 2 < amountOfTreasuresToPlace) {
+            throw new RuntimeException("Trying to place more treasures than there are available spaces!");
+        }
 
-                    new Coordinate(numberOfColumns / 2 - 1, numberOfRows / 2 + 4),
-                    new Coordinate(numberOfColumns / 2 - 2, numberOfRows / 2 + 3),
-                    new Coordinate(numberOfColumns / 2 - 3, numberOfRows / 2 + 2),
-                    new Coordinate(numberOfColumns / 2 - 4, numberOfRows / 2 + 1),
+        final Random rng = new Random();
+        final List<Coordinate> availableTiles = new ArrayList<>(availableTilesSet);
 
-                    new Coordinate(numberOfColumns / 2 - 1, numberOfRows / 2 - 4),
-                    new Coordinate(numberOfColumns / 2 - 2, numberOfRows / 2 - 3),
-                    new Coordinate(numberOfColumns / 2 - 3, numberOfRows / 2 - 2),
-                    new Coordinate(numberOfColumns / 2 - 4, numberOfRows / 2 - 1),
+        while (amountOfTreasuresToPlace > 0) {
+            final int index = rng.nextInt(availableTiles.size());
+            final Coordinate coord = availableTiles.remove(index);
 
-                    new Coordinate(numberOfColumns / 2 + 1, numberOfRows / 2 + 4),
-                    new Coordinate(numberOfColumns / 2 + 2, numberOfRows / 2 + 3),
-                    new Coordinate(numberOfColumns / 2 + 3, numberOfRows / 2 + 2),
-                    new Coordinate(numberOfColumns / 2 + 4, numberOfRows / 2 + 1),
+            if (board[coord.getX()][coord.getY()].getState() == TileState.YELLOW || board[coord.getX()][coord.getY()].getState() == TileState.RED) {
+                continue;
+            }
 
-                    new Coordinate(numberOfColumns / 2 + 1, numberOfRows / 2 - 4),
-                    new Coordinate(numberOfColumns / 2 + 2, numberOfRows / 2 - 3),
-                    new Coordinate(numberOfColumns / 2 + 3, numberOfRows / 2 - 2),
-                    new Coordinate(numberOfColumns / 2 + 4, numberOfRows / 2 - 1)
-                    );
+            board[coord.getX()][coord.getY()].setState(TileState.TREASURE);
+            amountOfTreasuresToPlace--;
+        }
     }
 
     @Override

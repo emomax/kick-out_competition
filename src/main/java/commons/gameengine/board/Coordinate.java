@@ -25,6 +25,21 @@ public class Coordinate implements Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o instanceof Coordinate) {
+            Coordinate other = (Coordinate) o;
+            return other.getX() == x && other.getY() == y;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int tmp = y + (x+1)/2;
+        return x + tmp * tmp;
+    }
+
+    @Override
     public String toString() {
         return "Coordinate{" +
                "x=" + x +
