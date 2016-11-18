@@ -150,7 +150,6 @@ public class TreasureHunterGame implements Game, Serializable {
     public String getGameOutcome() {
         return this.gameOutcome;
     }
-
     public void setGameOutcome(String outcome) {
         this.gameOutcome = outcome;
     }
@@ -161,12 +160,14 @@ public class TreasureHunterGame implements Game, Serializable {
         final AtomicInteger iterator = new AtomicInteger(0);
 
         while (true) {
-            if (iterator.get() % 50 == 0) {
-                System.out.println("Waited " + iterator.get()/50 + " seconds for " + playerName + "..");
-            }
+            if (getRedPlayerName() != null && getYellowPlayerName() != null) {
+                if (iterator.get() % 50 == 0) {
+                    System.out.println("Waited " + iterator.get() / 50 + " seconds for " + playerName + "..");
+                }
 
-            if (iterator.incrementAndGet() > maxIterationsBeforeTimeout) {
-                throw new InterruptedException("Player " + ((playerColor == PlayerColor.RED) ? PlayerColor.YELLOW : PlayerColor.RED) + " timed out!");
+                if (iterator.incrementAndGet() > maxIterationsBeforeTimeout) {
+                    throw new InterruptedException("Player " + ((playerColor == PlayerColor.RED) ? PlayerColor.YELLOW : PlayerColor.RED) + " timed out!");
+                }
             }
 
             if (playerColor.equals(PlayerColor.RED) && isRedPlayerTurn.get()) {
