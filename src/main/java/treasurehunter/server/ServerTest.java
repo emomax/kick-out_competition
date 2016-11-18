@@ -25,6 +25,7 @@ public class ServerTest {
             ServerResponseBase                   gameResult   = gameInstance.runGame(playerName, gameName, playerEngine);
 
             gameInstance.printGameResult(gameResult);
+
             //startPlaying(server, gameName, playerName, playerEngine);
         }).start();
 

@@ -11,6 +11,7 @@ public interface Game extends Serializable {
     String getName();
     String getRedPlayerName();
     String getYellowPlayerName();
+    String getGameOutcome();
 
     void setRedPlayerName(String redPlayerName);
     void setYellowPlayerName(String redPlayerName);
@@ -24,4 +25,6 @@ public interface Game extends Serializable {
     Date getGameStartTime();
     GameTimer getTimer();
     void updateGameStatisticsWithGameTime();
+
+    void setGameOutcome(String s);
 }

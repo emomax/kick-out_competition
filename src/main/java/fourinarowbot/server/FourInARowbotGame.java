@@ -28,6 +28,7 @@ public class FourInARowbotGame implements Game, Serializable {
     private final AtomicInteger      numberOfFinishedGames = new AtomicInteger();
     private final GameTimer          gameTimer             = new GameTimer();
     private final Date               gameStartTime         = new Date();
+    private       String             gameOutcome           = "";
 
     public FourInARowbotGame(final UUID id, final String name, final String redPlayerName) throws InterruptedException {
         this.id = id;
@@ -114,5 +115,13 @@ public class FourInARowbotGame implements Game, Serializable {
 
     public Date getGameStartTime() {
         return gameStartTime;
+    }
+
+    public void setGameOutcome(String outcome) {
+        this.gameOutcome = outcome;
+    }
+
+    public String getGameOutcome() {
+        return this.gameOutcome;
     }
 }

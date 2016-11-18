@@ -128,7 +128,7 @@ function populateGameTable() {
 				if (data === 'playerMoves' || data === 'initialBoardState') {
 					value = '<input type="button" value="Replay match">';
 				}
-				else if (data === 'boardStateUpdates') {
+				else if (data === 'boardStateUpdates' || data === 'gameOutcome') {
 					continue;
 				}
 				else if (data === 'redPlayerGameTime' || data === 'yellowPlayerGameTime') {
@@ -298,6 +298,8 @@ function showResultTitle() {
 	var yellowPlayerName = gameSummaries[currentMatchShowing]['yellowPlayerName'];
 	var redPlayerName = gameSummaries[currentMatchShowing]['redPlayerName'];
 
+	var gameOutcome = gameSummaries[currentMatchShowing].gameOutcome;
+
 	var showTitle = function() {
 		context.fillStyle = '#000';
 		context.fillRect(0, 0, gameField.width, gameField.height);
@@ -356,8 +358,7 @@ function showResultTitle() {
 
 	var showRedScore = function() {
 		if (redScoreIterator > redScore) {
-			imgData  = context.getImageData(0, 0, gameField.width, gameField.height);
-			timeoutEvents.push(setTimeout(fadeToBlackEnding, 4000));
+			timeoutEvents.push(setTimeout(showGameOutcome, 1000));
 			return;
 		}
 
@@ -369,6 +370,15 @@ function showResultTitle() {
 		context.fillText(redScoreIterator, gameField.width / 2 + 80 + redPlayerName.length * 15 / 2, 280);
 		redScoreIterator++;
 		timeoutEvents.push(setTimeout(showRedScore, 200));
+	};
+
+	var showGameOutcome = function() {
+		context.font= "40px Georgia";
+		context.fillStyle = '#fff';
+		context.fillText(gameOutcome, gameField.width / 2 - (gameOutcome.length * 19 / 2), gameField.height - 150);
+		imgData = context.getImageData(0, 0, gameField.width, gameField.height);
+
+		timeoutEvents.push(setTimeout(fadeToBlackEnding, 2500));
 	};
 
 	var imgData;

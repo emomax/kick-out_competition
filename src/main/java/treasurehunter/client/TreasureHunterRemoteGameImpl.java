@@ -57,10 +57,7 @@ public class TreasureHunterRemoteGameImpl implements RemoteGame {
 
     @Override
     public void printGameResult(final ServerResponseBase response) {
-        //System.out.println(response.getMessage());
-        /*if (((ServerResponse) response).getMoveHistory() != null) {
-
-        }*/
+        System.out.println(response.getMessage());
     }
 
     @Override

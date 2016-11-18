@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import commons.gameengine.board.Coordinate;
 import commons.gameengine.board.BoardState;
+import commons.gameengine.board.PlayerColor;
 import commons.network.server.Response.ServerResponseBase;
 import fourinarowbot.board.FourInARowbotBoard;
 import fourinarowbot.domain.Marker;
@@ -132,6 +133,9 @@ public class ServerRestController {
             return getTreasureHunterBoardStateResponse(playerName, gameName);
         }
         catch (final Exception e) {
+            Game currentGame = treasureHunterGameHandler.getGame(gameName);
+            currentGame.setGameOutcome(playerName + " won due to opponent timed out!");
+
             treasureHunterGameHandler.killGame(gameName);
             final treasurehunter.server.response.ServerResponse response = new treasurehunter.server.response.ServerResponse();
             response.setMessage("Error! " + e.getMessage());
@@ -149,6 +153,17 @@ public class ServerRestController {
 
         if (game.isGameOver()) {
             response.setMessage("TreasureHunterGame over!");
+
+            if (game.getRedPlayerTreasures() == game.getYellowPlayerTreasures()) {
+                game.setGameOutcome("Draw!");
+            }
+            else if (game.getRedPlayerTreasures() > game.getYellowPlayerTreasures()) {
+                game.setGameOutcome(game.getRedPlayerName() + " wins!");
+            }
+            else {
+                game.setGameOutcome(game.getYellowPlayerName() + " wins!");
+            }
+
             game.updateGameStatisticsWithGameTime();
             //response.setGameStatistics(game.getGameStatistics());
             treasureHunterGameHandler.killGame(gameName);
@@ -185,10 +200,14 @@ public class ServerRestController {
         }
         catch (final Exception e) {
             final TreasureHunterGame game       = treasureHunterGameHandler.getGame(gameName);
-            final BoardState<Tile> boardState = new BoardState<>(game.getBoard().getCells());
-            treasureHunterGameHandler.killGame(gameName);
             final treasurehunter.server.response.ServerResponse response = new treasurehunter.server.response.ServerResponse();
-            response.setBoardState(boardState);
+
+            if (game != null) {
+                final BoardState<Tile> boardState = new BoardState<>(game.getBoard().getCells());
+                treasureHunterGameHandler.killGame(gameName);
+                response.setBoardState(boardState);
+            }
+
             response.setMessage("Error! " + e.getMessage());
             return response;
         }
@@ -212,23 +231,23 @@ public class ServerRestController {
 
             final treasurehunter.server.response.GameSummaryResponse response = new treasurehunter.server.response.GameSummaryResponse();
             response.setUuid(game.getId());
-            response.setGameName(game.getName());
-            response.setRedPlayerName(game.getRedPlayerName());
-            response.setYellowPlayerName(game.getYellowPlayerName());
-
             response.setInitialBoardState(game.getInitialBoardStateAsString());
             response.setBoardStateUpdates(game.getBoardUpdatesAsJsonString());
 
+            response.setGameName(game.getName());
+            response.setTotalTreasures(game.getNumberOfTreasures());
+
+            response.setRedPlayerName(game.getRedPlayerName());
+            response.setRedPlayerTreasures(game.getRedPlayerTreasures());
             response.setRedPlayerGameTime(game.getRedPlayerGameTime());
+
+            response.setYellowPlayerName(game.getYellowPlayerName());
+            response.setYellowPlayerTreasures(game.getYellowPlayerTreasures());
             response.setYellowPlayerGameTime(game.getYellowPlayerGameTime());
 
-            response.setTotalTreasures(game.getNumberOfTreasures());
-            response.setYellowPlayerTreasures(game.getYellowPlayerTreasures());
-            response.setRedPlayerTreasures(game.getRedPlayerTreasures());
+            response.setGameOutcome(game.getGameOutcome());
 
             //response.setPlayerMoves(game.getGameStatistics().getPlayerMoves());
-            response.setRedPlayerGameTime(game.getRedPlayerGameTime());
-            response.setYellowPlayerGameTime(game.getYellowPlayerGameTime());
             response.setGameStartDate(game.getGameStartTime().toString());
             summaries.add(response);
         }

@@ -23,6 +23,8 @@ public class GameSummaryResponse {
     private String redPlayerName;
     private String yellowPlayerName;
 
+    private String gameOutcome;
+
     public UUID getUuid() {
         return uuid;
     }
@@ -118,4 +120,13 @@ public class GameSummaryResponse {
     public void setGameStartDate(final String gameStartDate) {
         this.gameStartDate = gameStartDate;
     }
+
+    public String getGameOutcome() {
+        return gameOutcome;
+    }
+
+    public void setGameOutcome(final String gameOutcome) {
+        this.gameOutcome = gameOutcome;
+    }
+
 }

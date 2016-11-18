@@ -24,6 +24,7 @@ public class TreasureHunterGame implements Game, Serializable {
     private       String yellowPlayerName;
     private       long redPlayerGameTime;
     private       long yellowPlayerGameTime;
+    private       String gameOutcome = "";
 
     private String[][] initialBoardStateAsString;
     private final List<String> boardStateUpdatesAsJsonString = new ArrayList<>();
@@ -145,9 +146,29 @@ public class TreasureHunterGame implements Game, Serializable {
     public long getYellowPlayerGameTime() {
         return yellowPlayerGameTime;
     }
+
+    public String getGameOutcome() {
+        return this.gameOutcome;
+    }
+
+    public void setGameOutcome(String outcome) {
+        this.gameOutcome = outcome;
+    }
+
     public void waitForMyTurn(final String playerName) throws InterruptedException {
         final PlayerColor playerColor = getPlayerColor(playerName);
+        final int maxIterationsBeforeTimeout = 750;
+        final AtomicInteger iterator = new AtomicInteger(0);
+
         while (true) {
+            if (iterator.get() % 50 == 0) {
+                System.out.println("Waited " + iterator.get()/50 + " seconds for " + playerName + "..");
+            }
+
+            if (iterator.incrementAndGet() > maxIterationsBeforeTimeout) {
+                throw new InterruptedException("Player " + ((playerColor == PlayerColor.RED) ? PlayerColor.YELLOW : PlayerColor.RED) + " timed out!");
+            }
+
             if (playerColor.equals(PlayerColor.RED) && isRedPlayerTurn.get()) {
                 break;
             }
