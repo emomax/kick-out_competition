@@ -104,21 +104,24 @@ function updateScoreboard() {
 }
 
 function populateGameTable() {
-	$('.table tr').remove();
-	$('.table thead').append(buildHeader(gameSummaries[Object.keys(gameSummaries)[0]]));
+	$('.table-new tr').remove();
+	$('.table-viewed tr').remove();
+	$('.table-viewed thead').append(buildHeader(gameSummaries[Object.keys(gameSummaries)[0]]));
 
 	for (var game in gameSummaries) {
-		var contentRow = $('<tr>');
+		var contentRow = $('<tr class="new-game-row">');
 
 		if (playedGames[gameSummaries[game]["uuid"]] === undefined) {
 			// This is an unplayed game. Add a play button.
 			var value = '<input type="hidden" value="' + gameSummaries[game]["uuid"] + '">';
-			var playButton = '<input type="button" value="Play"></input>';
+			var playButton = '<input type="button" class="play-btn" value="Play"></input>';
+			var redPlayerNameLabel = '<span class="red-name-label">' + gameSummaries[game]["redPlayerName"] + '</span>';
+			var yellowPlayerNameLabel = '<span class="yellow-name-label">' + gameSummaries[game]["yellowPlayerName"] + '</span>';
 
-			contentRow.append($('<td colspan="12">').html(value + playButton));
+			contentRow.append($('<td colspan="12">').html(value + playButton + redPlayerNameLabel + " VS " + yellowPlayerNameLabel));
 			contentRow.find('input[type=button]').click(playGame);
 
-			$('.table tbody').prepend(contentRow);
+			$('.table-new tbody').prepend(contentRow);
 			continue;
 		}
 		else {
@@ -142,7 +145,7 @@ function populateGameTable() {
 			}
 
 			contentRow.find('input[type=button]').click(playGame);
-			$('.table tbody').prepend(contentRow);
+			$('.table-viewed tbody').prepend(contentRow);
 		}
 
 	}

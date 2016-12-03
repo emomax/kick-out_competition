@@ -19,3 +19,21 @@ td.R {
 .result-row td {
 	border: 1px solid #888;
 }
+
+.table-new {
+	margin-bottom: 50px;
+}
+
+.red-name-label {
+	color: #FF0033;
+	margin: 0 10px 0 10px;
+}
+
+.yellow-name-label {
+	color: #E5F442;
+	margin: 0 10px 0 10px;
+}
+
+.play-btn {
+	margin: 5px;
+}
