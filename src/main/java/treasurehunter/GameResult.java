@@ -33,6 +33,9 @@ public class GameResult {
         return treasuresLeft;
     }
 
+    public boolean isDraw() {
+        return redTreasures == yellowTreasures;
+    }
 
     public PlayerColor getWinnerPlayerColor() {
         if (redTreasures > yellowTreasures) {
@@ -61,6 +64,11 @@ public class GameResult {
 
     public static void resetTurns() {
         turns.set(0);
+    }
+
+    public static void resetTreasureCount() {
+        redTreasures = 0;
+        yellowTreasures = 0;
     }
 
     public static synchronized boolean isGameOver(TreasureHunterBoard board) {

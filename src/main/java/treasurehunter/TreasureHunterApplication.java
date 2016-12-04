@@ -11,12 +11,11 @@ import treasurehunter.gameengine.TreasureHunterGameEngine;
 public class TreasureHunterApplication {
     private final TreasureHunterGameEngine redGameEngine;
     private final TreasureHunterGameEngine yellowGameEngine;
-    private final TreasureHunterBoard      board;
+    private TreasureHunterBoard board;
 
     public TreasureHunterApplication(final TreasureHunterGameEngine redGameEngine) {
         this.redGameEngine = redGameEngine;
         this.yellowGameEngine = new SmartRandomTreasureHunterGameEngine();
-        this.board = new TreasureHunterBoard();
     }
 
     public void runGameOnce() {
@@ -31,6 +30,11 @@ public class TreasureHunterApplication {
     private GameResult startGame(final boolean printBoardEveryRound) {
         boolean      isRedPlayerTurn = true;
         GameResult gameResult = GameResult.ResultWithoutWinner();
+
+        board = new TreasureHunterBoard();
+        GameResult.resetTurns();
+        GameResult.resetTreasureCount();
+
         while (!gameResult.isGameOver(board)) {
             try {
                 GameResult.incrementTurns();
@@ -53,15 +57,15 @@ public class TreasureHunterApplication {
             if (printBoardEveryRound) {
                 gameResult.printScore();
                 board.print();
+
+                try {
+                    Thread.sleep(60L);
+                }
+                catch (final InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
-            // A nice pace =o)
-            try {
-                Thread.sleep(60L);
-            }
-            catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
             gameResult = gameResult.getGameStatus();
         }
 
@@ -84,11 +88,32 @@ public class TreasureHunterApplication {
         }
     }
 
+    public void runGameMultipleTimes(int numberOfGames) {
+        int yellowWins = 0;
+        int redWins = 0;
+        int draws = 0;
+
+        for (int i = 0; i < numberOfGames; i++) {
+            final GameResult searchResult = startGame(false);
+
+            if (searchResult.isDraw()) {
+                draws++;
+            }
+            else if (searchResult.getWinnerPlayerColor() == PlayerColor.RED) {
+                redWins++;
+            }
+            else if (searchResult.getWinnerPlayerColor() == PlayerColor.YELLOW){
+                yellowWins++;
+            }
+        }
+
+        System.out.println("Final score (games won):\nRED: " + redWins + "\nYELLOW: " + yellowWins + "\nDRAWS:" + draws);
+    }
+
     public static void main(final String[] args) throws InterruptedException {
         Logger.setDebugLogOn(false);
         final TreasureHunterApplication application = new TreasureHunterApplication(new MyN00bTreasureHunterGameEngine());
 
-                application.runGameOnce();
-        //application.runGameMultipleGames(100);
+        application.runGameOnce();
     }
 }
