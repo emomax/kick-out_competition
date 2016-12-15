@@ -21,17 +21,17 @@ $(function() {
 	setInterval(updateScoreboard, 3000);
 });
 
-var emptyImage = $('<img />').prop('src', '/assets/img/empty.png');
-var treasureImage = $('<img />').prop('src', '/assets/img/chest.png');
-var wallImage = $('<img />').prop('src', '/assets/img/wall.png');
-var redUpImage = $('<img />').prop('src', '/assets/img/imp_red_up.png');
-var redDownImage = $('<img />').prop('src', '/assets/img/imp_red_down.png');
-var redLeftImage = $('<img >').prop('src', '/assets/img/imp_red_left.png');
-var redRightImage = $('<img >').prop('src', '/assets/img/imp_red_right.png');
-var yellowUpImage = $('<img >').prop('src', '/assets/img/imp_yellow_up.png');
-var yellowDownImage = $('<img >').prop('src', '/assets/img/imp_yellow_down.png');
-var yellowLeftImage = $('<img >').prop('src', '/assets/img/imp_yellow_left.png');
-var yellowRightImage = $('<img >').prop('src', '/assets/img/imp_yellow_right.png');
+var emptyImage = $('<img />').prop('src', '/assets/img/snow.jpg');
+var treasureImage = $('<img />').prop('src', '/assets/img/treasure_red.jpg');
+var wallImage = $('<img />').prop('src', '/assets/img/tree.jpg');
+var redUpImage = $('<img />').prop('src', '/assets/img/santa_red_up.jpg');
+var redDownImage = $('<img />').prop('src', '/assets/img/santa_red_down.jpg');
+var redLeftImage = $('<img >').prop('src', '/assets/img/santa_red_left.jpg');
+var redRightImage = $('<img >').prop('src', '/assets/img/santa_red_right.jpg');
+var yellowUpImage = $('<img >').prop('src', '/assets/img/santa_yellow_up.jpg');
+var yellowDownImage = $('<img >').prop('src', '/assets/img/santa_yellow_down.jpg');
+var yellowLeftImage = $('<img >').prop('src', '/assets/img/santa_yellow_left.jpg');
+var yellowRightImage = $('<img >').prop('src', '/assets/img/santa_yellow_right.jpg');
 
 emptyImage.load(imgLoaded);
 treasureImage.load(imgLoaded);
