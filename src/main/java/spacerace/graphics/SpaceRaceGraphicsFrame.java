@@ -1,5 +1,6 @@
 package spacerace.graphics;
 
+import java.awt.Dimension;
 import java.io.IOException;
 import javax.swing.JFrame;
 
@@ -11,7 +12,8 @@ class SpaceRaceGraphicsFrame extends JFrame {
         add(panel);
         setTitle("Space Race");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize((int) Level.DIMENSIONS.getX(), (int) Level.DIMENSIONS.getY());
+        getContentPane().setPreferredSize(new Dimension(Level.WIDTH, Level.HEIGHT));
+        pack();
         setLocationRelativeTo(null);
         setVisible(true);
         setResizable(false);

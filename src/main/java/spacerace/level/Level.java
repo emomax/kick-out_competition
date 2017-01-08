@@ -7,7 +7,8 @@ import spacerace.domain.Vector2D;
 
 public class Level {
 
-    public static final Vector2D DIMENSIONS = new Vector2D(900, 600);
+    public static int WIDTH  = 900;
+    public static int HEIGHT = 600;
 
     private int               number;
     private List<Rectangle2D> rectangles;
