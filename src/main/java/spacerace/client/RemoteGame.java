@@ -1,5 +1,6 @@
 package spacerace.client;
 
+import java.awt.Dimension;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.Arrays;
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import spacerace.domain.Action;
+import spacerace.domain.Detector;
+import spacerace.domain.DetectorFactory;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatistics;
 import spacerace.domain.GameStatus;
@@ -53,33 +56,39 @@ public class RemoteGame {
         while (true) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
-            final ServerResponse response  = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
-            final GameState      gameState = response.getGameState();
-            updateGraphics(gameState, level, manualKeyListener);
+            final ServerResponse    response           = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
+            final GameState         gameState          = response.getGameState();
+            final SpaceRaceGraphics graphics           = getGraphics(gameState, level, manualKeyListener);
+            final ShipState         playerShipState    = getPlayerShip(gameState);
+            final Dimension         shipImageDimension = graphics.getShipImageDimension();
+            final DetectorFactory   detectorFactory    = new DetectorFactory(playerShipState, shipImageDimension, level);
+            final List<Detector>    detectors          = detectorFactory.getDetectors();
+            playerShipState.setDetectors(detectors);
+
+            graphics.updateGraphics(gameState, detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
-                final Action action = getNextActionFromGameEngine(gameEngine, gameState);
+                final Action action = gameEngine.getAction(playerShipState);
                 invokeServerCall(() -> server.postActionToServer(action), "Exception when posting action: " + action);
             }
             sleepIfGameCycleTooFast(timeBeforeCycle);
         }
     }
 
-    private void updateGraphics(final GameState gameState, final Level level, final KeyListener manualKeyListener) throws IOException {
+    private ShipState getPlayerShip(final GameState gameState) {
+        return gameState.getShipStates().stream()
+                .filter(shipState -> shipState.getName().equals(playerName))
+                .findAny()
+                .orElseThrow(() -> new IllegalStateException("Could not find ship for player: " + playerName));
+    }
+
+    private SpaceRaceGraphics getGraphics(final GameState gameState, final Level level, final KeyListener manualKeyListener) throws IOException {
         if (spaceRaceGraphics == null) {
             final GameKeyAdapter    gameKeyAdapter = new GameKeyAdapter(this);
             final List<KeyListener> keyListeners   = Arrays.asList(manualKeyListener, gameKeyAdapter);
             spaceRaceGraphics = SpaceRaceGraphicsFactory.createGraphics(level, keyListeners, gameState, gameStatistics, playerName);
         }
-        spaceRaceGraphics.updateGraphics(gameState);
-    }
-
-    private Action getNextActionFromGameEngine(final SpaceRaceGameEngine gameEngine, final GameState gameState) {
-        final ShipState playerShipState = gameState.getShipStates().stream()
-                .filter(shipState -> shipState.getName().equals(playerName))
-                .findAny()
-                .orElseThrow(() -> new IllegalStateException("Could not find ship for player: " + playerName));
-        return gameEngine.getAction(playerShipState);
+        return spaceRaceGraphics;
     }
 
     private void sleepIfGameCycleTooFast(final long timeBeforeCycle) throws InterruptedException {

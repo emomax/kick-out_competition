@@ -11,7 +11,8 @@ import spacerace.gameengine.SpaceRaceGameEngine;
 public class GameRunner {
 
     private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
-    //    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // Game server
+    //    private static final String SERVER_ADDRESS = "10.46.1.42:8080"; // Game server
+    //    private static final String SERVER_ADDRESS = "10.46.0.243:8080"; // Max J
 
     public static void main(final String[] args) throws IOException, InterruptedException {
         setLogLevel();

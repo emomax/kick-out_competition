@@ -1,5 +1,5 @@
 package spacerace.graphics;
 
-enum DetectorPosition {
+public enum DetectorPosition {
     UP, DOWN, LEFT, RIGHT
 }

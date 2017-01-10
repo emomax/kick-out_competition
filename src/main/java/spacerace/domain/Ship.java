@@ -28,15 +28,8 @@ public class Ship {
         this.image = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
         this.name = name;
         this.color = color;
-        //        final double posX = startPosCenterX - (image.getWidth() / 2);
-        //        final double posY = startPosCenterY - (image.getHeight() / 2);
         this.position = new Vector2D(startPosition.getX(), startPosition.getY());
     }
-
-    //    public BufferedImage getImage() {
-    //        return image;
-    //    }
-
 
     public String getName() {
         return name;

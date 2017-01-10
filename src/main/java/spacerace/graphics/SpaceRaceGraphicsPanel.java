@@ -1,6 +1,7 @@
 package spacerace.graphics;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -18,6 +19,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import spacerace.domain.Detector;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatistics;
 import spacerace.domain.GameStatus;
@@ -36,6 +38,7 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
     private final BufferedImage  shipImage;
     private final BufferedImage  fireImage;
     private       GameState      gameState;
+    private       List<Detector> detectors;
     private final GameStatistics gameStatistics;
     private final String         playerName;
 
@@ -54,6 +57,10 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
         this.fireImage = ImageIO.read(new File(getClass().getResource(FIRE_IMAGE_DIR).getFile()));
     }
 
+    public Dimension getShipImageDimension() {
+        return new Dimension(shipImage.getWidth(), shipImage.getHeight());
+    }
+
     // ToDo: Must this be here?
     public void addNotify() {
         super.addNotify();
@@ -66,8 +73,9 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
     }
 
     @Override
-    public void updateGraphics(final GameState gameState) {
+    public void updateGraphics(final GameState gameState, final List<Detector> detectors) {
         this.gameState = gameState;
+        this.detectors = detectors;
         repaint();
     }
 
@@ -81,12 +89,12 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
             drawShip(shipState, graphics);
         }
 
+        drawDetectors(graphics);
+
         final ShipState myShip = gameState.getShipStates().stream()
                 .filter(shipState -> shipState.getName().equals(playerName))
                 .findAny()
                 .get();
-        drawDetectors(myShip, graphics);
-
         drawInfoPanel(myShip, graphics);
 
         if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.JOINABLE) {
@@ -141,10 +149,10 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
         return transformOp.filter(image, null);
     }
 
-    private void drawDetectors(final ShipState shipState, final Graphics graphics) {
-        final DetectorCalculator detectorCalculator = new DetectorCalculator(shipState, shipImage, level);
-        final List<Line2D>       detectorBeams      = detectorCalculator.getDetectorBeams();
-        detectorBeams.forEach(beam -> drawLine(beam, Color.RED, graphics));
+    private void drawDetectors(final Graphics graphics) {
+        detectors.stream()
+                .filter(detector -> detector.getBeam() != null)
+                .forEach(beam -> drawLine(beam.getBeam(), Color.RED, graphics));
     }
 
     private void drawLine(final Line2D line, final Color color, final Graphics graphics) {

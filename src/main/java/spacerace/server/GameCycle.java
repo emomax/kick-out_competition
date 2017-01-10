@@ -49,32 +49,44 @@ public class GameCycle implements Runnable {
 
 
     private void animationCycle(final long timeSinceLastCycle) {
-
-        // Check for wall collisions or goal
-        final List<Rectangle> rectangles = game.getLevel().getRectangles().stream()
-                .map(Rectangle2D::toAWTRectangle)
-                .collect(toList());
+        final List<Rectangle> rectangles = getLevelRectangles();
         for (final Ship ship : game.getShips()) {
+            final Rectangle shipRectangle = createShipRectangle(ship);
 
-            final Rectangle2D shipRectangle2D = new Rectangle2D((int) ship.getX(), (int) ship.getY(), ship.getWidth(), ship.getHeight());
-            final Rectangle   shipRectangle   = shipRectangle2D.toAWTRectangle();
-
-            // Goal
-            if (shipRectangle.intersects(game.getLevel().getGoal().toAWTRectangle())) {
+            if (shipPassedGoalLine(shipRectangle)) {
                 ship.reset(game.getLevel().getStartPosition());
                 continue;
             }
 
-            // Wall collision
-            for (final Rectangle wallRectangle : rectangles) {
-                if (shipRectangle.intersects(wallRectangle)) {
-                    ship.reset(game.getLevel().getStartPosition());
-                }
+            checkWallCollisions(rectangles, ship, shipRectangle);
+        }
+        moveShips(timeSinceLastCycle);
+    }
+
+    private List<Rectangle> getLevelRectangles() {
+        return game.getLevel().getRectangles().stream()
+                .map(Rectangle2D::toAWTRectangle)
+                .collect(toList());
+    }
+
+    private Rectangle createShipRectangle(final Ship ship) {
+        final Rectangle2D shipRectangle2D = new Rectangle2D((int) ship.getX(), (int) ship.getY(), ship.getWidth(), ship.getHeight());
+        return shipRectangle2D.toAWTRectangle();
+    }
+
+    private boolean shipPassedGoalLine(final Rectangle shipRectangle) {
+        return shipRectangle.intersects(game.getLevel().getGoal().toAWTRectangle());
+    }
+
+    private void checkWallCollisions(final List<Rectangle> rectangles, final Ship ship, final Rectangle shipRectangle) {
+        for (final Rectangle wallRectangle : rectangles) {
+            if (shipRectangle.intersects(wallRectangle)) {
+                ship.reset(game.getLevel().getStartPosition());
             }
         }
+    }
 
-
-        // Move ships
+    private void moveShips(final long timeSinceLastCycle) {
         game.getShips().stream().forEach(ship -> ship.move(timeSinceLastCycle));
     }
 }

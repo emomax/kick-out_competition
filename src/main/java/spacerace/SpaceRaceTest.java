@@ -7,12 +7,12 @@ import org.springframework.web.client.RestTemplate;
 import spacerace.client.RemoteGame;
 import spacerace.client.RemoteServerAdapter;
 import spacerace.gameengine.ManualGameEngine;
-import spacerace.server.response.ServerResponse;
 
 public class SpaceRaceTest {
 
-    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
-    //    private static final String SERVER_ADDRESS = "10.46.1.193:8080"; // Game server
+    //    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
+    //    private static final String SERVER_ADDRESS = "10.46.1.42:8080"; // Game server
+    private static final String SERVER_ADDRESS = "10.46.0.243:8080"; // Max J
 
     public static void main(final String[] args) throws InterruptedException, IOException {
         startGameWithMultipleShips();
@@ -20,7 +20,7 @@ public class SpaceRaceTest {
     }
 
     private static void startGameWithMultipleShips() throws IOException, InterruptedException {
-        final String gameName = "Battle of Trustly";
+        final String gameName = "Battle of Trustly5";
         new Thread(() -> {
             try {
                 startGame("Robocop1", gameName);
@@ -45,6 +45,30 @@ public class SpaceRaceTest {
                 e.printStackTrace();
             }
         }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop4", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop5", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop6", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private static void startGame(final String playerName, final String gameName) throws IOException, InterruptedException {
@@ -59,13 +83,13 @@ public class SpaceRaceTest {
 
         final String url = "http://" + SERVER_ADDRESS + "/test";
 
-        for (int i = 0; i < 20; i++) {
-            final long           before    = System.currentTimeMillis();
-            final ServerResponse response  = restTemplate.getForObject(url, ServerResponse.class);
-            final long           totalTime = System.currentTimeMillis() - before;
+        for (int i = 0; i < 10000; i++) {
+            final long   before    = System.currentTimeMillis();
+            final String response  = restTemplate.getForObject(url, String.class);
+            final long   totalTime = System.currentTimeMillis() - before;
             System.out.println(response + "    " + totalTime);
 
-            Thread.sleep(500);
+            Thread.sleep(100);
         }
     }
 }

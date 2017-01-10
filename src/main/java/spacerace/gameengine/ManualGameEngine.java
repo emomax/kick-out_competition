@@ -50,8 +50,7 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
     }
 
     public void keyReleased(final KeyEvent event) {
-        final int    key = event.getKeyCode();
-        final Action action;
+        final int key = event.getKeyCode();
 
         if (key == KeyEvent.VK_SPACE) {
             stabilize = false;

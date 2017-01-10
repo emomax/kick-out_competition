@@ -2,15 +2,17 @@ package spacerace.domain;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.List;
 
 public class ShipState implements Serializable {
 
-    private String   name;
-    private Vector2D position;
-    private Vector2D speed;
-    private Vector2D accelerationDirection;
-    private boolean  stabilize;
-    private Color    color;
+    private String         name;
+    private Vector2D       position;
+    private Vector2D       speed;
+    private Vector2D       accelerationDirection;
+    private boolean        stabilize;
+    private Color          color;
+    private List<Detector> detectors;
 
     public ShipState() {
         // For JSON conversion
@@ -62,5 +64,13 @@ public class ShipState implements Serializable {
 
     public void setColor(final Color color) {
         this.color = color;
+    }
+
+    public List<Detector> getDetectors() {
+        return detectors;
+    }
+
+    public void setDetectors(final List<Detector> detectors) {
+        this.detectors = detectors;
     }
 }
