@@ -12,14 +12,14 @@ public class GameStatistics {
 
     private final LinkedList<Integer> linkedList = new LinkedList<>();
 
-    public void addCycleTime(final Integer element) {
+    public synchronized void addCycleTime(final Integer element) {
         linkedList.add(element);
         while (linkedList.size() > MAX_NUMBER_OF_ELEMENTS) {
             linkedList.remove();
         }
     }
 
-    public IntSummaryStatistics getGameCycleStatistics() {
+    public synchronized IntSummaryStatistics getGameCycleStatistics() {
         return linkedList.stream().mapToInt(Integer::intValue).summaryStatistics();
     }
 }

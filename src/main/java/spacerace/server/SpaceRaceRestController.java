@@ -1,5 +1,6 @@
 package spacerace.server;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -31,6 +32,21 @@ public class SpaceRaceRestController {
         }
     }
 
+    private ServerResponse registerNewPlayer(final String gameName, final String playerName, final int levelNumber) throws IOException {
+        final SpaceRaceGame game = gameHandler.getOrCreateGame(gameName, playerName, levelNumber);
+
+        final ServerResponse response = new ServerResponse();
+        if (game.getGameStatus() != GameStatus.JOINABLE) {
+            response.setErrorMessage("Game not joinable state");
+            return response;
+        }
+        else {
+            game.addShip(playerName);
+        }
+        response.setLevel(game.getLevel());
+        return response;
+    }
+
     private ServerResponse createErrorResponse(final Exception e) {
         final StringWriter stringWriter = new StringWriter();
         final PrintWriter  printWriter  = new PrintWriter(stringWriter);
@@ -38,22 +54,7 @@ public class SpaceRaceRestController {
         final String errorMessage = e.getMessage() + "\n" + stringWriter.toString();
 
         final ServerResponse response = new ServerResponse();
-        response.setMessage(errorMessage);
-        return response;
-    }
-
-    ServerResponse registerNewPlayer(final String gameName, final String playerName, final int levelNumber) {
-        final SpaceRaceGame game = gameHandler.getOrCreateGame(gameName, playerName, levelNumber);
-
-        final ServerResponse response = new ServerResponse();
-        if (game.getGameStatus() != GameStatus.JOINABLE) {
-            response.setMessage("Game not joinable state");
-            return response;
-        }
-        else {
-            game.addShip(playerName);
-        }
-        response.setLevel(game.getLevel());
+        response.setErrorMessage(errorMessage);
         return response;
     }
 
@@ -75,6 +76,19 @@ public class SpaceRaceRestController {
             @RequestParam(value = "stabilize") final boolean stabilize) {
         final SpaceRaceGame game = gameHandler.getGame(gameName);
         game.updateShipParameters(playerName, Acceleration.valueOf(accelerationX), Acceleration.valueOf(accelerationY), stabilize);
+        return new ServerResponse();
+    }
+
+
+    @RequestMapping("/startGame")
+    public ServerResponse startGame(@RequestParam(value = "gameName") final String gameName) {
+        try {
+            final SpaceRaceGame game = gameHandler.getGame(gameName);
+            game.setGameStatus(GameStatus.RUNNING);
+        }
+        catch (final Exception e) {
+            return createErrorResponse(e);
+        }
         return new ServerResponse();
     }
 

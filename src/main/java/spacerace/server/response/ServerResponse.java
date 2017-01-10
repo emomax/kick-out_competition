@@ -7,9 +7,10 @@ import spacerace.level.Level;
 
 public class ServerResponse implements Serializable {
 
-    public String message;
-    GameState gameState;
-    Level     level;
+    private String    message;
+    private String    errorMessage;
+    private GameState gameState;
+    private Level     level;
 
     public String getMessage() {
         return message;
@@ -17,6 +18,14 @@ public class ServerResponse implements Serializable {
 
     public void setMessage(final String message) {
         this.message = message;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(final String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     public GameState getGameState() {

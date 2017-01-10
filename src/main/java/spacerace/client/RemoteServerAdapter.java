@@ -3,25 +3,24 @@ package spacerace.client;
 import org.springframework.web.client.RestTemplate;
 
 import spacerace.domain.Action;
-import spacerace.domain.GameState;
-import spacerace.level.Level;
 import spacerace.server.response.ServerResponse;
 
-final class RemoteServerAdapter {
+public class RemoteServerAdapter implements ServerAdapter {
 
     private final String serverAddress;
     private final String playerName;
     private final String gameName;
     private final int    levelNumber;
 
-    RemoteServerAdapter(final String serverAddress, final String playerName, final String gameName, final int levelNumber) {
+    public RemoteServerAdapter(final String serverAddress, final String playerName, final String gameName, final int levelNumber) {
         this.serverAddress = serverAddress;
         this.playerName = playerName;
         this.gameName = gameName;
         this.levelNumber = levelNumber;
     }
 
-    Level registerPlayer() {
+    @Override
+    public ServerResponse registerPlayer() {
         final RestTemplate restTemplate = new RestTemplate();
         final String url = "http://" + serverAddress
                            + "/registerPlayer"
@@ -29,25 +28,18 @@ final class RemoteServerAdapter {
                            + "&playerName=" + playerName
                            + "&levelNumber=" + levelNumber;
 
-        final ServerResponse response = restTemplate.getForObject(url, ServerResponse.class);
-        if (response.getMessage() != null) {
-            throw new IllegalStateException("Exception when trying to register player: " + playerName + ", message: " + response.getMessage());
-        }
-        return response.getLevel();
+        return restTemplate.getForObject(url, ServerResponse.class);
     }
 
-    GameState getGameState() {
+    @Override
+    public ServerResponse getGameState() {
         final RestTemplate restTemplate = new RestTemplate();
         final String       url          = "http://" + serverAddress + "/getGameState?gameName=" + gameName;
-
-        final ServerResponse response = restTemplate.getForObject(url, ServerResponse.class);
-        if (response.getMessage() != null) {
-            throw new IllegalStateException("Exception when getting game state for game: " + gameName + ", message: " + response.getMessage());
-        }
-        return response.getGameState();
+        return restTemplate.getForObject(url, ServerResponse.class);
     }
 
-    void postActionToServer(final Action action) {
+    @Override
+    public ServerResponse postActionToServer(final Action action) {
         final RestTemplate restTemplate = new RestTemplate();
         final String url = "http://" + serverAddress
                            + "/action"
@@ -57,9 +49,13 @@ final class RemoteServerAdapter {
                            + "&accelerationY=" + action.getAccelerationY()
                            + "&stabilize=" + action.isStabilize();
 
-        final ServerResponse response = restTemplate.getForObject(url, ServerResponse.class);
-        if (response.getMessage() != null) {
-            throw new IllegalStateException("Exception when posting action: " + action + ", message: " + response.getMessage());
-        }
+        return restTemplate.getForObject(url, ServerResponse.class);
+    }
+
+    @Override
+    public ServerResponse sendStartCommand() {
+        final RestTemplate restTemplate = new RestTemplate();
+        final String       url          = "http://" + serverAddress + "/startGame?gameName=" + gameName;
+        return restTemplate.getForObject(url, ServerResponse.class);
     }
 }

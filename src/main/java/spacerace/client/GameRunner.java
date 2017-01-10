@@ -21,7 +21,8 @@ public class GameRunner {
         final int                 levelNumber  = 1;
         final SpaceRaceGameEngine myGameEngine = new MyN00bGameEngine();
 
-        final RemoteGame remoteGame = new RemoteGame(SERVER_ADDRESS, playerName, gameName, levelNumber);
+        final RemoteServerAdapter server     = new RemoteServerAdapter(SERVER_ADDRESS, playerName, gameName, levelNumber);
+        final RemoteGame          remoteGame = new RemoteGame(server, playerName, gameName);
         //        final String gameResult = remoteGame.runGame(myGameEngine);
         final String gameResult = remoteGame.runManualGame();
 

@@ -1,6 +1,7 @@
 package spacerace.server;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -29,8 +30,8 @@ public class SpaceRaceGame {
     private final UUID   id;
     private final String name;
     private final ConcurrentHashMap<String, Ship> ships = new ConcurrentHashMap<>();
-    private final Level      level;
-    private final GameStatus gameStatus;
+    private final    Level      level;
+    private volatile GameStatus gameStatus;
     private static final List<Color> STANDARD_SHIP_COLORS = asList(RED, BLUE, MAGENTA, GREEN, CYAN, BLACK, WHITE, YELLOW, PINK);
 
     public SpaceRaceGame(final UUID id, final String name, final Level level) {
@@ -54,6 +55,10 @@ public class SpaceRaceGame {
         return gameStatus;
     }
 
+    public void setGameStatus(final GameStatus gameStatus) {
+        this.gameStatus = gameStatus;
+    }
+
     public Collection<Ship> getShips() {
         return ships.values();
     }
@@ -62,7 +67,7 @@ public class SpaceRaceGame {
         return level;
     }
 
-    public void addShip(final String playerName) {
+    public void addShip(final String playerName) throws IOException {
         synchronized (ships) {
             if (ships.get(playerName) != null) {
                 throw new IllegalArgumentException("Player already registered");

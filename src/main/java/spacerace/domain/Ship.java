@@ -2,26 +2,30 @@ package spacerace.domain;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 
 public class Ship {
 
-    private static final String SHIP_IMAGE_DIR         = "../../spacerace/ship.png";
+    private static final String SHIP_IMAGE_DIR         = "../../spacerace/ship2.png";
     private static final double MAX_SPEED              = 0.4;
     private static final double ACCELERATION           = 0.7;
     private static final double STABILIZE_ACCELERATION = 0.4;
     private static final double STABILIZE_STOP_SPEED   = 0.01;
 
-    private final String   name;
-    private final Color    color;
-    private final Vector2D position;
-    //    private final BufferedImage image;
-    private final    Vector2D speed                 = new Vector2D(0, 0);
+    private final String        name;
+    private final Color         color;
+    private       Vector2D      position;
+    private final BufferedImage image;
+    private          Vector2D speed                 = new Vector2D(0, 0);
     private volatile Vector2D accelerationDirection = new Vector2D(0, 0);
     private volatile boolean  stabilize             = false;
 
-    public Ship(final String name, final Color color, final Vector2D startPosition) {
-        //        this.image = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
+    public Ship(final String name, final Color color, final Vector2D startPosition) throws IOException {
+        this.image = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
         this.name = name;
         this.color = color;
         //        final double posX = startPosCenterX - (image.getWidth() / 2);
@@ -50,6 +54,18 @@ public class Ship {
         return position;
     }
 
+    public void setPosition(final Vector2D position) {
+        this.position = position;
+    }
+
+    public int getWidth() {
+        return image.getWidth();
+    }
+
+    public int getHeight() {
+        return image.getHeight();
+    }
+
     public double getSpeedX() {
         return speed.getX();
     }
@@ -60,6 +76,10 @@ public class Ship {
 
     public Vector2D getSpeed() {
         return speed;
+    }
+
+    public void setSpeed(final Vector2D speed) {
+        this.speed = speed;
     }
 
     public double getAccelerationDirectionX() {
@@ -88,6 +108,16 @@ public class Ship {
 
     public Color getColor() {
         return color;
+    }
+
+    public void reset(final Vector2D startPosition) {
+        position.setX(startPosition.getX());
+        position.setY(startPosition.getY());
+        speed.setX(0);
+        speed.setY(0);
+        accelerationDirection.setX(0);
+        accelerationDirection.setY(0);
+        stabilize = false;
     }
 
     public void move(final long timeElapsed) {

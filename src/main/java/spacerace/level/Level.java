@@ -13,15 +13,17 @@ public class Level {
     private int               number;
     private List<Rectangle2D> rectangles;
     private Vector2D          startPosition;
+    private Rectangle2D       goal;
 
     public Level() {
         // For JSON conversion
     }
 
-    public Level(final int number, final List<Rectangle2D> rectangles, final Vector2D startPosition) {
+    public Level(final int number, final List<Rectangle2D> rectangles, final Vector2D startPosition, final Rectangle2D goal) {
         this.number = number;
         this.rectangles = rectangles;
         this.startPosition = startPosition;
+        this.goal = goal;
     }
 
     public int getNumber() {
@@ -46,5 +48,13 @@ public class Level {
 
     public void setStartPosition(final Vector2D startPosition) {
         this.startPosition = startPosition;
+    }
+
+    public Rectangle2D getGoal() {
+        return goal;
+    }
+
+    public void setGoal(final Rectangle2D goal) {
+        this.goal = goal;
     }
 }
