@@ -18,6 +18,9 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
 
     @Override
     public Action getAction(final ShipState shipState) {
+
+        System.out.println(shipState);
+
         if (stabilize) {
             return Action.withStabilize(true);
         }

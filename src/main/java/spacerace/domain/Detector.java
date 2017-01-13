@@ -45,4 +45,15 @@ public class Detector {
         // One of these two will be 0 but still, look better to split than just to add them.
         return Math.abs(beam.getX1() - beam.getX2()) + Math.abs(beam.getY1() - beam.getY2());
     }
+
+    @Override
+    public String toString() {
+        return "Detector{" +
+               "detectorPosition=" + detectorPosition +
+               ", number=" + number +
+               ", x=" + x +
+               ", y=" + y +
+               ", beam=" + beam +
+               '}';
+    }
 }

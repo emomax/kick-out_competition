@@ -24,7 +24,7 @@ public class GameCycle implements Runnable {
 
         while (true) {
             final long timeSinceLastSpriteMovement = System.currentTimeMillis() - lastSpriteMovement;
-            animationCycle(timeSinceLastSpriteMovement);
+            runGameCycle(timeSinceLastSpriteMovement);
             lastSpriteMovement = System.currentTimeMillis();
 
             final long timeDiff  = System.currentTimeMillis() - beforeTime;
@@ -47,8 +47,7 @@ public class GameCycle implements Runnable {
         }
     }
 
-
-    private void animationCycle(final long timeSinceLastCycle) {
+    private void runGameCycle(final long timeSinceLastCycle) {
         final List<Rectangle> rectangles = getLevelRectangles();
         for (final Ship ship : game.getShips()) {
             final Rectangle shipRectangle = createShipRectangle(ship);

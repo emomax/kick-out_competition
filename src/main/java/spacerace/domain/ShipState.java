@@ -73,4 +73,17 @@ public class ShipState implements Serializable {
     public void setDetectors(final List<Detector> detectors) {
         this.detectors = detectors;
     }
+
+    @Override
+    public String toString() {
+        return "ShipState{" +
+               "name='" + name + '\'' +
+               ", position=" + position +
+               ", speed=" + speed +
+               ", accelerationDirection=" + accelerationDirection +
+               ", stabilize=" + stabilize +
+               ", color=" + color +
+               ", detectors=" + detectors +
+               '}';
+    }
 }

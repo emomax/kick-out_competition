@@ -33,4 +33,14 @@ public class Line2D {
     public java.awt.geom.Line2D convertToAWTLine2D() {
         return new java.awt.geom.Line2D.Double(x1, y1, x2, y2);
     }
+
+    @Override
+    public String toString() {
+        return "Line2D{" +
+               "x1=" + x1 +
+               ", y1=" + y1 +
+               ", x2=" + x2 +
+               ", y2=" + y2 +
+               '}';
+    }
 }
