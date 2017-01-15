@@ -1,16 +1,19 @@
 package spacerace.server.response;
 
 import java.io.Serializable;
+import java.util.List;
 
 import spacerace.domain.GameState;
+import spacerace.domain.PlayerResult;
 import spacerace.level.Level;
 
 public class ServerResponse implements Serializable {
 
-    private String    message;
-    private String    errorMessage;
-    private GameState gameState;
-    private Level     level;
+    private String             message;
+    private String             errorMessage;
+    private GameState          gameState;
+    private Level              level;
+    private List<PlayerResult> playerResults;
 
     public String getMessage() {
         return message;
@@ -42,5 +45,13 @@ public class ServerResponse implements Serializable {
 
     public void setLevel(final Level level) {
         this.level = level;
+    }
+
+    public List<PlayerResult> getPlayerResults() {
+        return playerResults;
+    }
+
+    public void setPlayerResults(final List<PlayerResult> playerResults) {
+        this.playerResults = playerResults;
     }
 }

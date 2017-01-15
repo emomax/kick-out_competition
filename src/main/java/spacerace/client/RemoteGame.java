@@ -37,40 +37,43 @@ public class RemoteGame {
         this.server = server;
     }
 
-    String runManualGame() throws IOException, InterruptedException {
+    public void runManualGame() throws IOException, InterruptedException {
         final ManualGameEngine manualGameEngine = new ManualGameEngine();
-        return runGame(manualGameEngine, manualGameEngine);
+        runGame(manualGameEngine, manualGameEngine);
     }
 
-    public String runGame(final SpaceRaceGameEngine gameEngine) throws IOException, InterruptedException {
-        return runGame(gameEngine, null);
+    public void runGame(final SpaceRaceGameEngine gameEngine) throws IOException, InterruptedException {
+        runGame(gameEngine, null);
     }
 
-    public String runGame(final SpaceRaceGameEngine gameEngine, final KeyListener manualKeyListener) throws IOException, InterruptedException {
-        //        final Level level = server.registerPlayer();
+    public void runGame(final SpaceRaceGameEngine gameEngine, final KeyListener manualKeyListener) throws IOException, InterruptedException {
         final ServerResponse response = invokeServerCall(server::registerPlayer, "Exception when trying to register player: " + playerName);
-        return runGameLoop(gameEngine, response.getLevel(), manualKeyListener);
+        runGameLoop(gameEngine, response.getLevel(), manualKeyListener);
     }
 
-    private String runGameLoop(final SpaceRaceGameEngine gameEngine, final Level level, final KeyListener manualKeyListener) throws InterruptedException, IOException {
-        while (true) {
+    private void runGameLoop(final SpaceRaceGameEngine gameEngine, final Level level, final KeyListener manualKeyListener) throws InterruptedException, IOException {
+        boolean stop = false;
+        while (!stop) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
-            final ServerResponse    response           = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
-            final GameState         gameState          = response.getGameState();
-            final SpaceRaceGraphics graphics           = getGraphics(gameState, level, manualKeyListener);
-            final ShipState         playerShipState    = getPlayerShip(gameState);
-            final Dimension         shipImageDimension = graphics.getShipImageDimension();
-            final DetectorFactory   detectorFactory    = new DetectorFactory(playerShipState, shipImageDimension, level);
-            final List<Detector>    detectors          = detectorFactory.getDetectors();
+            final ServerResponse    response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
+            final GameState         gameState       = response.getGameState();
+            final SpaceRaceGraphics graphics        = getGraphics(gameState, level, manualKeyListener);
+            final ShipState         playerShipState = getPlayerShip(gameState);
+            final List<Detector>    detectors       = getDetectors(level, graphics, playerShipState);
             playerShipState.setDetectors(detectors);
 
-            graphics.updateGraphics(gameState, detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
                 final Action action = gameEngine.getAction(playerShipState);
                 invokeServerCall(() -> server.postActionToServer(action), "Exception when posting action: " + action);
             }
+            else if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.FINISHED) {
+                final ServerResponse resultListResponse = invokeServerCall(server::getGameResult, "Exception when getting result for game: " + gameName);
+                graphics.setPlayerResults(resultListResponse.getPlayerResults());
+                stop = true;
+            }
+            graphics.updateGraphics(gameState, detectors);
             sleepIfGameCycleTooFast(timeBeforeCycle);
         }
     }
@@ -89,6 +92,12 @@ public class RemoteGame {
             spaceRaceGraphics = SpaceRaceGraphicsFactory.createGraphics(level, keyListeners, gameState, gameStatistics, playerName);
         }
         return spaceRaceGraphics;
+    }
+
+    private List<Detector> getDetectors(final Level level, final SpaceRaceGraphics graphics, final ShipState playerShipState) {
+        final Dimension       shipImageDimension = graphics.getShipImageDimension();
+        final DetectorFactory detectorFactory    = new DetectorFactory(playerShipState, shipImageDimension, level);
+        return detectorFactory.getDetectors();
     }
 
     private void sleepIfGameCycleTooFast(final long timeBeforeCycle) throws InterruptedException {

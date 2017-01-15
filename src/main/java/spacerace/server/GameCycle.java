@@ -7,6 +7,7 @@ import spacerace.domain.Rectangle2D;
 import spacerace.domain.Ship;
 
 import static java.util.stream.Collectors.toList;
+import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
 
 public class GameCycle implements Runnable {
 
@@ -23,6 +24,11 @@ public class GameCycle implements Runnable {
         long lastSpriteMovement = System.currentTimeMillis();
 
         while (true) {
+            if (gameTimeIsUp()) {
+                game.finishGame();
+                break;
+            }
+
             final long timeSinceLastSpriteMovement = System.currentTimeMillis() - lastSpriteMovement;
             runGameCycle(timeSinceLastSpriteMovement);
             lastSpriteMovement = System.currentTimeMillis();
@@ -38,13 +44,8 @@ public class GameCycle implements Runnable {
         }
     }
 
-    private void sleep(final long sleepTime) {
-        try {
-            Thread.sleep(sleepTime);
-        }
-        catch (final InterruptedException e) {
-            System.out.println("Interrupted!");
-        }
+    private boolean gameTimeIsUp() {
+        return (System.currentTimeMillis() - game.getStartTime()) > GAME_TIME_LIMIT;
     }
 
     private void runGameCycle(final long timeSinceLastCycle) {
@@ -54,6 +55,7 @@ public class GameCycle implements Runnable {
 
             if (shipPassedGoalLine(shipRectangle)) {
                 ship.reset(game.getLevel().getStartPosition());
+                game.setShipPassedGoalLine(ship);
                 continue;
             }
 
@@ -87,5 +89,14 @@ public class GameCycle implements Runnable {
 
     private void moveShips(final long timeSinceLastCycle) {
         game.getShips().stream().forEach(ship -> ship.move(timeSinceLastCycle));
+    }
+
+    private void sleep(final long sleepTime) {
+        try {
+            Thread.sleep(sleepTime);
+        }
+        catch (final InterruptedException e) {
+            System.out.println("Interrupted!");
+        }
     }
 }

@@ -36,4 +36,9 @@ public class LocalServerAdapter implements ServerAdapter {
     public ServerResponse sendStartCommand() {
         return serverController.startGame(gameName);
     }
+
+    @Override
+    public ServerResponse getGameResult() {
+        return serverController.getGameResult(gameName);
+    }
 }

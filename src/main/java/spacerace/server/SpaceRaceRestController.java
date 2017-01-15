@@ -33,7 +33,7 @@ public class SpaceRaceRestController {
     }
 
     private ServerResponse registerNewPlayer(final String gameName, final String playerName, final int levelNumber) throws IOException {
-        final SpaceRaceGame game = gameHandler.getOrCreateGame(gameName, playerName, levelNumber);
+        final SpaceRaceGame game = gameHandler.getOrCreateGame(gameName, levelNumber);
 
         final ServerResponse response = new ServerResponse();
         if (game.getGameStatus() != GameStatus.JOINABLE) {
@@ -60,10 +60,16 @@ public class SpaceRaceRestController {
 
     @RequestMapping("/getGameState")
     public ServerResponse getGameState(@RequestParam(value = "gameName") final String gameName) {
-        final SpaceRaceGame  game      = gameHandler.getGame(gameName);
-        final GameState      gameState = GameStateConverter.convertGameToGameState(game);
-        final ServerResponse response  = new ServerResponse();
-        response.setGameState(gameState);
+        final SpaceRaceGame  game = gameHandler.getGame(gameName);
+        final ServerResponse response;
+        if (game == null) {
+            response = createErrorResponse(new IllegalStateException("No game found. Maybe you did not start game in time?"));
+        }
+        else {
+            final GameState gameState = GameStateConverter.convertGameToGameState(game);
+            response = new ServerResponse();
+            response.setGameState(gameState);
+        }
         return response;
     }
 
@@ -84,12 +90,25 @@ public class SpaceRaceRestController {
     public ServerResponse startGame(@RequestParam(value = "gameName") final String gameName) {
         try {
             final SpaceRaceGame game = gameHandler.getGame(gameName);
-            game.setGameStatus(GameStatus.RUNNING);
+            game.startGame();
         }
         catch (final Exception e) {
             return createErrorResponse(e);
         }
         return new ServerResponse();
+    }
+
+    @RequestMapping("/getPlayerPositions")
+    public ServerResponse getGameResult(@RequestParam(value = "gameName") final String gameName) {
+        try {
+            final SpaceRaceGame  game     = gameHandler.getGame(gameName);
+            final ServerResponse response = new ServerResponse();
+            response.setPlayerResults(game.getPlayerPositions());
+            return response;
+        }
+        catch (final Exception e) {
+            return createErrorResponse(e);
+        }
     }
 
     @RequestMapping("/test")

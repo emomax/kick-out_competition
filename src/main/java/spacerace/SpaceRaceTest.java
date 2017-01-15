@@ -10,9 +10,9 @@ import spacerace.gameengine.ManualGameEngine;
 
 public class SpaceRaceTest {
 
-    //    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
+    private static final String SERVER_ADDRESS = "127.0.0.1:8080"; // If you run locally
     //    private static final String SERVER_ADDRESS = "10.46.1.42:8080"; // Game server WIFI
-    private static final String SERVER_ADDRESS = "10.46.1.111:8080"; // Game server ETHERNET
+    //    private static final String SERVER_ADDRESS = "10.46.1.111:8080"; // Game server ETHERNET
     //        private static final String SERVER_ADDRESS = "10.46.0.243:8080"; // Max J
 
     public static void main(final String[] args) throws InterruptedException, IOException {

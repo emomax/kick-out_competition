@@ -18,6 +18,7 @@ public class GameStateConverter {
     public static GameState convertGameToGameState(final SpaceRaceGame game) {
         final GameState gameState = new GameState();
         gameState.setGameStatus(game.getGameStatus().toString());
+        gameState.setStartTime(game.getStartTime());
 
         final List<ShipState> shipStates = game.getShips().stream()
                 .map(GameStateConverter::convertShipToShipState)

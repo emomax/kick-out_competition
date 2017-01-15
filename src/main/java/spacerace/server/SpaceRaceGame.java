@@ -2,19 +2,24 @@ package spacerace.server;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import spacerace.domain.Acceleration;
 import spacerace.domain.GameStatus;
+import spacerace.domain.PlayerResult;
 import spacerace.domain.Ship;
 import spacerace.domain.Vector2D;
 import spacerace.level.Level;
 
-import static java.awt.Color.BLACK;
 import static java.awt.Color.BLUE;
 import static java.awt.Color.CYAN;
 import static java.awt.Color.GREEN;
@@ -27,20 +32,30 @@ import static java.util.Arrays.asList;
 
 public class SpaceRaceGame {
 
+    public static final  long        GAME_TIME_LIMIT      = 10_000;
+    private static final List<Color> STANDARD_SHIP_COLORS = asList(RED, BLUE, MAGENTA, GREEN, CYAN, WHITE, YELLOW, PINK);
+
     private final UUID   id;
     private final String name;
     private final ConcurrentHashMap<String, Ship> ships = new ConcurrentHashMap<>();
     private final    Level      level;
     private volatile GameStatus gameStatus;
-    private static final List<Color> STANDARD_SHIP_COLORS = asList(RED, BLUE, MAGENTA, GREEN, CYAN, BLACK, WHITE, YELLOW, PINK);
+    private          long       startTime;
+    private final Map<String, PlayerResult> playerPositions = new ConcurrentHashMap<>();
 
-    public SpaceRaceGame(final UUID id, final String name, final Level level) {
+    SpaceRaceGame(final UUID id, final String name, final Level level) {
         this.id = id;
         this.name = name;
         this.level = level;
         this.gameStatus = GameStatus.JOINABLE;
-        final GameCycle gameCycle = new GameCycle(this);
-        new Thread(gameCycle).start();
+
+        // Schedule game killer if game created but players never started it
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(() -> {
+            if (gameStatus.equals(GameStatus.JOINABLE)) {
+                gameStatus = GameStatus.CLOSED;
+            }
+        }, 15, TimeUnit.SECONDS);
     }
 
     public UUID getId() {
@@ -55,8 +70,18 @@ public class SpaceRaceGame {
         return gameStatus;
     }
 
-    public void setGameStatus(final GameStatus gameStatus) {
-        this.gameStatus = gameStatus;
+    void startGame() {
+        startTime = System.currentTimeMillis();
+        final GameCycle gameCycle = new GameCycle(this);
+        new Thread(gameCycle).start();
+        gameStatus = GameStatus.RUNNING;
+    }
+
+    void finishGame() {
+        gameStatus = GameStatus.FINISHED;
+        // Close game in a moment so that all players have time to discover that the game has finished before it closes
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.schedule(() -> gameStatus = GameStatus.CLOSED, 5, TimeUnit.SECONDS);
     }
 
     public Collection<Ship> getShips() {
@@ -67,7 +92,11 @@ public class SpaceRaceGame {
         return level;
     }
 
-    public void addShip(final String playerName) throws IOException {
+    public long getStartTime() {
+        return startTime;
+    }
+
+    void addShip(final String playerName) throws IOException {
         synchronized (ships) {
             if (ships.get(playerName) != null) {
                 throw new IllegalArgumentException("Player already registered");
@@ -77,6 +106,7 @@ public class SpaceRaceGame {
             final Ship  ship      = new Ship(playerName, shipColor, level.getStartPosition());
             ships.put(ship.getName(), ship);
         }
+        playerPositions.put(playerName, new PlayerResult(playerName, null));
     }
 
     private Color getNextShipColor() {
@@ -90,7 +120,7 @@ public class SpaceRaceGame {
         }
     }
 
-    public void updateShipParameters(final String playerName, final Acceleration accelerationX, final Acceleration accelerationY, final boolean stabilize) {
+    void updateShipParameters(final String playerName, final Acceleration accelerationX, final Acceleration accelerationY, final boolean stabilize) {
         final Ship ship = ships.get(playerName);
 
         final int      accelerationDirectionX = convertAcceleration(accelerationX);
@@ -111,5 +141,17 @@ public class SpaceRaceGame {
         else {
             return 0;
         }
+    }
+
+    List<PlayerResult> getPlayerPositions() {
+        return new ArrayList<>(playerPositions.values());
+    }
+
+    // This implementation only supports that a player finishes one time. If we want to support multiple runs,
+    // we must save the last start time (and check if new run is better)
+    void setShipPassedGoalLine(final Ship ship) {
+        final long         timeSinceStart = System.currentTimeMillis() - startTime;
+        final PlayerResult playerResult   = new PlayerResult(ship.getName(), timeSinceStart);
+        playerPositions.put(ship.getName(), playerResult);
     }
 }

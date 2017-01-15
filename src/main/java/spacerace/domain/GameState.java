@@ -7,14 +7,10 @@ public class GameState implements Serializable {
 
     private String          gameStatus;
     private List<ShipState> shipStates;
+    private long            startTime;
 
     public GameState() {
         // For JSON conversion
-    }
-
-    public GameState(final String gameStatus, final List<ShipState> shipStates) {
-        this.gameStatus = gameStatus;
-        this.shipStates = shipStates;
     }
 
     public void setGameStatus(final String gameStatus) {
@@ -31,5 +27,13 @@ public class GameState implements Serializable {
 
     public void setShipStates(final List<ShipState> shipStates) {
         this.shipStates = shipStates;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(final long startTime) {
+        this.startTime = startTime;
     }
 }

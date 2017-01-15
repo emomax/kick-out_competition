@@ -12,4 +12,6 @@ public interface ServerAdapter {
     ServerResponse postActionToServer(final Action action);
 
     ServerResponse sendStartCommand();
+
+    ServerResponse getGameResult();
 }

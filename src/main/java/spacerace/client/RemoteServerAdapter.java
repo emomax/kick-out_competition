@@ -58,4 +58,11 @@ public class RemoteServerAdapter implements ServerAdapter {
         final String       url          = "http://" + serverAddress + "/startGame?gameName=" + gameName;
         return restTemplate.getForObject(url, ServerResponse.class);
     }
+
+    @Override
+    public ServerResponse getGameResult() {
+        final RestTemplate restTemplate = new RestTemplate();
+        final String       url          = "http://" + serverAddress + "/getPlayerPositions?gameName=" + gameName;
+        return restTemplate.getForObject(url, ServerResponse.class);
+    }
 }

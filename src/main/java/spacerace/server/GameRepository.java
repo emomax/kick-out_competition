@@ -1,22 +1,41 @@
 package spacerace.server;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import spacerace.domain.GameStatus;
 import spacerace.level.Level;
 
-public class GameRepository {
+class GameRepository {
 
     private final ConcurrentHashMap<String, SpaceRaceGame> games           = new ConcurrentHashMap<>();
     private final LevelRepository                          levelRepository = new LevelRepository();
-    //    private final List<SpaceRaceGame> finishedGames;
-    //    private final FinishedGamesDao                         finishedGamesDao = new FinishedGamesDao();
+    private final List<SpaceRaceGame>                      finishedGames   = Collections.synchronizedList(new ArrayList<>());
 
-    //    public GameRepository() {
-    //        finishedGames = finishedGamesDao.readGames();
-    //    }
+    GameRepository() {
+        startOldGamesCleaner();
+    }
 
-    public SpaceRaceGame getOrCreateGame(final String gameName, final String playerName, final int levelNumber) {
+    private void startOldGamesCleaner() {
+        final Runnable moveOldGames = () -> {
+            games.values().stream()
+                    .filter(spaceRaceGame -> spaceRaceGame.getGameStatus() == GameStatus.CLOSED)
+                    .forEach(game -> {
+                        finishedGames.add(game);
+                        games.remove(game.getName());
+                    });
+        };
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(moveOldGames, 5, 5, TimeUnit.SECONDS);
+    }
+
+    SpaceRaceGame getOrCreateGame(final String gameName, final int levelNumber) {
         synchronized (games) {
             final SpaceRaceGame foundGame = games.get(gameName);
             if (foundGame != null) {
@@ -32,7 +51,7 @@ public class GameRepository {
         }
     }
 
-    public SpaceRaceGame getGame(final String gameName) {
+    SpaceRaceGame getGame(final String gameName) {
         return games.get(gameName);
     }
 }

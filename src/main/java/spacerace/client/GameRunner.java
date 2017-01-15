@@ -26,9 +26,7 @@ public class GameRunner {
         final RemoteServerAdapter server     = new RemoteServerAdapter(SERVER_ADDRESS, playerName, gameName, levelNumber);
         final RemoteGame          remoteGame = new RemoteGame(server, playerName, gameName);
         //        final String gameResult = remoteGame.runGame(myGameEngine);
-        final String gameResult = remoteGame.runManualGame();
-
-        System.out.println(gameResult);
+        remoteGame.runManualGame();
     }
 
     private static void setLogLevel() {
