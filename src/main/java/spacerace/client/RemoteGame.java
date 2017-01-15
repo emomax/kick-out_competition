@@ -60,7 +60,7 @@ public class RemoteGame {
             final GameState         gameState       = response.getGameState();
             final SpaceRaceGraphics graphics        = getGraphics(gameState, level, manualKeyListener);
             final ShipState         playerShipState = getPlayerShip(gameState);
-            final List<Detector>    detectors       = getDetectors(level, graphics, playerShipState);
+            final List<Detector>    detectors       = getDetectors(level, graphics.getShipImageDimension(), playerShipState);
             playerShipState.setDetectors(detectors);
 
 
@@ -73,7 +73,7 @@ public class RemoteGame {
                 graphics.setPlayerResults(resultListResponse.getPlayerResults());
                 stop = true;
             }
-            graphics.updateGraphics(gameState, detectors);
+            graphics.setState(gameState, detectors);
             sleepIfGameCycleTooFast(timeBeforeCycle);
         }
     }
@@ -94,9 +94,8 @@ public class RemoteGame {
         return spaceRaceGraphics;
     }
 
-    private List<Detector> getDetectors(final Level level, final SpaceRaceGraphics graphics, final ShipState playerShipState) {
-        final Dimension       shipImageDimension = graphics.getShipImageDimension();
-        final DetectorFactory detectorFactory    = new DetectorFactory(playerShipState, shipImageDimension, level);
+    private List<Detector> getDetectors(final Level level, final Dimension shipImageDimension, final ShipState playerShipState) {
+        final DetectorFactory detectorFactory = new DetectorFactory(playerShipState, shipImageDimension, level);
         return detectorFactory.getDetectors();
     }
 

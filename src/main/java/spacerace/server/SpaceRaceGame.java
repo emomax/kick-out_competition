@@ -32,6 +32,7 @@ import static java.util.Arrays.asList;
 
 public class SpaceRaceGame {
 
+    public static final  int         JOIN_GAME_TIMEOUT    = 15;
     public static final  long        GAME_TIME_LIMIT      = 10_000;
     private static final List<Color> STANDARD_SHIP_COLORS = asList(RED, BLUE, MAGENTA, GREEN, CYAN, WHITE, YELLOW, PINK);
 
@@ -55,7 +56,7 @@ public class SpaceRaceGame {
             if (gameStatus.equals(GameStatus.JOINABLE)) {
                 gameStatus = GameStatus.CLOSED;
             }
-        }, 15, TimeUnit.SECONDS);
+        }, JOIN_GAME_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public UUID getId() {

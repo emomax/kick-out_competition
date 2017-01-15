@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -31,10 +34,11 @@ import spacerace.level.Level;
 
 import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
 
-public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
+class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
 
-    private static final String SHIP_IMAGE_DIR = "../../spacerace/ship2.png";
-    private static final String FIRE_IMAGE_DIR = "../../spacerace/fire_50px.png";
+    private static final String SHIP_IMAGE_DIR           = "../../spacerace/ship2.png";
+    private static final String FIRE_IMAGE_DIR           = "../../spacerace/fire_50px.png";
+    public static final  int    GRAPHICS_UPDATE_INTERVAL = 17;
 
     private final Level              level;
     private final BufferedImage      shipImage;
@@ -45,7 +49,7 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
     private final String             playerName;
     private       List<PlayerResult> playerResults;
 
-    public SpaceRaceGraphicsPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final GameStatistics gameStatistics, final String playerName) throws IOException {
+    SpaceRaceGraphicsPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final GameStatistics gameStatistics, final String playerName) throws IOException {
         this.level = level;
         this.gameState = gameState;
         this.gameStatistics = gameStatistics;
@@ -58,6 +62,13 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
 
         this.shipImage = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
         this.fireImage = ImageIO.read(new File(getClass().getResource(FIRE_IMAGE_DIR).getFile()));
+
+        startGraphicsUpdateLoop();
+    }
+
+    private void startGraphicsUpdateLoop() {
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(this::repaint, 0, GRAPHICS_UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
     public Dimension getShipImageDimension() {
@@ -81,10 +92,9 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
     }
 
     @Override
-    public void updateGraphics(final GameState gameState, final List<Detector> detectors) {
+    public void setState(final GameState gameState, final List<Detector> detectors) {
         this.gameState = gameState;
         this.detectors = detectors;
-        repaint();
     }
 
     @Override
@@ -97,21 +107,19 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
             drawShip(shipState, graphics);
         }
 
-        drawDetectors(graphics);
-
-        final ShipState myShip = gameState.getShipStates().stream()
-                .filter(shipState -> shipState.getName().equals(playerName))
-                .findAny()
-                .get();
-        drawInfoPanel(myShip, graphics);
-
-        if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.JOINABLE) {
+        final GameStatus gameStatus = GameStatus.valueOf(gameState.getGameStatus());
+        if (gameStatus == GameStatus.JOINABLE) {
             printWaitingText(graphics);
+            drawInfoPanel(graphics);
         }
-        else if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.FINISHED) {
+        else if (gameStatus == GameStatus.RUNNING) {
+            drawDetectors(graphics);
+            drawInfoPanel(graphics);
+        }
+        else if (gameStatus == GameStatus.FINISHED) {
             printGameResult(graphics);
         }
-        else if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.CLOSED) {
+        else if (gameStatus == GameStatus.CLOSED) {
             printJoinTimeIsUp(graphics);
         }
 
@@ -184,7 +192,8 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
         graphics.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
-    private void drawInfoPanel(final ShipState myShip, final Graphics graphics) {
+    private void drawInfoPanel(final Graphics graphics) {
+        final ShipState     myShip    = getMyShip();
         final DecimalFormat formatter = new DecimalFormat("#0.0000");
         final Font          font      = new Font("Helvetica", Font.BOLD, 14);
 
@@ -232,6 +241,13 @@ public class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics 
         graphics.setColor(Color.GREEN);
         graphics.setFont(font);
         graphics.drawString(timeLeftText, 800, 20);
+    }
+    
+    private ShipState getMyShip() {
+        return gameState.getShipStates().stream()
+                .filter(shipState -> shipState.getName().equals(playerName))
+                .findAny()
+                .get();
     }
 
     //    private void drawShipDataForAllShips(final Graphics graphics, final DecimalFormat formatter, final Font font) {

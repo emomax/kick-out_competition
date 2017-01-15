@@ -9,9 +9,9 @@ import spacerace.domain.PlayerResult;
 
 public interface SpaceRaceGraphics {
 
-    void updateGraphics(final GameState gameState, final List<Detector> detectorBeams);
+    void setState(final GameState gameState, final List<Detector> detectorBeams);
 
-    public Dimension getShipImageDimension();
+    Dimension getShipImageDimension();
 
     void setPlayerResults(List<PlayerResult> playerResults);
 }

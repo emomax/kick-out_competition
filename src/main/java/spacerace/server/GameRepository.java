@@ -14,6 +14,8 @@ import spacerace.level.Level;
 
 class GameRepository {
 
+    public static final int MOVE_OLD_GAMES_PERIOD = 5;
+
     private final ConcurrentHashMap<String, SpaceRaceGame> games           = new ConcurrentHashMap<>();
     private final LevelRepository                          levelRepository = new LevelRepository();
     private final List<SpaceRaceGame>                      finishedGames   = Collections.synchronizedList(new ArrayList<>());
@@ -32,7 +34,7 @@ class GameRepository {
                     });
         };
         final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(moveOldGames, 5, 5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(moveOldGames, 0, MOVE_OLD_GAMES_PERIOD, TimeUnit.SECONDS);
     }
 
     SpaceRaceGame getOrCreateGame(final String gameName, final int levelNumber) {
