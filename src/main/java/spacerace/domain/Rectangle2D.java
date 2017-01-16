@@ -1,8 +1,9 @@
 package spacerace.domain;
 
 import java.awt.Rectangle;
+import java.io.Serializable;
 
-public class Rectangle2D {
+public class Rectangle2D implements Serializable {
 
     private int x;
     private int y;

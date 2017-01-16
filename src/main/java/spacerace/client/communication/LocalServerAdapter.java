@@ -1,4 +1,4 @@
-package spacerace.client;
+package spacerace.client.communication;
 
 import spacerace.domain.Action;
 import spacerace.server.SpaceRaceRestController;

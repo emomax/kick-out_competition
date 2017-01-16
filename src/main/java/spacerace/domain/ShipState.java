@@ -7,8 +7,8 @@ import java.util.List;
 public class ShipState implements Serializable {
 
     private String         name;
-    private Vector2D       position;
     private Vector2D       speed;
+    private Vector2D       position;
     private Vector2D       accelerationDirection;
     private boolean        stabilize;
     private Color          color;

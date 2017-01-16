@@ -1,6 +1,8 @@
 package spacerace.domain;
 
-public class PlayerResult {
+import java.io.Serializable;
+
+public class PlayerResult implements Serializable {
 
     String name;
     Long   bestFinishTime;

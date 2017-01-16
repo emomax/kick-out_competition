@@ -16,11 +16,11 @@ public class Ship {
     private static final double STABILIZE_ACCELERATION = 0.4;
     private static final double STABILIZE_STOP_SPEED   = 0.01;
 
-    private final String        name;
-    private final Color         color;
-    private       Vector2D      position;
-    private final BufferedImage image;
-    private          Vector2D speed                 = new Vector2D(0, 0);
+    private final    String        name;
+    private final    Color         color;
+    private final    BufferedImage image;
+    private volatile Vector2D      position;
+    private volatile Vector2D speed                 = new Vector2D(0, 0);
     private volatile Vector2D accelerationDirection = new Vector2D(0, 0);
     private volatile boolean  stabilize             = false;
 
@@ -104,25 +104,26 @@ public class Ship {
     }
 
     public void reset(final Vector2D startPosition) {
-        position.setX(startPosition.getX());
-        position.setY(startPosition.getY());
-        speed.setX(0);
-        speed.setY(0);
-        accelerationDirection.setX(0);
-        accelerationDirection.setY(0);
+        // Creating new vectors (instead of modifying existing ones) to enable thread sync with the volatile modifier. Volatile does
+        // not seem to work if modifying existing object.
+        setPosition(new Vector2D(startPosition.getX(), (startPosition.getY())));
+        setSpeed(new Vector2D(0, 0));
+        setAccelerationDirection(new Vector2D(0, 0));
         stabilize = false;
     }
 
     public void move(final long timeElapsed) {
         final double newSpeedX = getSpeed(speed.getX(), accelerationDirection.getX(), timeElapsed);
         final double newSpeedY = getSpeed(speed.getY(), accelerationDirection.getY(), timeElapsed);
-        speed.setX(newSpeedX);
-        speed.setY(newSpeedY);
+        // Creating new vector (instead of modifying existing one) to enable thread sync with the volatile modifier. Volatile does not seem to work if modifying
+        // existing object.
+        setSpeed(new Vector2D(newSpeedX, newSpeedY));
 
         final double distanceX = speed.getX() * timeElapsed;
         final double distanceY = speed.getY() * timeElapsed;
-        position.setX(position.getX() + distanceX);
-        position.setY(position.getY() + distanceY);
+        // Creating new vector (instead of modifying existing one) to enable thread sync with the volatile modifier. Volatile does not seem to work if modifying
+        // existing object.
+        setPosition(new Vector2D(position.getX() + distanceX, position.getY() + distanceY));
     }
 
     private double getSpeed(final double currentSpeed, final double accelerationDirection, final long timeElapsed) {

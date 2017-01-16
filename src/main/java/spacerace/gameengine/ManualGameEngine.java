@@ -4,8 +4,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 
-import spacerace.client.LocalServerAdapter;
 import spacerace.client.RemoteGame;
+import spacerace.client.communication.LocalServerAdapter;
 import spacerace.domain.Acceleration;
 import spacerace.domain.Action;
 import spacerace.domain.ShipState;
@@ -44,9 +44,6 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
         else if (key == KeyEvent.VK_DOWN) {
             accelerationY = Acceleration.POSITIVE;
         }
-        else {
-            System.out.println("Unknown user input");
-        }
     }
 
     public void keyReleased(final KeyEvent event) {
@@ -60,9 +57,6 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
         }
         else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
             accelerationY = Acceleration.NONE;
-        }
-        else {
-            System.out.println("Unknown user input");
         }
     }
 

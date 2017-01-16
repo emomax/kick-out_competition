@@ -1,11 +1,12 @@
 package spacerace.level;
 
+import java.io.Serializable;
 import java.util.List;
 
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.Vector2D;
 
-public class Level {
+public class Level implements Serializable {
 
     public static int WIDTH  = 900;
     public static int HEIGHT = 600;

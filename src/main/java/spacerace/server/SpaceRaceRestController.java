@@ -115,33 +115,4 @@ public class SpaceRaceRestController {
     public String testing() {
         return "It still works!";
     }
-    //    @RequestMapping("/test")
-    //    public ServerResponse testing() {
-    //
-    //        final ServerResponse serverResponse = new ServerResponse();
-    //        final GameState      gameState      = new GameState();
-    //        gameState.setGameStatus(GameStatus.JOINABLE.toString());
-    //
-    //        final ShipState shipState1 = new ShipState();
-    //        shipState1.setName("Max");
-    //        shipState1.setStabilize(false);
-    //        shipState1.setColor(Color.BLUE);
-    //        shipState1.setSpeed(new Vector2D(0.01, 0.2));
-    //        shipState1.setAccelerationDirection(new Vector2D(1, 1));
-    //        shipState1.setPosition(new Vector2D(100, 200));
-    //
-    //        final ShipState shipState2 = new ShipState();
-    //        shipState2.setName("Sandy");
-    //        shipState2.setStabilize(false);
-    //        shipState2.setColor(Color.RED);
-    //        shipState2.setSpeed(new Vector2D(0.05, 0.9));
-    //        shipState2.setAccelerationDirection(new Vector2D(0, 0));
-    //        shipState2.setPosition(new Vector2D(450, 300));
-    //
-    //        gameState.setShipStates(Arrays.asList(shipState1, shipState2));
-    //
-    //        serverResponse.setGameState(gameState);
-    //
-    //        return serverResponse;
-    //    }
 }

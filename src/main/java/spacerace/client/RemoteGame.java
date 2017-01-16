@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
+import spacerace.client.communication.ServerAdapter;
 import spacerace.domain.Action;
 import spacerace.domain.Detector;
 import spacerace.domain.DetectorFactory;
@@ -62,7 +63,6 @@ public class RemoteGame {
             final ShipState         playerShipState = getPlayerShip(gameState);
             final List<Detector>    detectors       = getDetectors(level, graphics.getShipImageDimension(), playerShipState);
             playerShipState.setDetectors(detectors);
-
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
                 final Action action = gameEngine.getAction(playerShipState);

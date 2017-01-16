@@ -242,7 +242,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         graphics.setFont(font);
         graphics.drawString(timeLeftText, 800, 20);
     }
-    
+
     private ShipState getMyShip() {
         return gameState.getShipStates().stream()
                 .filter(shipState -> shipState.getName().equals(playerName))

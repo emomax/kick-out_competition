@@ -1,4 +1,4 @@
-package spacerace.client;
+package spacerace.client.communication;
 
 import org.springframework.web.client.RestTemplate;
 
@@ -7,13 +7,15 @@ import spacerace.server.response.ServerResponse;
 
 public class RemoteServerAdapter implements ServerAdapter {
 
+    private static final int PORT = 8080;
+
     private final String serverAddress;
     private final String playerName;
     private final String gameName;
     private final int    levelNumber;
 
-    public RemoteServerAdapter(final String serverAddress, final String playerName, final String gameName, final int levelNumber) {
-        this.serverAddress = serverAddress;
+    public RemoteServerAdapter(final String serverIP, final String playerName, final String gameName, final int levelNumber) {
+        this.serverAddress = serverIP + ":" + PORT;
         this.playerName = playerName;
         this.gameName = gameName;
         this.levelNumber = levelNumber;
