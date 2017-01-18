@@ -1,24 +1,30 @@
 package spacerace.client.communication;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import spacerace.domain.Action;
 import spacerace.server.response.ServerResponse;
 import spacerace.server.socket.SocketRequest;
-
-import static spacerace.server.socket.SpaceRaceSocketServer.PORT;
+import spacerace.server.socket.SocketRequestType;
+import spacerace.server.socket.SpaceRaceSocketServer;
 
 public class SocketServerAdapter implements ServerAdapter {
 
-    private final String             playerName;
-    private final String             gameName;
-    private final int                levelNumber;
-    private       Socket             socket;
-    private       ObjectOutputStream outputStream;
-    private       ObjectInputStream  inputStream;
+    private final String         playerName;
+    private final String         gameName;
+    private final int            levelNumber;
+    private       Socket         socket;
+    //    private       ObjectOutputStream outputStream;
+    //    private       ObjectInputStream  inputStream;
+    private       BufferedReader in;
+    private       PrintWriter    out;
 
     public SocketServerAdapter(final String serverIP, final String playerName, final String gameName, final int levelNumber) {
         this.playerName = playerName;
@@ -30,18 +36,31 @@ public class SocketServerAdapter implements ServerAdapter {
 
     private void connectToServer(final String serverIP) {
         try {
-            socket = new Socket(serverIP, PORT);
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            inputStream = new ObjectInputStream(socket.getInputStream());
+            socket = new Socket(serverIP, SpaceRaceSocketServer.PORT);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
         }
         catch (final IOException e) {
             throw new IllegalArgumentException("Exception when connecting to " + serverIP, e);
         }
     }
 
-    public void disconnect() {
+
+    //    private void connectToServer(final String serverIP) {
+    //        try {
+    //            socket = new Socket(serverIP, PORT);
+    //            outputStream = new ObjectOutputStream(socket.getOutputStream());
+    //            inputStream = new ObjectInputStream(socket.getInputStream());
+    //        }
+    //        catch (final IOException e) {
+    //            throw new IllegalArgumentException("Exception when connecting to " + serverIP, e);
+    //        }
+    //    }
+
+    private void disconnect() {
         try {
             socket.close();
+            System.out.println("Disconnected from server");
         }
         catch (final IOException e) {
             throw new IllegalArgumentException("Exception when disconnecting from server", e);
@@ -50,7 +69,8 @@ public class SocketServerAdapter implements ServerAdapter {
 
     @Override
     public ServerResponse registerPlayer() {
-        final SocketRequest request = new SocketRequest(SocketRequest.Type.REGISTER_PLAYER);
+        final SocketRequest request = new SocketRequest();
+        request.setType(SocketRequestType.REGISTER_PLAYER);
         request.setGameName(gameName);
         request.setPlayerName(playerName);
         request.setLevelNumber(levelNumber);
@@ -59,14 +79,16 @@ public class SocketServerAdapter implements ServerAdapter {
 
     @Override
     public ServerResponse getGameState() {
-        final SocketRequest request = new SocketRequest(SocketRequest.Type.GET_GAME_STATE);
+        final SocketRequest request = new SocketRequest();
+        request.setType(SocketRequestType.GET_GAME_STATE);
         request.setGameName(gameName);
         return sendRequest(request);
     }
 
     @Override
     public ServerResponse postActionToServer(final Action action) {
-        final SocketRequest request = new SocketRequest(SocketRequest.Type.POST_ACTION);
+        final SocketRequest request = new SocketRequest();
+        request.setType(SocketRequestType.POST_ACTION);
         request.setGameName(gameName);
         request.setPlayerName(playerName);
         request.setAccelerationX(action.getAccelerationX().toString());
@@ -77,30 +99,56 @@ public class SocketServerAdapter implements ServerAdapter {
 
     @Override
     public ServerResponse sendStartCommand() {
-        final SocketRequest request = new SocketRequest(SocketRequest.Type.SEND_START_COMMAND);
+        final SocketRequest request = new SocketRequest();
+        request.setType(SocketRequestType.SEND_START_COMMAND);
         request.setGameName(gameName);
         return sendRequest(request);
     }
 
     @Override
     public ServerResponse getGameResult() {
-        final SocketRequest request = new SocketRequest(SocketRequest.Type.GET_GAME_RESULT);
+        final SocketRequest request = new SocketRequest();
+        request.setType(SocketRequestType.GET_GAME_RESULT);
         request.setGameName(gameName);
         final ServerResponse response = sendRequest(request);
 
         // Not too pretty to have here but what the heck...
+        System.out.println("Game result received, disconnecting from server... ");
         disconnect();
         return response;
     }
 
     private ServerResponse sendRequest(final SocketRequest request) {
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        // Send request
+        final String requestString;
         try {
-            outputStream.writeObject(request);
-            return (ServerResponse) inputStream.readObject();
+            requestString = objectMapper.writeValueAsString(request);
         }
-        catch (final IOException | ClassNotFoundException ex) {
-            disconnect();
-            throw new IllegalStateException(ex);
+        catch (final JsonProcessingException e) {
+            throw new IllegalArgumentException("Unable to map object to JSON", e);
         }
+        out.println(requestString);
+
+        // Receive response
+        try {
+            final String response = in.readLine();
+            if (response == null) {
+                throw new IllegalArgumentException("Server response was null");
+            }
+            return objectMapper.readValue(response, ServerResponse.class);
+        }
+        catch (final IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+        //        try {
+        //            outputStream.writeObject(request);
+        //            return (ServerResponse) inputStream.readObject();
+        //        }
+        //        catch (final Exception e) {
+        //            disconnect();
+        //            throw new IllegalStateException(e);
+        //        }
     }
 }

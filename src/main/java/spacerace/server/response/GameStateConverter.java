@@ -19,7 +19,7 @@ public class GameStateConverter {
         final GameState gameState = new GameState();
         gameState.setGameStatus(game.getGameStatus().toString());
         gameState.setStartTime(game.getStartTime());
-        
+
         final List<ShipState> shipStates = game.getShips().stream()
                 .map(GameStateConverter::convertShipToShipState)
                 .collect(toList());
@@ -36,7 +36,7 @@ public class GameStateConverter {
         shipState.setSpeed(ship.getSpeed());
         shipState.setAccelerationDirection(ship.getAccelerationDirection());
         shipState.setStabilize(ship.isStabilize());
-        shipState.setColor(ship.getColor());
+        shipState.setColorRGB(ship.getColor().getRGB());
         return shipState;
     }
 }

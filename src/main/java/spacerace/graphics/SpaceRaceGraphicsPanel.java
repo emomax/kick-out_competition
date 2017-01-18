@@ -139,7 +139,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
     private void drawShip(final ShipState shipState, final Graphics graphics) {
-        drawRectangle(new Rectangle2D((int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), shipImage.getWidth(), shipImage.getHeight()), shipState.getColor(), graphics);
+        drawRectangle(new Rectangle2D((int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), shipImage.getWidth(), shipImage.getHeight()), new Color(shipState.getColorRGB()), graphics);
         graphics.drawImage(shipImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), this);
         drawRocketFire(shipState, graphics);
     }
@@ -309,7 +309,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         int numberOfShipsInRow = 0;
         for (final ShipState ship : gameState.getShipStates()) {
             final Rectangle2D shipColorRectangle = new Rectangle2D(x, y, 20, 20);
-            drawRectangle(shipColorRectangle, ship.getColor(), graphics);
+            drawRectangle(shipColorRectangle, new Color(ship.getColorRGB()), graphics);
             graphics.drawString(ship.getName(), (shipColorRectangle.getX() + shipColorRectangle.getWidth()) + 5, shipColorRectangle.getY() + 15);
 
             numberOfShipsInRow++;
@@ -356,7 +356,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     private void printPosition(final Graphics graphics, final int x, final int y, final int position, final PlayerResult playerResult) {
         // Print position and name
         final ShipState ship = getShipByName(playerResult.getName());
-        graphics.setColor(ship.getColor());
+        graphics.setColor(new Color(ship.getColorRGB()));
         graphics.drawString(position + ".  " + ship.getName(), x, y);
 
         // Print time

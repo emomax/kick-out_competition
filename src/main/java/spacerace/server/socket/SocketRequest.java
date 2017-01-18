@@ -4,29 +4,20 @@ import java.io.Serializable;
 
 public class SocketRequest implements Serializable {
 
-    public enum Type {
-        REGISTER_PLAYER,
-        GET_GAME_STATE,
-        POST_ACTION,
-        SEND_START_COMMAND,
-        GET_GAME_RESULT,
-        TEST
-    }
+    private SocketRequestType type;
+    private String            gameName;
+    private String            playerName;
+    private Integer           levelNumber;
+    private String            accelerationX;
+    private String            accelerationY;
+    private boolean           stabilize;
 
-    private final Type    type;
-    private       String  gameName;
-    private       String  playerName;
-    private       Integer levelNumber;
-    private       String  accelerationX;
-    private       String  accelerationY;
-    private       boolean stabilize;
-
-    public SocketRequest(final Type type) {
-        this.type = type;
-    }
-
-    public Type getType() {
+    public SocketRequestType getType() {
         return type;
+    }
+
+    public void setType(final SocketRequestType type) {
+        this.type = type;
     }
 
     public String getGameName() {

@@ -1,6 +1,5 @@
 package spacerace.domain;
 
-import java.awt.Color;
 import java.io.Serializable;
 import java.util.List;
 
@@ -11,7 +10,7 @@ public class ShipState implements Serializable {
     private Vector2D       position;
     private Vector2D       accelerationDirection;
     private boolean        stabilize;
-    private Color          color;
+    private int            colorRGB;
     private List<Detector> detectors;
 
     public ShipState() {
@@ -58,12 +57,12 @@ public class ShipState implements Serializable {
         this.stabilize = stabilize;
     }
 
-    public Color getColor() {
-        return color;
+    public int getColorRGB() {
+        return colorRGB;
     }
 
-    public void setColor(final Color color) {
-        this.color = color;
+    public void setColorRGB(final int colorRGB) {
+        this.colorRGB = colorRGB;
     }
 
     public List<Detector> getDetectors() {
@@ -82,7 +81,7 @@ public class ShipState implements Serializable {
                ", speed=" + speed +
                ", accelerationDirection=" + accelerationDirection +
                ", stabilize=" + stabilize +
-               ", color=" + color +
+               ", colorRGB=" + colorRGB +
                ", detectors=" + detectors +
                '}';
     }
