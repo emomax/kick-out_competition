@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-import spacerace.server.SpaceRaceRestController;
-import spacerace.server.socket.SpaceRaceSocketServer;
+import spacerace.server.communication.rest.SpaceRaceRestController;
+import spacerace.server.communication.socket.SpaceRaceSocketServer;
 
 @SpringBootApplication
 @ComponentScan(basePackageClasses = SpaceRaceRestController.class)
