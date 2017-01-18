@@ -1,4 +1,4 @@
-package spacerace.server.response;
+package spacerace.server.communication.response;
 
 import java.io.Serializable;
 import java.util.List;

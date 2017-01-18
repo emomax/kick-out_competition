@@ -24,12 +24,12 @@ import javax.swing.JPanel;
 
 import spacerace.domain.Detector;
 import spacerace.domain.GameState;
-import spacerace.domain.GameStatistics;
 import spacerace.domain.GameStatus;
 import spacerace.domain.Line2D;
 import spacerace.domain.PlayerResult;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.ShipState;
+import spacerace.domain.Statistics;
 import spacerace.level.Level;
 
 import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
@@ -40,20 +40,25 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     private static final String FIRE_IMAGE_DIR           = "../../spacerace/fire_50px.png";
     public static final  int    GRAPHICS_UPDATE_INTERVAL = 17;
 
-    private final Level              level;
-    private final BufferedImage      shipImage;
-    private final BufferedImage      fireImage;
-    private       GameState          gameState;
-    private       List<Detector>     detectors;
-    private final GameStatistics     gameStatistics;
-    private final String             playerName;
-    private       List<PlayerResult> playerResults;
+    private final    Level              level;
+    private final    BufferedImage      shipImage;
+    private final    BufferedImage      fireImage;
+    private          GameState          gameState;
+    private          List<Detector>     detectors;
+    private final    Statistics         gameCycleStatistics;
+    private final    Statistics         responseTimeStatistics;
+    private final    Statistics         graphicsPaintStatistics;
+    private final    String             playerName;
+    private          List<PlayerResult> playerResults;
+    private volatile long               lastPaintTime;
 
-    SpaceRaceGraphicsPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final GameStatistics gameStatistics, final String playerName) throws IOException {
+    SpaceRaceGraphicsPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String playerName) throws IOException {
         this.level = level;
         this.gameState = gameState;
-        this.gameStatistics = gameStatistics;
+        this.gameCycleStatistics = gameCycleStatistics;
+        this.responseTimeStatistics = responseTimeStatistics;
         this.playerName = playerName;
+        this.graphicsPaintStatistics = new Statistics();
 
         keyListeners.forEach(this::addKeyListener);
         setFocusable(true);
@@ -99,6 +104,11 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
 
     @Override
     public void paint(final Graphics graphics) {
+        if (lastPaintTime != 0) {
+            final Long timeSinceLastPaint = System.currentTimeMillis() - lastPaintTime;
+            graphicsPaintStatistics.add(timeSinceLastPaint.intValue());
+            lastPaintTime = System.currentTimeMillis();
+        }
         super.paint(graphics);
 
         drawLevel(graphics);
@@ -172,9 +182,11 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
     private void drawDetectors(final Graphics graphics) {
-        detectors.stream()
-                .filter(detector -> detector.getBeam() != null)
-                .forEach(beam -> drawLine(beam.getBeam(), Color.RED, graphics));
+        if (!getMyShip().isPassedGoal()) {
+            detectors.stream()
+                    .filter(detector -> detector.getBeam() != null)
+                    .forEach(beam -> drawLine(beam.getBeam(), Color.RED, graphics));
+        }
     }
 
     private void drawLine(final Line2D line, final Color color, final Graphics graphics) {
@@ -193,14 +205,13 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
     private void drawInfoPanel(final Graphics graphics) {
-        final ShipState     myShip    = getMyShip();
-        final DecimalFormat formatter = new DecimalFormat("#0.0000");
-        final Font          font      = new Font("Helvetica", Font.BOLD, 14);
+        final ShipState     myShip        = getMyShip();
+        final DecimalFormat decimalFormat = new DecimalFormat("#0.0");
+        final Font          font          = new Font("Helvetica", Font.BOLD, 14);
 
-        // Draw ship speed and acceleration
-        //        drawShipDataForAllShips(graphics, formatter, font);
-        final String speedXText = formatter.format(myShip.getSpeed().getX());
-        final String speedYText = formatter.format(myShip.getSpeed().getY());
+        // Draw ship info
+        final String speedXText = decimalFormat.format(myShip.getSpeed().getX() * 1000);
+        final String speedYText = decimalFormat.format(myShip.getSpeed().getY() * 1000);
         final String speedText  = "Speed: [" + speedXText + ", " + speedYText + "]";
 
         final String accelerationXText = String.valueOf((int) myShip.getAccelerationDirection().getX());
@@ -212,21 +223,30 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         graphics.setFont(font);
         graphics.drawString(text, 5, 20);
 
-        // Draw update times and FPS statistics
-        final IntSummaryStatistics updateTimeStatistics = gameStatistics.getGameCycleStatistics();
+        // Draw statistics
+        final IntSummaryStatistics gameCycleSummaryStatistics    = gameCycleStatistics.getStatistics();
+        final IntSummaryStatistics responseTimeSummaryStatistics = responseTimeStatistics.getStatistics();
 
-        final String updateTimeText = "Update time"
-                                      + "  min: " + updateTimeStatistics.getMin()
-                                      + "  max: " + updateTimeStatistics.getMax()
-                                      + "  average: " + ((int) updateTimeStatistics.getAverage());
-        final String fpsText = "FPS3    "
-                               + "  min: " + (1000 / updateTimeStatistics.getMax())
-                               + "  max: " + (1000 / updateTimeStatistics.getMin())
-                               + "  average: " + ((int) (1000 / updateTimeStatistics.getAverage()));
+
+        final String responseTimesText = "Server response time"
+                                         + "  min: " + responseTimeSummaryStatistics.getMin()
+                                         + "  max: " + responseTimeSummaryStatistics.getMax()
+                                         + "  average: " + decimalFormat.format(responseTimeSummaryStatistics.getAverage());
+        final String gameCysleTimesText = "Game cycle time"
+                                          + "  min: " + gameCycleSummaryStatistics.getMin()
+                                          + "  max: " + gameCycleSummaryStatistics.getMax()
+                                          + "  average: " + decimalFormat.format(gameCycleSummaryStatistics.getAverage());
+        final String fpsText = "FPS    "
+                               + "  min: " + (1000 / gameCycleSummaryStatistics.getMax())
+                               + "  max: " + (1000 / gameCycleSummaryStatistics.getMin())
+                               + "  average: " + decimalFormat.format(1000 / gameCycleSummaryStatistics.getAverage());
+
+
         graphics.setColor(Color.YELLOW);
         graphics.setFont(font);
-        graphics.drawString(updateTimeText, 400, 20);
-        graphics.drawString(fpsText, 400, 40);
+        graphics.drawString(responseTimesText, 400, 20);
+        graphics.drawString(gameCysleTimesText, 400, 40);
+        graphics.drawString(fpsText, 400, 60);
 
         // Draw time left
         String timeLeftText = "Time left:  ";
@@ -250,26 +270,6 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
                 .get();
     }
 
-    //    private void drawShipDataForAllShips(final Graphics graphics, final DecimalFormat formatter, final Font font) {
-    //        int linePosY = 20;
-    //        for (final ShipState shipState : gameState.getShipStates()) {
-    //            final String speedXText = formatter.format(shipState.getSpeed().getX());
-    //            final String speedYText = formatter.format(shipState.getSpeed().getY());
-    //            final String speedText  = "Speed: [" + speedXText + ", " + speedYText + "]";
-    //
-    //            final String accelerationXText = formatter.format(shipState.getAccelerationDirection().getX());
-    //            final String accelerationYText = formatter.format(shipState.getAccelerationDirection().getY());
-    //            final String accelerationText  = "Acceleration: [" + accelerationXText + ", " + accelerationYText + "]";
-    //
-    //            final String text = speedText + "   " + accelerationText;
-    //            graphics.setColor(Color.YELLOW);
-    //            graphics.setFont(font);
-    //            graphics.drawString(text, 5, linePosY);
-    //
-    //            linePosY = linePosY + 10;
-    //        }
-    //    }
-
     private void printWaitingText(final Graphics graphics) {
         printJoinableMessage(graphics);
         printJoinedPlayers(graphics);
@@ -292,7 +292,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         graphics.setColor(Color.YELLOW);
         final Font bigFont = new Font("Helvetica", Font.BOLD, 50);
         graphics.setFont(bigFont);
-        graphics.drawString("Join-time timeout", (Level.WIDTH / 2) - 250, (Level.HEIGHT / 2));
+        graphics.drawString("Join time timeout", (Level.WIDTH / 2) - 250, (Level.HEIGHT / 2));
     }
 
     private void printJoinedPlayers(final Graphics graphics) {

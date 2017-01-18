@@ -1,4 +1,4 @@
-package spacerace.server.socket;
+package spacerace.server.communication.socket;
 
 public enum SocketRequestType {
     REGISTER_PLAYER,

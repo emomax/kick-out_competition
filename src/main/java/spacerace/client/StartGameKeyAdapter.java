@@ -3,12 +3,12 @@ package spacerace.client;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class GameKeyAdapter extends KeyAdapter {
+public class StartGameKeyAdapter extends KeyAdapter {
 
     private final RemoteGame remoteGame;
     private boolean startGameCommandSent = false;
 
-    public GameKeyAdapter(final RemoteGame remoteGame) {
+    public StartGameKeyAdapter(final RemoteGame remoteGame) {
         this.remoteGame = remoteGame;
     }
 

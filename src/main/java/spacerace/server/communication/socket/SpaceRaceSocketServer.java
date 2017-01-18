@@ -1,4 +1,4 @@
-package spacerace.server.socket;
+package spacerace.server.communication.socket;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,15 +11,15 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import spacerace.server.SpaceRaceRestController;
-import spacerace.server.response.ServerResponse;
+import spacerace.server.communication.ServerCommunicationController;
+import spacerace.server.communication.response.ServerResponse;
 
 @Component
 public class SpaceRaceSocketServer {
 
     public static final int PORT = 9898;
 
-    private final SpaceRaceRestController restController = new SpaceRaceRestController();
+    private final ServerCommunicationController communicationController = new ServerCommunicationController();
 
     public SpaceRaceSocketServer() throws IOException {
         System.out.println("Socket server running at port " + PORT);
@@ -35,7 +35,7 @@ public class SpaceRaceSocketServer {
             while (true) {
                 final Socket clientSocket = listener.accept();
                 clientNumber++;
-                final ClientConnection clientConnection = new ClientConnection(clientSocket, clientNumber, restController);
+                final ClientConnection clientConnection = new ClientConnection(clientSocket, clientNumber, communicationController);
                 new Thread(clientConnection).start();
             }
         }
@@ -45,14 +45,14 @@ public class SpaceRaceSocketServer {
     }
 
     private static class ClientConnection implements Runnable {
-        private final Socket                  socket;
-        private final int                     clientNumber;
-        private final SpaceRaceRestController restController;
+        private final Socket                        socket;
+        private final int                           clientNumber;
+        private final ServerCommunicationController communicationController;
 
-        private ClientConnection(final Socket socket, final int clientNumber, final SpaceRaceRestController restController) {
+        private ClientConnection(final Socket socket, final int clientNumber, final ServerCommunicationController communicationController) {
             this.socket = socket;
             this.clientNumber = clientNumber;
-            this.restController = restController;
+            this.communicationController = communicationController;
             System.out.println("Client " + clientNumber + " connected at " + socket);
         }
 
@@ -93,25 +93,25 @@ public class SpaceRaceSocketServer {
 
         private ServerResponse getServerResponse(final SocketRequest request) {
             if (request.getType() == SocketRequestType.REGISTER_PLAYER) {
-                return restController.registerPlayer(request.getGameName(),
-                                                     request.getPlayerName(),
-                                                     request.getLevelNumber());
+                return communicationController.registerPlayer(request.getGameName(),
+                                                              request.getPlayerName(),
+                                                              request.getLevelNumber());
             }
             else if (request.getType() == SocketRequestType.GET_GAME_STATE) {
-                return restController.getGameState(request.getGameName());
+                return communicationController.getGameState(request.getGameName());
             }
             else if (request.getType() == SocketRequestType.POST_ACTION) {
-                return restController.action(request.getGameName(),
-                                             request.getPlayerName(),
-                                             request.getAccelerationX(),
-                                             request.getAccelerationY(),
-                                             request.isStabilize());
+                return communicationController.action(request.getGameName(),
+                                                      request.getPlayerName(),
+                                                      request.getAccelerationX(),
+                                                      request.getAccelerationY(),
+                                                      request.isStabilize());
             }
             else if (request.getType() == SocketRequestType.SEND_START_COMMAND) {
-                return restController.startGame(request.getGameName());
+                return communicationController.startGame(request.getGameName());
             }
             else if (request.getType() == SocketRequestType.GET_GAME_RESULT) {
-                return restController.getGameResult(request.getGameName());
+                return communicationController.getGameResult(request.getGameName());
             }
             else if (request.getType() == SocketRequestType.TEST) {
                 final ServerResponse testResponse = new ServerResponse();

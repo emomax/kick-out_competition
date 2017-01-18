@@ -1,7 +1,6 @@
 package spacerace.domain;
 
 import java.awt.Color;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +14,7 @@ public class Ship {
     private static final double ACCELERATION           = 0.7;
     private static final double STABILIZE_ACCELERATION = 0.4;
     private static final double STABILIZE_STOP_SPEED   = 0.01;
+    private static final long   RESET_PAUSE_TIME       = 500;
 
     private final    String        name;
     private final    Color         color;
@@ -23,6 +23,9 @@ public class Ship {
     private volatile Vector2D speed                 = new Vector2D(0, 0);
     private volatile Vector2D accelerationDirection = new Vector2D(0, 0);
     private volatile boolean  stabilize             = false;
+    private volatile boolean  resetFrozen           = false;
+    private volatile Long     resetTime             = null;
+    private          boolean  passedGoal            = false;
 
     public Ship(final String name, final Color color, final Vector2D startPosition) throws IOException {
         this.image = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
@@ -59,28 +62,12 @@ public class Ship {
         return image.getHeight();
     }
 
-    public double getSpeedX() {
-        return speed.getX();
-    }
-
-    public double getSpeedY() {
-        return speed.getY();
-    }
-
     public Vector2D getSpeed() {
         return speed;
     }
 
     public void setSpeed(final Vector2D speed) {
         this.speed = speed;
-    }
-
-    public double getAccelerationDirectionX() {
-        return accelerationDirection.getX();
-    }
-
-    public double getAccelerationDirectionY() {
-        return accelerationDirection.getY();
     }
 
     public Vector2D getAccelerationDirection() {
@@ -103,6 +90,18 @@ public class Ship {
         return color;
     }
 
+    public boolean isResetFrozen() {
+        return resetFrozen;
+    }
+
+    public Long getResetTime() {
+        return resetTime;
+    }
+
+    public boolean isPassedGoal() {
+        return passedGoal;
+    }
+
     public void reset(final Vector2D startPosition) {
         // Creating new vectors (instead of modifying existing ones) to enable thread sync with the volatile modifier. Volatile does
         // not seem to work if modifying existing object.
@@ -110,9 +109,23 @@ public class Ship {
         setSpeed(new Vector2D(0, 0));
         setAccelerationDirection(new Vector2D(0, 0));
         stabilize = false;
+        resetFrozen = true;
+        resetTime = System.currentTimeMillis();
+    }
+
+    public void setHasPassedGoalLine() {
+        passedGoal = true;
+        // Creating new vectors (instead of modifying existing ones) to enable thread sync with the volatile modifier. Volatile does
+        // not seem to work if modifying existing object.
+        setSpeed(new Vector2D(0, 0));
+        setAccelerationDirection(new Vector2D(0, 0));
     }
 
     public void move(final long timeElapsed) {
+        if (passedGoal || checkAndUpdateResetFrozen()) {
+            return;
+        }
+
         final double newSpeedX = getSpeed(speed.getX(), accelerationDirection.getX(), timeElapsed);
         final double newSpeedY = getSpeed(speed.getY(), accelerationDirection.getY(), timeElapsed);
         // Creating new vector (instead of modifying existing one) to enable thread sync with the volatile modifier. Volatile does not seem to work if modifying
@@ -124,6 +137,20 @@ public class Ship {
         // Creating new vector (instead of modifying existing one) to enable thread sync with the volatile modifier. Volatile does not seem to work if modifying
         // existing object.
         setPosition(new Vector2D(position.getX() + distanceX, position.getY() + distanceY));
+    }
+
+    private boolean checkAndUpdateResetFrozen() {
+        if (!resetFrozen) {
+            return false;
+        }
+        else if ((System.currentTimeMillis() - resetTime) < RESET_PAUSE_TIME) {
+            return true;
+        }
+        else {
+            // Reset time has passed, move on
+            resetFrozen = false;
+            return false;
+        }
     }
 
     private double getSpeed(final double currentSpeed, final double accelerationDirection, final long timeElapsed) {
@@ -161,40 +188,6 @@ public class Ship {
         }
         else {
             return calculatedSpeed;
-        }
-    }
-
-    public void keyPressed(final KeyEvent e) {
-        final int key = e.getKeyCode();
-
-        if (key == KeyEvent.VK_SPACE) {
-            stabilize = true;
-        }
-        else if (key == KeyEvent.VK_LEFT) {
-            accelerationDirection.setX(-1);
-        }
-        else if (key == KeyEvent.VK_RIGHT) {
-            accelerationDirection.setX(1);
-        }
-        else if (key == KeyEvent.VK_UP) {
-            accelerationDirection.setY(-1);
-        }
-        else if (key == KeyEvent.VK_DOWN) {
-            accelerationDirection.setY(1);
-        }
-    }
-
-    public void keyReleased(final KeyEvent e) {
-        final int key = e.getKeyCode();
-
-        if (key == KeyEvent.VK_SPACE) {
-            stabilize = false;
-        }
-        else if (key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {
-            accelerationDirection.setX(0);
-        }
-        else if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN) {
-            accelerationDirection.setY(0);
         }
     }
 }

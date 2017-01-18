@@ -15,21 +15,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import spacerace.client.RemoteGame;
-import spacerace.client.communication.RemoteServerAdapter;
-import spacerace.domain.GameStatistics;
+import spacerace.client.communication.SocketServerAdapter;
+import spacerace.domain.Statistics;
 import spacerace.gameengine.ManualGameEngine;
-import spacerace.server.response.ServerResponse;
-import spacerace.server.socket.SocketRequest;
-import spacerace.server.socket.SocketRequestType;
+import spacerace.server.communication.response.ServerResponse;
+import spacerace.server.communication.socket.SocketRequest;
+import spacerace.server.communication.socket.SocketRequestType;
 
-import static spacerace.server.socket.SpaceRaceSocketServer.PORT;
+import static spacerace.server.communication.socket.SpaceRaceSocketServer.PORT;
 
-public class SpaceRaceTest {
+public class SpaceRaceLoadTest {
 
     //    private static final String SERVER_IP = "127.0.0.1"; // If you run locally
     //    private static final String SERVER_IP = "10.46.1.42"; // Game server WIFI
     //    private static final String SERVER_IP = "10.46.1.69"; // Game server ETHERNET
-    //    private static final String SERVER_IP = "10.46.1.19"; // Max J
     private static final String SERVER_IP = "192.168.1.174"; // Other
 
     public static void main(final String[] args) throws InterruptedException, IOException {
@@ -164,10 +163,10 @@ public class SpaceRaceTest {
     }
 
     private static void startGame(final String playerName, final String gameName) throws IOException, InterruptedException {
-        final RemoteServerAdapter server = new RemoteServerAdapter(SERVER_IP, playerName, gameName, 1);
-        //        final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, 1);
-        final RemoteGame       remoteGame       = new RemoteGame(server, playerName, gameName);
-        final ManualGameEngine manualGameEngine = new ManualGameEngine();
+        //        final RemoteServerAdapter server = new RemoteServerAdapter(SERVER_IP, playerName, gameName, 1);
+        final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, 1);
+        final RemoteGame          remoteGame       = new RemoteGame(server, playerName, gameName);
+        final ManualGameEngine    manualGameEngine = new ManualGameEngine();
         remoteGame.runGame(manualGameEngine, manualGameEngine);
     }
 
@@ -176,14 +175,14 @@ public class SpaceRaceTest {
 
         final String url = "http://" + SERVER_IP + ":8080/test";
 
-        final GameStatistics gameStatistics = new GameStatistics();
-        String               statistics     = "";
+        final Statistics gameStatistics = new Statistics();
+        String           statistics     = "";
         for (int i = 1; i <= 1000; i++) {
             final long   before    = System.currentTimeMillis();
             final String response  = restTemplate.getForObject(url, String.class);
             final Long   totalTime = System.currentTimeMillis() - before;
             //            System.out.println(response + "    " + totalTime);
-            gameStatistics.addCycleTime(totalTime.intValue());
+            gameStatistics.add(totalTime.intValue());
 
             Thread.sleep(17);
             if (i % 100 == 0) {
@@ -207,8 +206,8 @@ public class SpaceRaceTest {
              PrintWriter out = new PrintWriter(socket.getOutputStream(
              ), true)
         ) {
-            final GameStatistics gameStatistics = new GameStatistics();
-            final ObjectMapper   objectMapper   = new ObjectMapper();
+            final Statistics   gameStatistics = new Statistics();
+            final ObjectMapper objectMapper   = new ObjectMapper();
             for (int i = 1; i <= 1000; i++) {
                 final long before = System.currentTimeMillis();
 
@@ -262,7 +261,7 @@ public class SpaceRaceTest {
 
                 final Long totalTime = System.currentTimeMillis() - before;
                 //            System.out.println(response + "    " + totalTime);
-                gameStatistics.addCycleTime(totalTime.intValue());
+                gameStatistics.add(totalTime.intValue());
 
                 Thread.sleep(17);
 
@@ -294,21 +293,21 @@ public class SpaceRaceTest {
     }
 
 
-    private static void printStatistics(final GameStatistics gameStatistics) {
-        final IntSummaryStatistics statistics = gameStatistics.getGameCycleStatistics();
+    private static void printStatistics(final Statistics gameStatistics) {
+        final IntSummaryStatistics statistics = gameStatistics.getStatistics();
         System.out.println("Min: " + statistics.getMin());
         System.out.println("Max: " + statistics.getMax());
         System.out.println("Average: " + statistics.getAverage());
-        System.out.println("Median: " + gameStatistics.getGameCycleMedian());
+        System.out.println("Median: " + gameStatistics.getMedian());
         System.out.println("");
     }
 
-    private static String getStatisticsString(final GameStatistics gameStatistics) {
-        final IntSummaryStatistics statistics       = gameStatistics.getGameCycleStatistics();
+    private static String getStatisticsString(final Statistics gameStatistics) {
+        final IntSummaryStatistics statistics       = gameStatistics.getStatistics();
         String                     statisticsString = "Min: " + statistics.getMin() + "\n";
         statisticsString += "Max: " + statistics.getMax() + "\n";
         statisticsString += "Average: " + statistics.getAverage() + "\n";
-        statisticsString += "Median: " + gameStatistics.getGameCycleMedian() + "\n" + "\n";
+        statisticsString += "Median: " + gameStatistics.getMedian() + "\n" + "\n";
         return statisticsString;
     }
 }

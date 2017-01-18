@@ -3,7 +3,7 @@ package spacerace.client.communication;
 import org.springframework.web.client.RestTemplate;
 
 import spacerace.domain.Action;
-import spacerace.server.response.ServerResponse;
+import spacerace.server.communication.response.ServerResponse;
 
 public class RemoteServerAdapter implements ServerAdapter {
 

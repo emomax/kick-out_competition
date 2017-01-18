@@ -1,7 +1,7 @@
 package spacerace.client.communication;
 
 import spacerace.domain.Action;
-import spacerace.server.response.ServerResponse;
+import spacerace.server.communication.response.ServerResponse;
 
 public interface ServerAdapter {
 

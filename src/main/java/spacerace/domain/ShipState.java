@@ -12,6 +12,8 @@ public class ShipState implements Serializable {
     private boolean        stabilize;
     private int            colorRGB;
     private List<Detector> detectors;
+    private boolean        resetFrozen;
+    private boolean        passedGoal;
 
     public ShipState() {
         // For JSON conversion
@@ -73,16 +75,34 @@ public class ShipState implements Serializable {
         this.detectors = detectors;
     }
 
+    public boolean isResetFrozen() {
+        return resetFrozen;
+    }
+
+    public void setResetFrozen(final boolean resetFrozen) {
+        this.resetFrozen = resetFrozen;
+    }
+
+    public boolean isPassedGoal() {
+        return passedGoal;
+    }
+
+    public void setPassedGoal(final boolean passedGoal) {
+        this.passedGoal = passedGoal;
+    }
+
     @Override
     public String toString() {
         return "ShipState{" +
                "name='" + name + '\'' +
-               ", position=" + position +
                ", speed=" + speed +
+               ", position=" + position +
                ", accelerationDirection=" + accelerationDirection +
                ", stabilize=" + stabilize +
                ", colorRGB=" + colorRGB +
                ", detectors=" + detectors +
+               ", resetFrozen=" + resetFrozen +
+               ", passedGoal=" + passedGoal +
                '}';
     }
 }

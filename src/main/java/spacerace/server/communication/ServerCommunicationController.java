@@ -1,29 +1,22 @@
-package spacerace.server;
+package spacerace.server.communication;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import spacerace.domain.Acceleration;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
-import spacerace.server.response.GameStateConverter;
-import spacerace.server.response.ServerResponse;
+import spacerace.server.GameHandler;
+import spacerace.server.SpaceRaceGame;
+import spacerace.server.communication.response.GameStateConverter;
+import spacerace.server.communication.response.ServerResponse;
 
-@RestController
-public class SpaceRaceRestController {
+public class ServerCommunicationController {
 
     private final GameHandler gameHandler = new GameHandler();
 
-    @RequestMapping("/registerPlayer")
-    public ServerResponse registerPlayer(
-            @RequestParam(value = "gameName") final String gameName,
-            @RequestParam(value = "playerName") final String playerName,
-            @RequestParam(value = "levelNumber") final Integer levelNumber) {
+    public ServerResponse registerPlayer(final String gameName, final String playerName, final Integer levelNumber) {
         try {
             return registerNewPlayer(gameName, playerName, levelNumber);
         }
@@ -58,8 +51,7 @@ public class SpaceRaceRestController {
         return response;
     }
 
-    @RequestMapping("/getGameState")
-    public ServerResponse getGameState(@RequestParam(value = "gameName") final String gameName) {
+    public ServerResponse getGameState(final String gameName) {
         final SpaceRaceGame  game = gameHandler.getGame(gameName);
         final ServerResponse response;
         if (game == null) {
@@ -73,21 +65,18 @@ public class SpaceRaceRestController {
         return response;
     }
 
-    @RequestMapping("/action")
     public ServerResponse action(
-            @RequestParam(value = "gameName") final String gameName,
-            @RequestParam(value = "playerName") final String playerName,
-            @RequestParam(value = "accelerationX") final String accelerationX,
-            @RequestParam(value = "accelerationY") final String accelerationY,
-            @RequestParam(value = "stabilize") final boolean stabilize) {
+            final String gameName,
+            final String playerName,
+            final Acceleration accelerationX,
+            final Acceleration accelerationY,
+            final boolean stabilize) {
         final SpaceRaceGame game = gameHandler.getGame(gameName);
-        game.updateShipParameters(playerName, Acceleration.valueOf(accelerationX), Acceleration.valueOf(accelerationY), stabilize);
+        game.updateShipParameters(playerName, accelerationX, accelerationY, stabilize);
         return new ServerResponse();
     }
 
-
-    @RequestMapping("/startGame")
-    public ServerResponse startGame(@RequestParam(value = "gameName") final String gameName) {
+    public ServerResponse startGame(final String gameName) {
         try {
             final SpaceRaceGame game = gameHandler.getGame(gameName);
             game.startGame();
@@ -98,8 +87,7 @@ public class SpaceRaceRestController {
         return new ServerResponse();
     }
 
-    @RequestMapping("/getPlayerPositions")
-    public ServerResponse getGameResult(@RequestParam(value = "gameName") final String gameName) {
+    public ServerResponse getGameResult(final String gameName) {
         try {
             final SpaceRaceGame  game     = gameHandler.getGame(gameName);
             final ServerResponse response = new ServerResponse();
@@ -109,10 +97,5 @@ public class SpaceRaceRestController {
         catch (final Exception e) {
             return createErrorResponse(e);
         }
-    }
-
-    @RequestMapping("/test")
-    public String testing() {
-        return "It still works!";
     }
 }

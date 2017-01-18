@@ -10,10 +10,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import spacerace.domain.Action;
-import spacerace.server.response.ServerResponse;
-import spacerace.server.socket.SocketRequest;
-import spacerace.server.socket.SocketRequestType;
-import spacerace.server.socket.SpaceRaceSocketServer;
+import spacerace.server.communication.response.ServerResponse;
+import spacerace.server.communication.socket.SocketRequest;
+import spacerace.server.communication.socket.SocketRequestType;
+import spacerace.server.communication.socket.SpaceRaceSocketServer;
 
 public class SocketServerAdapter implements ServerAdapter {
 
@@ -77,8 +77,8 @@ public class SocketServerAdapter implements ServerAdapter {
         request.setType(SocketRequestType.POST_ACTION);
         request.setGameName(gameName);
         request.setPlayerName(playerName);
-        request.setAccelerationX(action.getAccelerationX().toString());
-        request.setAccelerationY(action.getAccelerationY().toString());
+        request.setAccelerationX(action.getAccelerationX());
+        request.setAccelerationY(action.getAccelerationY());
         request.setStabilize(action.isStabilize());
         return sendRequest(request);
     }

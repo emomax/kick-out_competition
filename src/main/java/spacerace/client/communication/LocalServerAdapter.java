@@ -1,8 +1,8 @@
 package spacerace.client.communication;
 
 import spacerace.domain.Action;
-import spacerace.server.SpaceRaceRestController;
-import spacerace.server.response.ServerResponse;
+import spacerace.server.communication.response.ServerResponse;
+import spacerace.server.communication.rest.SpaceRaceRestController;
 
 public class LocalServerAdapter implements ServerAdapter {
 

@@ -71,7 +71,7 @@ public class SpaceRaceGame {
         return gameStatus;
     }
 
-    void startGame() {
+    public void startGame() {
         startTime = System.currentTimeMillis();
         final GameCycle gameCycle = new GameCycle(this);
         new Thread(gameCycle).start();
@@ -97,7 +97,7 @@ public class SpaceRaceGame {
         return startTime;
     }
 
-    void addShip(final String playerName) throws IOException {
+    public void addShip(final String playerName) throws IOException {
         synchronized (ships) {
             if (ships.get(playerName) != null) {
                 throw new IllegalArgumentException("Player already registered");
@@ -121,7 +121,7 @@ public class SpaceRaceGame {
         }
     }
 
-    void updateShipParameters(final String playerName, final Acceleration accelerationX, final Acceleration accelerationY, final boolean stabilize) {
+    public void updateShipParameters(final String playerName, final Acceleration accelerationX, final Acceleration accelerationY, final boolean stabilize) {
         final Ship ship = ships.get(playerName);
 
         final int      accelerationDirectionX = convertAcceleration(accelerationX);
@@ -144,15 +144,21 @@ public class SpaceRaceGame {
         }
     }
 
-    List<PlayerResult> getPlayerPositions() {
+    public List<PlayerResult> getPlayerPositions() {
         return new ArrayList<>(playerPositions.values());
     }
 
     // This implementation only supports that a player finishes one time. If we want to support multiple runs,
     // we must save the last start time (and check if new run is better)
     void setShipPassedGoalLine(final Ship ship) {
-        final long         timeSinceStart = System.currentTimeMillis() - startTime;
-        final PlayerResult playerResult   = new PlayerResult(ship.getName(), timeSinceStart);
+        final long lapTime;
+        if (ship.getResetTime() != null) {
+            lapTime = System.currentTimeMillis() - ship.getResetTime();
+        }
+        else {
+            lapTime = System.currentTimeMillis() - startTime;
+        }
+        final PlayerResult playerResult = new PlayerResult(ship.getName(), lapTime);
         playerPositions.put(ship.getName(), playerResult);
     }
 }

@@ -12,15 +12,15 @@ import spacerace.domain.Action;
 import spacerace.domain.Detector;
 import spacerace.domain.DetectorFactory;
 import spacerace.domain.GameState;
-import spacerace.domain.GameStatistics;
 import spacerace.domain.GameStatus;
 import spacerace.domain.ShipState;
+import spacerace.domain.Statistics;
 import spacerace.gameengine.ManualGameEngine;
 import spacerace.gameengine.SpaceRaceGameEngine;
 import spacerace.graphics.SpaceRaceGraphics;
 import spacerace.graphics.SpaceRaceGraphicsFactory;
 import spacerace.level.Level;
-import spacerace.server.response.ServerResponse;
+import spacerace.server.communication.response.ServerResponse;
 
 public class RemoteGame {
 
@@ -30,7 +30,8 @@ public class RemoteGame {
     private final String            playerName;
     private final ServerAdapter     server;
     private       SpaceRaceGraphics spaceRaceGraphics;
-    private final GameStatistics gameStatistics = new GameStatistics();
+    private final Statistics gameCycleStatistics    = new Statistics();
+    private final Statistics responseTimeStatistics = new Statistics();
 
     public RemoteGame(final ServerAdapter server, final String playerName, final String gameName) {
         this.gameName = gameName;
@@ -87,9 +88,9 @@ public class RemoteGame {
 
     private SpaceRaceGraphics getGraphics(final GameState gameState, final Level level, final KeyListener manualKeyListener) throws IOException {
         if (spaceRaceGraphics == null) {
-            final GameKeyAdapter    gameKeyAdapter = new GameKeyAdapter(this);
-            final List<KeyListener> keyListeners   = Arrays.asList(manualKeyListener, gameKeyAdapter);
-            spaceRaceGraphics = SpaceRaceGraphicsFactory.createGraphics(level, keyListeners, gameState, gameStatistics, playerName);
+            final StartGameKeyAdapter startGameKeyAdapter = new StartGameKeyAdapter(this);
+            final List<KeyListener>   keyListeners        = Arrays.asList(manualKeyListener, startGameKeyAdapter);
+            spaceRaceGraphics = SpaceRaceGraphicsFactory.createGraphics(level, keyListeners, gameState, gameCycleStatistics, responseTimeStatistics, playerName);
         }
         return spaceRaceGraphics;
     }
@@ -105,7 +106,7 @@ public class RemoteGame {
             Thread.sleep(GAME_CYCLE_MIN_TIME - executionTime);
         }
         final Long cycleTime = System.currentTimeMillis() - timeBeforeCycle;
-        gameStatistics.addCycleTime(cycleTime.intValue());
+        gameCycleStatistics.add(cycleTime.intValue());
     }
 
     public void sendStartCommand() {
@@ -113,10 +114,13 @@ public class RemoteGame {
     }
 
     private ServerResponse invokeServerCall(final Supplier<ServerResponse> supplier, final String failMessage) {
-        final ServerResponse response = supplier.get();
+        final long           beforeTime = System.currentTimeMillis();
+        final ServerResponse response   = supplier.get();
         if (response.getErrorMessage() != null) {
             throw new IllegalStateException(failMessage + ". Error message: " + response.getErrorMessage());
         }
+        final Long responseTime = System.currentTimeMillis() - beforeTime;
+        responseTimeStatistics.add(responseTime.intValue());
         return response;
     }
 }

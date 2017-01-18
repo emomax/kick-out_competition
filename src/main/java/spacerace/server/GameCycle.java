@@ -51,10 +51,15 @@ public class GameCycle implements Runnable {
     private void runGameCycle(final long timeSinceLastCycle) {
         final List<Rectangle> rectangles = getLevelRectangles();
         for (final Ship ship : game.getShips()) {
+
+            if (ship.isPassedGoal()) {
+                continue;
+            }
+
             final Rectangle shipRectangle = createShipRectangle(ship);
 
             if (shipPassedGoalLine(shipRectangle)) {
-                ship.reset(game.getLevel().getStartPosition());
+                ship.setHasPassedGoalLine();
                 game.setShipPassedGoalLine(ship);
                 continue;
             }

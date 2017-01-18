@@ -1,6 +1,8 @@
-package spacerace.server.socket;
+package spacerace.server.communication.socket;
 
 import java.io.Serializable;
+
+import spacerace.domain.Acceleration;
 
 public class SocketRequest implements Serializable {
 
@@ -8,8 +10,8 @@ public class SocketRequest implements Serializable {
     private String            gameName;
     private String            playerName;
     private Integer           levelNumber;
-    private String            accelerationX;
-    private String            accelerationY;
+    private Acceleration      accelerationX;
+    private Acceleration      accelerationY;
     private boolean           stabilize;
 
     public SocketRequestType getType() {
@@ -44,19 +46,19 @@ public class SocketRequest implements Serializable {
         this.levelNumber = levelNumber;
     }
 
-    public String getAccelerationX() {
+    public Acceleration getAccelerationX() {
         return accelerationX;
     }
 
-    public void setAccelerationX(final String accelerationX) {
+    public void setAccelerationX(final Acceleration accelerationX) {
         this.accelerationX = accelerationX;
     }
 
-    public String getAccelerationY() {
+    public Acceleration getAccelerationY() {
         return accelerationY;
     }
 
-    public void setAccelerationY(final String accelerationY) {
+    public void setAccelerationY(final Acceleration accelerationY) {
         this.accelerationY = accelerationY;
     }
 

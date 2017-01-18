@@ -1,4 +1,4 @@
-package spacerace.server.response;
+package spacerace.server.communication.response;
 
 import java.util.List;
 
@@ -37,6 +37,8 @@ public class GameStateConverter {
         shipState.setAccelerationDirection(ship.getAccelerationDirection());
         shipState.setStabilize(ship.isStabilize());
         shipState.setColorRGB(ship.getColor().getRGB());
+        shipState.setResetFrozen(ship.isResetFrozen());
+        shipState.setPassedGoal(ship.isPassedGoal());
         return shipState;
     }
 }
