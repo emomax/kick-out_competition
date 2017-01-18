@@ -21,8 +21,6 @@ public class SocketServerAdapter implements ServerAdapter {
     private final String         gameName;
     private final int            levelNumber;
     private       Socket         socket;
-    //    private       ObjectOutputStream outputStream;
-    //    private       ObjectInputStream  inputStream;
     private       BufferedReader in;
     private       PrintWriter    out;
 
@@ -44,18 +42,6 @@ public class SocketServerAdapter implements ServerAdapter {
             throw new IllegalArgumentException("Exception when connecting to " + serverIP, e);
         }
     }
-
-
-    //    private void connectToServer(final String serverIP) {
-    //        try {
-    //            socket = new Socket(serverIP, PORT);
-    //            outputStream = new ObjectOutputStream(socket.getOutputStream());
-    //            inputStream = new ObjectInputStream(socket.getInputStream());
-    //        }
-    //        catch (final IOException e) {
-    //            throw new IllegalArgumentException("Exception when connecting to " + serverIP, e);
-    //        }
-    //    }
 
     private void disconnect() {
         try {
@@ -120,8 +106,11 @@ public class SocketServerAdapter implements ServerAdapter {
 
     private ServerResponse sendRequest(final SocketRequest request) {
         final ObjectMapper objectMapper = new ObjectMapper();
+        sendRequest(request, objectMapper);
+        return getResponse(objectMapper);
+    }
 
-        // Send request
+    private void sendRequest(final SocketRequest request, final ObjectMapper objectMapper) {
         final String requestString;
         try {
             requestString = objectMapper.writeValueAsString(request);
@@ -130,8 +119,9 @@ public class SocketServerAdapter implements ServerAdapter {
             throw new IllegalArgumentException("Unable to map object to JSON", e);
         }
         out.println(requestString);
+    }
 
-        // Receive response
+    private ServerResponse getResponse(final ObjectMapper objectMapper) {
         try {
             final String response = in.readLine();
             if (response == null) {
@@ -142,13 +132,5 @@ public class SocketServerAdapter implements ServerAdapter {
         catch (final IOException e) {
             throw new IllegalArgumentException(e);
         }
-        //        try {
-        //            outputStream.writeObject(request);
-        //            return (ServerResponse) inputStream.readObject();
-        //        }
-        //        catch (final Exception e) {
-        //            disconnect();
-        //            throw new IllegalStateException(e);
-        //        }
     }
 }
