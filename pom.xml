@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>se.maxjonsson.playground</groupId>
-	<artifactId>kick-out-competition</artifactId>
+    <artifactId>kick-out-competition</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <parent>
@@ -32,7 +32,7 @@
     </build>
 
     <properties>
-        <start-class>commons.network.server.ServerApplication</start-class>
+        <start-class>commons.ServerApplication</start-class>
         <java.version>1.8</java.version>
     </properties>
 
