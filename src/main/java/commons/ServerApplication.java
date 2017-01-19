@@ -1,4 +1,4 @@
-package commons.network.server;
+package commons;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

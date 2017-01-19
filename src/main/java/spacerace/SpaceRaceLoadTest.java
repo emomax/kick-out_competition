@@ -80,46 +80,46 @@ public class SpaceRaceLoadTest {
                 e.printStackTrace();
             }
         }).start();
-        //        new Thread(() -> {
-        //            try {
-        //                startGame("Robocop6", gameName);
-        //            }
-        //            catch (final Exception e) {
-        //                e.printStackTrace();
-        //            }
-        //        }).start();
-        //        new Thread(() -> {
-        //            try {
-        //                startGame("Robocop7", gameName);
-        //            }
-        //            catch (final Exception e) {
-        //                e.printStackTrace();
-        //            }
-        //        }).start();
-        //        new Thread(() -> {
-        //            try {
-        //                startGame("Robocop8", gameName);
-        //            }
-        //            catch (final Exception e) {
-        //                e.printStackTrace();
-        //            }
-        //        }).start();
-        //        new Thread(() -> {
-        //            try {
-        //                startGame("Robocop9", gameName);
-        //            }
-        //            catch (final Exception e) {
-        //                e.printStackTrace();
-        //            }
-        //        }).start();
-        //        new Thread(() -> {
-        //            try {
-        //                startGame("Robocop10", gameName);
-        //            }
-        //            catch (final Exception e) {
-        //                e.printStackTrace();
-        //            }
-        //        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop6", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop7", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop8", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop9", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                startGame("Robocop10", gameName);
+            }
+            catch (final Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
         //        new Thread(() -> {
         //            try {
         //                startGame("Robocop11", gameName);

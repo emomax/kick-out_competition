@@ -12,10 +12,10 @@ import spacerace.gameengine.SpaceRaceGameEngine;
 
 public class GameRunner {
 
-    private static final String SERVER_IP = "127.0.0.1"; // If you run locally
+    //    private static final String SERVER_IP = "127.0.0.1"; // If you run locally
     //    private static final String SERVER_IP = "10.46.1.42"; // Game server WIFI
     //    private static final String SERVER_IP = "10.46.1.111"; // Game server ETHERNET
-    //    private static final String SERVER_IP = "192.168.1.174"; // Other
+    private static final String SERVER_IP = "192.168.1.174"; // Other
 
     public static void main(final String[] args) throws IOException, InterruptedException {
         setLogLevel();

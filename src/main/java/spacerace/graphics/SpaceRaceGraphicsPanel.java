@@ -296,7 +296,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
     private void printJoinedPlayers(final Graphics graphics) {
-        final Rectangle2D background      = new Rectangle2D((Level.WIDTH / 2) - 300, (Level.HEIGHT / 2 + 100), 600, 150);
+        final Rectangle2D background      = new Rectangle2D((Level.WIDTH / 2) - 300, (Level.HEIGHT / 2), 600, 250);
         final Rectangle2D backgroundFrame = new Rectangle2D(background.getX() - 10, background.getY() - 10, background.getWidth() + 20, background.getHeight() + 20);
         drawRectangle(backgroundFrame, Color.CYAN, graphics);
         drawRectangle(background, Color.BLACK, graphics);
@@ -325,7 +325,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
     private void printGameResult(final Graphics graphics) {
-        final Rectangle2D background      = new Rectangle2D((Level.WIDTH / 2) - 200, (Level.HEIGHT / 2 - 150), 400, 300);
+        final Rectangle2D background      = new Rectangle2D((Level.WIDTH / 2) - 200, (Level.HEIGHT / 2 - 250), 400, 500);
         final Rectangle2D backgroundFrame = new Rectangle2D(background.getX() - 10, background.getY() - 10, background.getWidth() + 20, background.getHeight() + 20);
         drawRectangle(backgroundFrame, Color.GREEN, graphics);
         drawRectangle(background, Color.BLACK, graphics);
