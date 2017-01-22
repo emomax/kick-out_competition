@@ -3,7 +3,6 @@ package spacerace.graphics;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -25,7 +24,6 @@ import javax.swing.JPanel;
 import spacerace.domain.Detector;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
-import spacerace.domain.Line2D;
 import spacerace.domain.PlayerResult;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.ShipState;
@@ -36,9 +34,7 @@ import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
 
 class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
 
-    private static final String SHIP_IMAGE_DIR           = "../../spacerace/ship2.png";
-    private static final String FIRE_IMAGE_DIR           = "../../spacerace/fire_50px.png";
-    public static final  int    GRAPHICS_UPDATE_INTERVAL = 17;
+    public static final int GRAPHICS_UPDATE_INTERVAL = 17;
 
     private final    Level              level;
     private final    BufferedImage      shipImage;
@@ -59,14 +55,13 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         this.responseTimeStatistics = responseTimeStatistics;
         this.playerName = playerName;
         this.graphicsPaintStatistics = new Statistics();
+        this.shipImage = ImageIO.read(new File(getClass().getResource(level.getShipImagePath()).getFile()));
+        this.fireImage = ImageIO.read(new File(getClass().getResource(level.getFireImagePath()).getFile()));
 
         keyListeners.forEach(this::addKeyListener);
         setFocusable(true);
         setBackground(Color.black);
         setDoubleBuffered(true);
-
-        this.shipImage = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
-        this.fireImage = ImageIO.read(new File(getClass().getResource(FIRE_IMAGE_DIR).getFile()));
 
         startGraphicsUpdateLoop();
     }
@@ -111,11 +106,13 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         }
         super.paint(graphics);
 
-        drawLevel(graphics);
+        paintLevelBaseLayer(graphics);
 
         for (final ShipState shipState : gameState.getShipStates()) {
             drawShip(shipState, graphics);
         }
+
+        paintLevelTopLayer(graphics);
 
         final GameStatus gameStatus = GameStatus.valueOf(gameState.getGameStatus());
         if (gameStatus == GameStatus.JOINABLE) {
@@ -137,19 +134,24 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         graphics.dispose();
     }
 
-    private void drawLevel(final Graphics graphics) {
-        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.BLUE, 15, 25, Color.BLACK, true);
-        level.getRectangles().forEach(rectangle -> drawRectangle(rectangle, gradientPaint, graphics));
+    private void paintLevelBaseLayer(final Graphics graphics) {
+        //        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.BLUE, 15, 25, Color.BLACK, true);
+        level.getTrackBorders().forEach(line -> GraphicsUtils.drawLine(line, Color.WHITE, graphics));
+        level.paintBaseLayer((Graphics2D) graphics);
         drawGoal(graphics);
     }
 
+    private void paintLevelTopLayer(final Graphics graphics) {
+        level.paintTopLayer((Graphics2D) graphics);
+    }
+
     private void drawGoal(final Graphics graphics) {
-        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.WHITE, 15, 25, Color.BLACK, true);
-        drawRectangle(level.getGoal(), gradientPaint, graphics);
+        //        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.WHITE, 15, 25, Color.BLACK, true);
+        GraphicsUtils.drawLine(level.getGoalLine(), Color.YELLOW, graphics);
     }
 
     private void drawShip(final ShipState shipState, final Graphics graphics) {
-        drawRectangle(new Rectangle2D((int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), shipImage.getWidth(), shipImage.getHeight()), new Color(shipState.getColorRGB()), graphics);
+        GraphicsUtils.drawRectangle(new Rectangle2D((int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), shipImage.getWidth(), shipImage.getHeight()), new Color(shipState.getColorRGB()), graphics);
         graphics.drawImage(shipImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), this);
         drawRocketFire(shipState, graphics);
     }
@@ -185,23 +187,8 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         if (!getMyShip().isPassedGoal()) {
             detectors.stream()
                     .filter(detector -> detector.getBeam() != null)
-                    .forEach(beam -> drawLine(beam.getBeam(), Color.RED, graphics));
+                    .forEach(beam -> GraphicsUtils.drawLine(beam.getBeam(), Color.RED, graphics));
         }
-    }
-
-    private void drawLine(final Line2D line, final Color color, final Graphics graphics) {
-        graphics.setColor(color);
-        graphics.drawLine(line.getX1(), line.getY1(), line.getX2(), line.getY2());
-    }
-
-    private void drawRectangle(final Rectangle2D rectangle, final Color color, final Graphics graphics) {
-        graphics.setColor(color);
-        graphics.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
-    }
-
-    private void drawRectangle(final Rectangle2D rectangle, final GradientPaint gradientPaint, final Graphics graphics) {
-        ((Graphics2D) graphics).setPaint(gradientPaint);
-        graphics.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
     }
 
     private void drawInfoPanel(final Graphics graphics) {
@@ -280,11 +267,11 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
 
         final Font bigFont = new Font("Helvetica", Font.BOLD, 50);
         graphics.setFont(bigFont);
-        graphics.drawString("Game is now joinable", (Level.WIDTH / 2) - 250, (Level.HEIGHT / 2));
+        graphics.drawString("Game is now joinable", (level.getWidth() / 2) - 250, ((level.getHeight() / 2) - 75));
 
         final Font smallFont = new Font("Helvetica", Font.BOLD, 30);
         graphics.setFont(smallFont);
-        graphics.drawString("Press space to start game", (Level.WIDTH / 2) - 180, (Level.HEIGHT / 2) + 50);
+        graphics.drawString("Press space to start game", (level.getWidth() / 2) - 180, (level.getHeight() / 2) - 35);
     }
 
 
@@ -292,14 +279,14 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         graphics.setColor(Color.YELLOW);
         final Font bigFont = new Font("Helvetica", Font.BOLD, 50);
         graphics.setFont(bigFont);
-        graphics.drawString("Join time timeout", (Level.WIDTH / 2) - 250, (Level.HEIGHT / 2));
+        graphics.drawString("Join time timeout", (level.getWidth() / 2) - 250, (level.getHeight() / 2));
     }
 
     private void printJoinedPlayers(final Graphics graphics) {
-        final Rectangle2D background      = new Rectangle2D((Level.WIDTH / 2) - 300, (Level.HEIGHT / 2), 600, 250);
+        final Rectangle2D background      = new Rectangle2D((level.getWidth() / 2) - 300, (level.getHeight() / 2), 600, 250);
         final Rectangle2D backgroundFrame = new Rectangle2D(background.getX() - 10, background.getY() - 10, background.getWidth() + 20, background.getHeight() + 20);
-        drawRectangle(backgroundFrame, Color.CYAN, graphics);
-        drawRectangle(background, Color.BLACK, graphics);
+        GraphicsUtils.drawRectangle(backgroundFrame, Color.CYAN, graphics);
+        GraphicsUtils.drawRectangle(background, Color.BLACK, graphics);
 
         final Font font = new Font("Helvetica", Font.BOLD, 20);
         graphics.setFont(font);
@@ -309,7 +296,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         int numberOfShipsInRow = 0;
         for (final ShipState ship : gameState.getShipStates()) {
             final Rectangle2D shipColorRectangle = new Rectangle2D(x, y, 20, 20);
-            drawRectangle(shipColorRectangle, new Color(ship.getColorRGB()), graphics);
+            GraphicsUtils.drawRectangle(shipColorRectangle, new Color(ship.getColorRGB()), graphics);
             graphics.drawString(ship.getName(), (shipColorRectangle.getX() + shipColorRectangle.getWidth()) + 5, shipColorRectangle.getY() + 15);
 
             numberOfShipsInRow++;
@@ -325,10 +312,10 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
     private void printGameResult(final Graphics graphics) {
-        final Rectangle2D background      = new Rectangle2D((Level.WIDTH / 2) - 200, (Level.HEIGHT / 2 - 250), 400, 500);
+        final Rectangle2D background      = new Rectangle2D((level.getWidth() / 2) - 200, (level.getHeight() / 2 - 250), 400, 500);
         final Rectangle2D backgroundFrame = new Rectangle2D(background.getX() - 10, background.getY() - 10, background.getWidth() + 20, background.getHeight() + 20);
-        drawRectangle(backgroundFrame, Color.GREEN, graphics);
-        drawRectangle(background, Color.BLACK, graphics);
+        GraphicsUtils.drawRectangle(backgroundFrame, Color.GREEN, graphics);
+        GraphicsUtils.drawRectangle(background, Color.BLACK, graphics);
 
         final Font font = new Font("Helvetica", Font.BOLD, 20);
         graphics.setFont(font);

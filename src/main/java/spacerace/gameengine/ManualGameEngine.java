@@ -63,8 +63,9 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
     public static void main(final String[] args) throws IOException, InterruptedException {
         final String             playerName       = "Robocop";
         final String             gameName         = "Battle of Trustly";
-        final LocalServerAdapter server           = new LocalServerAdapter(playerName, gameName, 1);
-        final RemoteGame         remoteGame       = new RemoteGame(server, playerName, gameName);
+        final int                levelNumber      = 1;
+        final LocalServerAdapter server           = new LocalServerAdapter(playerName, gameName, levelNumber);
+        final RemoteGame         remoteGame       = new RemoteGame(server, playerName, gameName, levelNumber);
         final ManualGameEngine   manualGameEngine = new ManualGameEngine();
         remoteGame.runGame(manualGameEngine, manualGameEngine);
     }

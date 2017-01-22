@@ -1,7 +1,6 @@
 package spacerace.domain;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,19 +13,19 @@ public class DetectorFactory {
 
     private final int DETECTOR_BEAM_MAX_LENGTH = 100;
 
-    private final int             shipPosX;
-    private final int             shipPosY;
-    private final int             shipHeight;
-    private final int             shipWidth;
-    private final List<Rectangle> rectangles;
+    private final int                        shipPosX;
+    private final int                        shipPosY;
+    private final int                        shipHeight;
+    private final int                        shipWidth;
+    private final List<java.awt.geom.Line2D> trackBorders;
 
     public DetectorFactory(final ShipState shipState, final Dimension shipImageDimension, final Level level) {
         this.shipPosX = (int) shipState.getPosition().getX();
         this.shipPosY = (int) shipState.getPosition().getY();
         this.shipHeight = (int) shipImageDimension.getHeight();
         this.shipWidth = (int) shipImageDimension.getWidth();
-        this.rectangles = level.getRectangles().stream()
-                .map(Rectangle2D::toAWTRectangle)
+        this.trackBorders = level.getTrackBorders().stream()
+                .map(Line2D::convertToAWTLine2D)
                 .collect(toList());
     }
 
@@ -99,10 +98,10 @@ public class DetectorFactory {
     private Integer getDetectorBeamLength(final java.awt.geom.Line2D awtLine2D, final DetectorPosition detectorPosition) {
         Integer detectorBeamLength = null;
 
-        for (final Rectangle rectangle : rectangles) {
-            if (rectangle.intersectsLine(awtLine2D)) {
+        for (final java.awt.geom.Line2D line : trackBorders) {
+            if (line.intersectsLine(awtLine2D)) {
 
-                final int distanceDetectorToRectangle = getDetectorToRectangleDistance(detectorPosition, rectangle);
+                final int distanceDetectorToRectangle = getDetectorToTrackBoundDistance(detectorPosition, line);
 
                 if (detectorBeamLength == null || distanceDetectorToRectangle < detectorBeamLength) {
                     detectorBeamLength = distanceDetectorToRectangle;
@@ -112,18 +111,18 @@ public class DetectorFactory {
         return detectorBeamLength;
     }
 
-    private int getDetectorToRectangleDistance(final DetectorPosition detectorPosition, final Rectangle rectangle) {
+    private int getDetectorToTrackBoundDistance(final DetectorPosition detectorPosition, final java.awt.geom.Line2D line) {
         if (detectorPosition == DetectorPosition.UP) {
-            return shipPosY - ((int) rectangle.getY() + (int) rectangle.getHeight());
+            return shipPosY - ((int) line.getY1());
         }
         else if (detectorPosition == DetectorPosition.DOWN) {
-            return (int) rectangle.getY() - (shipPosY + shipHeight);
+            return (int) line.getY1() - (shipPosY + shipHeight);
         }
         else if (detectorPosition == DetectorPosition.LEFT) {
-            return shipPosX - ((int) rectangle.getX() + (int) rectangle.getWidth());
+            return shipPosX - ((int) line.getX1());
         }
         else {
-            return (int) rectangle.getX() - (shipPosX + shipWidth);
+            return (int) line.getX1() - (shipPosX + shipWidth);
         }
     }
 

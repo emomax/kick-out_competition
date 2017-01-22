@@ -36,7 +36,6 @@ public class ServerCommunicationController {
         else {
             game.addShip(playerName);
         }
-        response.setLevel(game.getLevel());
         return response;
     }
 

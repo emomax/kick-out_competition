@@ -1,14 +1,11 @@
-package spacerace.server;
+package spacerace.level;
 
 import java.util.Arrays;
 import java.util.List;
 
-import spacerace.level.Level;
-import spacerace.level.Level1;
-
 public class LevelRepository {
 
-    private static final List<Level> levels = Arrays.asList(Level1.create());
+    private static final List<Level> levels = Arrays.asList(Level1Builder.build());
 
     public Level getLevel(final int levelNumber) {
         return levels.stream()

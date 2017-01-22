@@ -14,7 +14,7 @@ public class SpaceRaceGraphicsFactory {
         final SpaceRaceGraphicsPanel panel = new SpaceRaceGraphicsPanel(level, keyListeners, gameState, gameCycleStatistics, responseTimeStatistics, playerName);
 
         // Create and show frame containing panel
-        new SpaceRaceGraphicsFrame(panel);
+        new SpaceRaceGraphicsFrame(panel, level);
 
         return panel;
     }

@@ -5,14 +5,12 @@ import java.util.List;
 
 import spacerace.domain.GameState;
 import spacerace.domain.PlayerResult;
-import spacerace.level.Level;
 
 public class ServerResponse implements Serializable {
 
     private String             message;
     private String             errorMessage;
     private GameState          gameState;
-    private Level              level;
     private List<PlayerResult> playerResults;
 
     public String getMessage() {
@@ -37,14 +35,6 @@ public class ServerResponse implements Serializable {
 
     public void setGameState(final GameState gameState) {
         this.gameState = gameState;
-    }
-
-    public Level getLevel() {
-        return level;
-    }
-
-    public void setLevel(final Level level) {
-        this.level = level;
     }
 
     public List<PlayerResult> getPlayerResults() {

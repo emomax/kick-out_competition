@@ -26,10 +26,10 @@ import static spacerace.server.communication.socket.SpaceRaceSocketServer.PORT;
 
 public class SpaceRaceLoadTest {
 
-    //    private static final String SERVER_IP = "127.0.0.1"; // If you run locally
+    private static final String SERVER_IP = "127.0.0.1"; // If you run locally
     //    private static final String SERVER_IP = "10.46.1.42"; // Game server WIFI
     //    private static final String SERVER_IP = "10.46.1.69"; // Game server ETHERNET
-    private static final String SERVER_IP = "192.168.1.174"; // Other
+    //    private static final String SERVER_IP = "192.168.1.174"; // Other
 
     public static void main(final String[] args) throws InterruptedException, IOException {
         startGameWithMultipleShips();
@@ -163,9 +163,10 @@ public class SpaceRaceLoadTest {
     }
 
     private static void startGame(final String playerName, final String gameName) throws IOException, InterruptedException {
-        //        final RemoteServerAdapter server = new RemoteServerAdapter(SERVER_IP, playerName, gameName, 1);
-        final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, 1);
-        final RemoteGame          remoteGame       = new RemoteGame(server, playerName, gameName);
+        final int levelNumber = 1;
+        //        final RemoteServerAdapter server = new RemoteServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
+        final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
+        final RemoteGame          remoteGame       = new RemoteGame(server, playerName, gameName, levelNumber);
         final ManualGameEngine    manualGameEngine = new ManualGameEngine();
         remoteGame.runGame(manualGameEngine, manualGameEngine);
     }

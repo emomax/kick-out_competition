@@ -20,6 +20,7 @@ import spacerace.gameengine.SpaceRaceGameEngine;
 import spacerace.graphics.SpaceRaceGraphics;
 import spacerace.graphics.SpaceRaceGraphicsFactory;
 import spacerace.level.Level;
+import spacerace.level.LevelRepository;
 import spacerace.server.communication.response.ServerResponse;
 
 public class RemoteGame {
@@ -29,17 +30,21 @@ public class RemoteGame {
     private final String            gameName;
     private final String            playerName;
     private final ServerAdapter     server;
+    private final Level             level;
     private       SpaceRaceGraphics spaceRaceGraphics;
     private final Statistics gameCycleStatistics    = new Statistics();
     private final Statistics responseTimeStatistics = new Statistics();
 
-    public RemoteGame(final ServerAdapter server, final String playerName, final String gameName) {
+    public RemoteGame(final ServerAdapter server, final String playerName, final String gameName, final int levelNumber) {
         this.gameName = gameName;
         this.playerName = playerName;
         this.server = server;
+
+        final LevelRepository levelRepository = new LevelRepository();
+        this.level = levelRepository.getLevel(levelNumber);
     }
 
-    public void runManualGame() throws IOException, InterruptedException {
+    void runManualGame() throws IOException, InterruptedException {
         final ManualGameEngine manualGameEngine = new ManualGameEngine();
         runGame(manualGameEngine, manualGameEngine);
     }
@@ -50,19 +55,19 @@ public class RemoteGame {
 
     public void runGame(final SpaceRaceGameEngine gameEngine, final KeyListener manualKeyListener) throws IOException, InterruptedException {
         final ServerResponse response = invokeServerCall(server::registerPlayer, "Exception when trying to register player: " + playerName);
-        runGameLoop(gameEngine, response.getLevel(), manualKeyListener);
+        runGameLoop(gameEngine, manualKeyListener);
     }
 
-    private void runGameLoop(final SpaceRaceGameEngine gameEngine, final Level level, final KeyListener manualKeyListener) throws InterruptedException, IOException {
+    private void runGameLoop(final SpaceRaceGameEngine gameEngine, final KeyListener manualKeyListener) throws InterruptedException, IOException {
         boolean stop = false;
         while (!stop) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
             final ServerResponse    response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
             final GameState         gameState       = response.getGameState();
-            final SpaceRaceGraphics graphics        = getGraphics(gameState, level, manualKeyListener);
+            final SpaceRaceGraphics graphics        = getGraphics(gameState, manualKeyListener);
             final ShipState         playerShipState = getPlayerShip(gameState);
-            final List<Detector>    detectors       = getDetectors(level, graphics.getShipImageDimension(), playerShipState);
+            final List<Detector>    detectors       = getDetectors(graphics.getShipImageDimension(), playerShipState);
             playerShipState.setDetectors(detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
@@ -86,7 +91,7 @@ public class RemoteGame {
                 .orElseThrow(() -> new IllegalStateException("Could not find ship for player: " + playerName));
     }
 
-    private SpaceRaceGraphics getGraphics(final GameState gameState, final Level level, final KeyListener manualKeyListener) throws IOException {
+    private SpaceRaceGraphics getGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {
         if (spaceRaceGraphics == null) {
             final StartGameKeyAdapter startGameKeyAdapter = new StartGameKeyAdapter(this);
             final List<KeyListener>   keyListeners        = Arrays.asList(manualKeyListener, startGameKeyAdapter);
@@ -95,7 +100,7 @@ public class RemoteGame {
         return spaceRaceGraphics;
     }
 
-    private List<Detector> getDetectors(final Level level, final Dimension shipImageDimension, final ShipState playerShipState) {
+    private List<Detector> getDetectors(final Dimension shipImageDimension, final ShipState playerShipState) {
         final DetectorFactory detectorFactory = new DetectorFactory(playerShipState, shipImageDimension, level);
         return detectorFactory.getDetectors();
     }

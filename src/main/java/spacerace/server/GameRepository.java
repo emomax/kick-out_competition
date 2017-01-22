@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import spacerace.domain.GameStatus;
 import spacerace.level.Level;
+import spacerace.level.LevelRepository;
 
 class GameRepository {
 

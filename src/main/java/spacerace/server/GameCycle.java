@@ -3,6 +3,7 @@ package spacerace.server;
 import java.awt.Rectangle;
 import java.util.List;
 
+import spacerace.domain.Line2D;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.Ship;
 
@@ -49,7 +50,7 @@ public class GameCycle implements Runnable {
     }
 
     private void runGameCycle(final long timeSinceLastCycle) {
-        final List<Rectangle> rectangles = getLevelRectangles();
+        final List<java.awt.geom.Line2D> trackBounds = getLevelRectangles();
         for (final Ship ship : game.getShips()) {
 
             if (ship.isPassedGoal()) {
@@ -64,14 +65,14 @@ public class GameCycle implements Runnable {
                 continue;
             }
 
-            checkWallCollisions(rectangles, ship, shipRectangle);
+            checkWallCollisions(trackBounds, ship, shipRectangle);
         }
         moveShips(timeSinceLastCycle);
     }
 
-    private List<Rectangle> getLevelRectangles() {
-        return game.getLevel().getRectangles().stream()
-                .map(Rectangle2D::toAWTRectangle)
+    private List<java.awt.geom.Line2D> getLevelRectangles() {
+        return game.getLevel().getTrackBorders().stream()
+                .map(Line2D::convertToAWTLine2D)
                 .collect(toList());
     }
 
@@ -81,12 +82,12 @@ public class GameCycle implements Runnable {
     }
 
     private boolean shipPassedGoalLine(final Rectangle shipRectangle) {
-        return shipRectangle.intersects(game.getLevel().getGoal().toAWTRectangle());
+        return game.getLevel().getGoalLine().convertToAWTLine2D().intersects(shipRectangle);
     }
 
-    private void checkWallCollisions(final List<Rectangle> rectangles, final Ship ship, final Rectangle shipRectangle) {
-        for (final Rectangle wallRectangle : rectangles) {
-            if (shipRectangle.intersects(wallRectangle)) {
+    private void checkWallCollisions(final List<java.awt.geom.Line2D> trackBounds, final Ship ship, final Rectangle shipRectangle) {
+        for (final java.awt.geom.Line2D wallLine : trackBounds) {
+            if (wallLine.intersects(shipRectangle)) {
                 ship.reset(game.getLevel().getStartPosition());
             }
         }

@@ -8,11 +8,11 @@ import spacerace.level.Level;
 
 class SpaceRaceGraphicsFrame extends JFrame {
 
-    SpaceRaceGraphicsFrame(final SpaceRaceGraphicsPanel panel) throws IOException {
+    SpaceRaceGraphicsFrame(final SpaceRaceGraphicsPanel panel, final Level level) throws IOException {
         add(panel);
         setTitle("Space Race");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        getContentPane().setPreferredSize(new Dimension(Level.WIDTH, Level.HEIGHT));
+        getContentPane().setPreferredSize(new Dimension(level.getWidth(), level.getHeight()));
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
