@@ -14,12 +14,12 @@ public class GameRunner {
 
     public static void main(final String[] args) throws IOException, InterruptedException {
         final String playerName  = "n00b";
-        final String gameName    = "battleOfTrustly";
+        final String gameName    = "BattleOfTrustly";
         final int    levelNumber = 1;
 
         // Choose how you want to connect. Direct socket or REST
         final ServerAdapter server = new SocketServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
-        //        final ServerAdapter server     = new RemoteServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
+        //        final ServerAdapter server = new RestServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
 
         final RemoteGame remoteGame = new RemoteGame(server, playerName, gameName, levelNumber);
 

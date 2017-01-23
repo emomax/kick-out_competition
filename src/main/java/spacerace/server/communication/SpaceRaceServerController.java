@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.springframework.stereotype.Component;
+
 import spacerace.domain.Acceleration;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
@@ -12,7 +14,8 @@ import spacerace.server.SpaceRaceGame;
 import spacerace.server.communication.response.GameStateConverter;
 import spacerace.server.communication.response.ServerResponse;
 
-public class ServerCommunicationController {
+@Component
+public class SpaceRaceServerController {
 
     private final GameHandler gameHandler = new GameHandler();
 
@@ -59,6 +62,16 @@ public class ServerCommunicationController {
         else {
             final GameState gameState = GameStateConverter.convertGameToGameState(game);
             response = new ServerResponse();
+            response.setGameState(gameState);
+        }
+        return response;
+    }
+
+    public ServerResponse getGameStateForViewing(final String gameName) {
+        final SpaceRaceGame  game     = gameHandler.getGame(gameName);
+        final ServerResponse response = new ServerResponse();
+        if (game != null) {
+            final GameState gameState = GameStateConverter.convertGameToGameState(game);
             response.setGameState(gameState);
         }
         return response;

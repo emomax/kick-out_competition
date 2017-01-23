@@ -17,8 +17,8 @@ import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
 import spacerace.gameengine.ManualGameEngine;
 import spacerace.gameengine.SpaceRaceGameEngine;
-import spacerace.graphics.SpaceRaceGraphics;
 import spacerace.graphics.SpaceRaceGraphicsFactory;
+import spacerace.graphics.SpaceRacePlayerPanel;
 import spacerace.level.Level;
 import spacerace.level.LevelRepository;
 import spacerace.server.communication.response.ServerResponse;
@@ -27,11 +27,11 @@ public class RemoteGame {
 
     private static final int GAME_CYCLE_MIN_TIME = 15;
 
-    private final String            gameName;
-    private final String            playerName;
-    private final ServerAdapter     server;
-    private final Level             level;
-    private       SpaceRaceGraphics spaceRaceGraphics;
+    private final String               gameName;
+    private final String               playerName;
+    private final ServerAdapter        server;
+    private final Level                level;
+    private       SpaceRacePlayerPanel spaceRacePlayerGraphics;
     private final Statistics gameCycleStatistics    = new Statistics();
     private final Statistics responseTimeStatistics = new Statistics();
 
@@ -63,11 +63,11 @@ public class RemoteGame {
         while (!stop) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
-            final ServerResponse    response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
-            final GameState         gameState       = response.getGameState();
-            final SpaceRaceGraphics graphics        = getGraphics(gameState, manualKeyListener);
-            final ShipState         playerShipState = getPlayerShip(gameState);
-            final List<Detector>    detectors       = getDetectors(graphics.getShipImageDimension(), playerShipState);
+            final ServerResponse       response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
+            final GameState            gameState       = response.getGameState();
+            final SpaceRacePlayerPanel graphics        = getGraphics(gameState, manualKeyListener);
+            final ShipState            playerShipState = getPlayerShip(gameState);
+            final List<Detector>       detectors       = getDetectors(graphics.getShipImageDimension(), playerShipState);
             playerShipState.setDetectors(detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
@@ -79,7 +79,8 @@ public class RemoteGame {
                 graphics.setPlayerResults(resultListResponse.getPlayerResults());
                 stop = true;
             }
-            graphics.setState(gameState, detectors);
+            graphics.setState(gameState);
+            graphics.setDetectors(detectors);
             sleepIfGameCycleTooFast(timeBeforeCycle);
         }
     }
@@ -91,13 +92,13 @@ public class RemoteGame {
                 .orElseThrow(() -> new IllegalStateException("Could not find ship for player: " + playerName));
     }
 
-    private SpaceRaceGraphics getGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {
-        if (spaceRaceGraphics == null) {
+    private SpaceRacePlayerPanel getGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {
+        if (spaceRacePlayerGraphics == null) {
             final StartGameKeyAdapter startGameKeyAdapter = new StartGameKeyAdapter(this);
             final List<KeyListener>   keyListeners        = Arrays.asList(manualKeyListener, startGameKeyAdapter);
-            spaceRaceGraphics = SpaceRaceGraphicsFactory.createGraphics(level, keyListeners, gameState, gameCycleStatistics, responseTimeStatistics, playerName);
+            spaceRacePlayerGraphics = SpaceRaceGraphicsFactory.createPlayerGraphics(level, keyListeners, gameState, gameCycleStatistics, responseTimeStatistics, playerName);
         }
-        return spaceRaceGraphics;
+        return spaceRacePlayerGraphics;
     }
 
     private List<Detector> getDetectors(final Dimension shipImageDimension, final ShipState playerShipState) {

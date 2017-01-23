@@ -1,29 +1,40 @@
 package spacerace.server.communication.rest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import spacerace.domain.Acceleration;
-import spacerace.server.communication.ServerCommunicationController;
+import spacerace.server.communication.SpaceRaceServerController;
 import spacerace.server.communication.response.ServerResponse;
 
 @RestController
 public class SpaceRaceRestController {
 
-    private final ServerCommunicationController communicationController = new ServerCommunicationController();
+    private final SpaceRaceServerController serverController;
+
+    @Autowired
+    public SpaceRaceRestController(final SpaceRaceServerController serverController) {
+        this.serverController = serverController;
+    }
 
     @RequestMapping("/registerPlayer")
     public ServerResponse registerPlayer(
             @RequestParam(value = "gameName") final String gameName,
             @RequestParam(value = "playerName") final String playerName,
             @RequestParam(value = "levelNumber") final Integer levelNumber) {
-        return communicationController.registerPlayer(gameName, playerName, levelNumber);
+        return serverController.registerPlayer(gameName, playerName, levelNumber);
     }
 
     @RequestMapping("/getGameState")
     public ServerResponse getGameState(@RequestParam(value = "gameName") final String gameName) {
-        return communicationController.getGameState(gameName);
+        return serverController.getGameState(gameName);
+    }
+
+    @RequestMapping("/getGameStateForViewing")
+    public ServerResponse getGameStateForViewing(@RequestParam(value = "gameName") final String gameName) {
+        return serverController.getGameStateForViewing(gameName);
     }
 
     @RequestMapping("/action")
@@ -33,7 +44,7 @@ public class SpaceRaceRestController {
             @RequestParam(value = "accelerationX") final String accelerationX,
             @RequestParam(value = "accelerationY") final String accelerationY,
             @RequestParam(value = "stabilize") final boolean stabilize) {
-        return communicationController.action(
+        return serverController.action(
                 gameName,
                 playerName,
                 Acceleration.valueOf(accelerationX),
@@ -45,12 +56,12 @@ public class SpaceRaceRestController {
 
     @RequestMapping("/startGame")
     public ServerResponse startGame(@RequestParam(value = "gameName") final String gameName) {
-        return communicationController.startGame(gameName);
+        return serverController.startGame(gameName);
     }
 
     @RequestMapping("/getPlayerPositions")
     public ServerResponse getGameResult(@RequestParam(value = "gameName") final String gameName) {
-        return communicationController.getGameResult(gameName);
+        return serverController.getGameResult(gameName);
     }
 
     @RequestMapping("/test")

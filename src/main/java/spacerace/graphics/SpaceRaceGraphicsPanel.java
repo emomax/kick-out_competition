@@ -5,10 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
-import java.awt.event.KeyListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import spacerace.domain.Detector;
 import spacerace.domain.GameState;
-import spacerace.domain.GameStatus;
 import spacerace.domain.PlayerResult;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.ShipState;
@@ -32,33 +26,29 @@ import spacerace.level.Level;
 
 import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
 
-class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
+abstract class SpaceRaceGraphicsPanel extends JPanel {
 
-    public static final int GRAPHICS_UPDATE_INTERVAL = 17;
+    private static final int GRAPHICS_UPDATE_INTERVAL = 17;
 
-    private final    Level              level;
-    private final    BufferedImage      shipImage;
-    private final    BufferedImage      fireImage;
-    private          GameState          gameState;
-    private          List<Detector>     detectors;
-    private final    Statistics         gameCycleStatistics;
-    private final    Statistics         responseTimeStatistics;
-    private final    Statistics         graphicsPaintStatistics;
-    private final    String             playerName;
-    private          List<PlayerResult> playerResults;
-    private volatile long               lastPaintTime;
+    protected final    Level              level;
+    private final      BufferedImage      shipImage;
+    private final      BufferedImage      fireImage;
+    protected volatile GameState          gameState;
+    private final      Statistics         gameCycleStatistics;
+    private final      Statistics         responseTimeStatistics;
+    private final      Statistics         graphicsPaintStatistics;
+    private volatile   List<PlayerResult> playerResults;
+    private volatile   long               lastPaintTime;
 
-    SpaceRaceGraphicsPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String playerName) throws IOException {
+    SpaceRaceGraphicsPanel(final Level level, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics) throws IOException {
         this.level = level;
         this.gameState = gameState;
         this.gameCycleStatistics = gameCycleStatistics;
         this.responseTimeStatistics = responseTimeStatistics;
-        this.playerName = playerName;
         this.graphicsPaintStatistics = new Statistics();
         this.shipImage = ImageIO.read(new File(getClass().getResource(level.getShipImagePath()).getFile()));
         this.fireImage = ImageIO.read(new File(getClass().getResource(level.getFireImagePath()).getFile()));
 
-        keyListeners.forEach(this::addKeyListener);
         setFocusable(true);
         setBackground(Color.black);
         setDoubleBuffered(true);
@@ -75,15 +65,14 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         return new Dimension(shipImage.getWidth(), shipImage.getHeight());
     }
 
-    @Override
     public void setPlayerResults(final List<PlayerResult> playerResults) {
         this.playerResults = playerResults;
     }
 
-    // ToDo: Must this be here?
-    public void addNotify() {
-        super.addNotify();
-    }
+    //    // ToDo: Must this be here?
+    //    public void addNotify() {
+    //        super.addNotify();
+    //    }
 
     // ToDo: Must this be here?
     @Override
@@ -91,66 +80,29 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         paint(g);
     }
 
-    @Override
-    public void setState(final GameState gameState, final List<Detector> detectors) {
+    public void setState(final GameState gameState) {
         this.gameState = gameState;
-        this.detectors = detectors;
     }
 
-    @Override
-    public void paint(final Graphics graphics) {
+    void updatePaintTimeStatistics() {
         if (lastPaintTime != 0) {
             final Long timeSinceLastPaint = System.currentTimeMillis() - lastPaintTime;
             graphicsPaintStatistics.add(timeSinceLastPaint.intValue());
-            lastPaintTime = System.currentTimeMillis();
         }
-        super.paint(graphics);
-
-        paintLevelBaseLayer(graphics);
-
-        for (final ShipState shipState : gameState.getShipStates()) {
-            drawShip(shipState, graphics);
-        }
-
-        paintLevelTopLayer(graphics);
-
-        final GameStatus gameStatus = GameStatus.valueOf(gameState.getGameStatus());
-        if (gameStatus == GameStatus.JOINABLE) {
-            printWaitingText(graphics);
-            drawInfoPanel(graphics);
-        }
-        else if (gameStatus == GameStatus.RUNNING) {
-            drawDetectors(graphics);
-            drawInfoPanel(graphics);
-        }
-        else if (gameStatus == GameStatus.FINISHED) {
-            printGameResult(graphics);
-        }
-        else if (gameStatus == GameStatus.CLOSED) {
-            printJoinTimeIsUp(graphics);
-        }
-
-        Toolkit.getDefaultToolkit().sync();
-        graphics.dispose();
+        lastPaintTime = System.currentTimeMillis();
     }
 
-    private void paintLevelBaseLayer(final Graphics graphics) {
-        //        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.BLUE, 15, 25, Color.BLACK, true);
+    void paintLevelBaseLayer(final Graphics graphics) {
         level.getTrackBorders().forEach(line -> GraphicsUtils.drawLine(line, Color.WHITE, graphics));
         level.paintBaseLayer((Graphics2D) graphics);
-        drawGoal(graphics);
-    }
-
-    private void paintLevelTopLayer(final Graphics graphics) {
-        level.paintTopLayer((Graphics2D) graphics);
-    }
-
-    private void drawGoal(final Graphics graphics) {
-        //        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.WHITE, 15, 25, Color.BLACK, true);
         GraphicsUtils.drawLine(level.getGoalLine(), Color.YELLOW, graphics);
     }
 
-    private void drawShip(final ShipState shipState, final Graphics graphics) {
+    void paintLevelTopLayer(final Graphics graphics) {
+        level.paintTopLayer((Graphics2D) graphics);
+    }
+
+    void drawShip(final ShipState shipState, final Graphics graphics) {
         GraphicsUtils.drawRectangle(new Rectangle2D((int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), shipImage.getWidth(), shipImage.getHeight()), new Color(shipState.getColorRGB()), graphics);
         graphics.drawImage(shipImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), this);
         drawRocketFire(shipState, graphics);
@@ -161,65 +113,34 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
             graphics.drawImage(fireImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY() + shipImage.getHeight(), this);
         }
         if (shipState.getAccelerationDirection().getY() > 0 || shipState.isStabilize()) {
-            final BufferedImage rotatedImage = rotateImage(fireImage, 180);
+            final BufferedImage rotatedImage = GraphicsUtils.rotateImage(fireImage, 180);
             graphics.drawImage(rotatedImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY() - fireImage.getHeight(), this);
         }
         if (shipState.getAccelerationDirection().getX() < 0 || shipState.isStabilize()) {
-            final BufferedImage rotatedImage = rotateImage(fireImage, 270);
+            final BufferedImage rotatedImage = GraphicsUtils.rotateImage(fireImage, 270);
             graphics.drawImage(rotatedImage, (int) shipState.getPosition().getX() + shipImage.getWidth(), (int) shipState.getPosition().getY(), this);
         }
         if (shipState.getAccelerationDirection().getX() > 0 || shipState.isStabilize()) {
-            final BufferedImage rotatedImage = rotateImage(fireImage, 90);
+            final BufferedImage rotatedImage = GraphicsUtils.rotateImage(fireImage, 90);
             graphics.drawImage(rotatedImage, (int) shipState.getPosition().getX() - rotatedImage.getWidth(), (int) shipState.getPosition().getY(), this);
         }
     }
 
-    private BufferedImage rotateImage(final BufferedImage image, final int angle) {
-        final double            rotationRequired = Math.toRadians(angle);
-        final double            locationX        = image.getWidth() / 2;
-        final double            locationY        = image.getHeight() / 2;
-        final AffineTransform   transform        = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
-        final AffineTransformOp transformOp      = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
-        return transformOp.filter(image, null);
-    }
-
-    private void drawDetectors(final Graphics graphics) {
-        if (!getMyShip().isPassedGoal()) {
-            detectors.stream()
-                    .filter(detector -> detector.getBeam() != null)
-                    .forEach(beam -> GraphicsUtils.drawLine(beam.getBeam(), Color.RED, graphics));
-        }
-    }
-
-    private void drawInfoPanel(final Graphics graphics) {
-        final ShipState     myShip        = getMyShip();
+    void drawInfoPanel(final Graphics graphics) {
         final DecimalFormat decimalFormat = new DecimalFormat("#0.0");
         final Font          font          = new Font("Helvetica", Font.BOLD, 14);
-
-        // Draw ship info
-        final String speedXText = decimalFormat.format(myShip.getSpeed().getX() * 1000);
-        final String speedYText = decimalFormat.format(myShip.getSpeed().getY() * 1000);
-        final String speedText  = "Speed: [" + speedXText + ", " + speedYText + "]";
-
-        final String accelerationXText = String.valueOf((int) myShip.getAccelerationDirection().getX());
-        final String accelerationYText = String.valueOf((int) myShip.getAccelerationDirection().getY());
-        final String accelerationText  = "Acceleration: [" + accelerationXText + ", " + accelerationYText + "]";
-
-        final String text = speedText + "   " + accelerationText;
-        graphics.setColor(Color.YELLOW);
-        graphics.setFont(font);
-        graphics.drawString(text, 5, 20);
 
         // Draw statistics
         final IntSummaryStatistics gameCycleSummaryStatistics    = gameCycleStatistics.getStatistics();
         final IntSummaryStatistics responseTimeSummaryStatistics = responseTimeStatistics.getStatistics();
+        final IntSummaryStatistics graphicsSummaryStatistics     = graphicsPaintStatistics.getStatistics();
 
 
         final String responseTimesText = "Server response time"
                                          + "  min: " + responseTimeSummaryStatistics.getMin()
                                          + "  max: " + responseTimeSummaryStatistics.getMax()
                                          + "  average: " + decimalFormat.format(responseTimeSummaryStatistics.getAverage());
-        final String gameCysleTimesText = "Game cycle time"
+        final String gameCycleTimesText = "Game cycle time"
                                           + "  min: " + gameCycleSummaryStatistics.getMin()
                                           + "  max: " + gameCycleSummaryStatistics.getMax()
                                           + "  average: " + decimalFormat.format(gameCycleSummaryStatistics.getAverage());
@@ -227,13 +148,18 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
                                + "  min: " + (1000 / gameCycleSummaryStatistics.getMax())
                                + "  max: " + (1000 / gameCycleSummaryStatistics.getMin())
                                + "  average: " + decimalFormat.format(1000 / gameCycleSummaryStatistics.getAverage());
+        final String graphicsPaintTimesText = "Graphics FPS    "
+                                              + "  min: " + (1000 / graphicsSummaryStatistics.getMax())
+                                              + "  max: " + (1000 / graphicsSummaryStatistics.getMin())
+                                              + "  average: " + decimalFormat.format(1000 / graphicsSummaryStatistics.getAverage());
 
 
         graphics.setColor(Color.YELLOW);
         graphics.setFont(font);
         graphics.drawString(responseTimesText, 400, 20);
-        graphics.drawString(gameCysleTimesText, 400, 40);
+        graphics.drawString(gameCycleTimesText, 400, 40);
         graphics.drawString(fpsText, 400, 60);
+        graphics.drawString(graphicsPaintTimesText, 400, 80);
 
         // Draw time left
         String timeLeftText = "Time left:  ";
@@ -250,14 +176,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         graphics.drawString(timeLeftText, 800, 20);
     }
 
-    private ShipState getMyShip() {
-        return gameState.getShipStates().stream()
-                .filter(shipState -> shipState.getName().equals(playerName))
-                .findAny()
-                .get();
-    }
-
-    private void printWaitingText(final Graphics graphics) {
+    void printWaitingText(final Graphics graphics) {
         printJoinableMessage(graphics);
         printJoinedPlayers(graphics);
     }
@@ -275,7 +194,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
     }
 
 
-    private void printJoinTimeIsUp(final Graphics graphics) {
+    void printJoinTimeIsUp(final Graphics graphics) {
         graphics.setColor(Color.YELLOW);
         final Font bigFont = new Font("Helvetica", Font.BOLD, 50);
         graphics.setFont(bigFont);
@@ -311,7 +230,7 @@ class SpaceRaceGraphicsPanel extends JPanel implements SpaceRaceGraphics {
         }
     }
 
-    private void printGameResult(final Graphics graphics) {
+    void printGameResult(final Graphics graphics) {
         final Rectangle2D background      = new Rectangle2D((level.getWidth() / 2) - 200, (level.getHeight() / 2 - 250), 400, 500);
         final Rectangle2D backgroundFrame = new Rectangle2D(background.getX() - 10, background.getY() - 10, background.getWidth() + 20, background.getHeight() + 20);
         GraphicsUtils.drawRectangle(backgroundFrame, Color.GREEN, graphics);

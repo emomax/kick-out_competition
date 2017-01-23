@@ -9,6 +9,8 @@ public interface ServerAdapter {
 
     ServerResponse getGameState();
 
+    ServerResponse getGameStateForViewing();
+
     ServerResponse postActionToServer(final Action action);
 
     ServerResponse sendStartCommand();

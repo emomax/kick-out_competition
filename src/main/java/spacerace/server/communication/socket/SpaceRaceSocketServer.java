@@ -7,11 +7,12 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import spacerace.server.communication.ServerCommunicationController;
+import spacerace.server.communication.SpaceRaceServerController;
 import spacerace.server.communication.response.ServerResponse;
 
 @Component
@@ -19,9 +20,11 @@ public class SpaceRaceSocketServer {
 
     public static final int PORT = 9898;
 
-    private final ServerCommunicationController communicationController = new ServerCommunicationController();
+    private final SpaceRaceServerController serverController;
 
-    public SpaceRaceSocketServer() throws IOException {
+    @Autowired
+    public SpaceRaceSocketServer(final SpaceRaceServerController serverController) throws IOException {
+        this.serverController = serverController;
         System.out.println("Socket server running at port " + PORT);
 
         // We need to run this async so that server start completes (otherwise we hog the main startup thread).
@@ -35,7 +38,7 @@ public class SpaceRaceSocketServer {
             while (true) {
                 final Socket clientSocket = listener.accept();
                 clientNumber++;
-                final ClientConnection clientConnection = new ClientConnection(clientSocket, clientNumber, communicationController);
+                final ClientConnection clientConnection = new ClientConnection(clientSocket, clientNumber, serverController);
                 new Thread(clientConnection).start();
             }
         }
@@ -45,11 +48,11 @@ public class SpaceRaceSocketServer {
     }
 
     private static class ClientConnection implements Runnable {
-        private final Socket                        socket;
-        private final int                           clientNumber;
-        private final ServerCommunicationController communicationController;
+        private final Socket                    socket;
+        private final int                       clientNumber;
+        private final SpaceRaceServerController communicationController;
 
-        private ClientConnection(final Socket socket, final int clientNumber, final ServerCommunicationController communicationController) {
+        private ClientConnection(final Socket socket, final int clientNumber, final SpaceRaceServerController communicationController) {
             this.socket = socket;
             this.clientNumber = clientNumber;
             this.communicationController = communicationController;
@@ -99,6 +102,9 @@ public class SpaceRaceSocketServer {
             }
             else if (request.getType() == SocketRequestType.GET_GAME_STATE) {
                 return communicationController.getGameState(request.getGameName());
+            }
+            else if (request.getType() == SocketRequestType.GET_GAME_STATE_FOR_VIEWING) {
+                return communicationController.getGameStateForViewing(request.getGameName());
             }
             else if (request.getType() == SocketRequestType.POST_ACTION) {
                 return communicationController.action(request.getGameName(),

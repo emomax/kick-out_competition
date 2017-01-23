@@ -72,6 +72,14 @@ public class SocketServerAdapter implements ServerAdapter {
     }
 
     @Override
+    public ServerResponse getGameStateForViewing() {
+        final SocketRequest request = new SocketRequest();
+        request.setType(SocketRequestType.GET_GAME_STATE_FOR_VIEWING);
+        request.setGameName(gameName);
+        return sendRequest(request);
+    }
+
+    @Override
     public ServerResponse postActionToServer(final Action action) {
         final SocketRequest request = new SocketRequest();
         request.setType(SocketRequestType.POST_ACTION);

@@ -164,7 +164,7 @@ public class SpaceRaceLoadTest {
 
     private static void startGame(final String playerName, final String gameName) throws IOException, InterruptedException {
         final int levelNumber = 1;
-        //        final RemoteServerAdapter server = new RemoteServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
+        //        final RestServerAdapter server = new RestServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
         final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
         final RemoteGame          remoteGame       = new RemoteGame(server, playerName, gameName, levelNumber);
         final ManualGameEngine    manualGameEngine = new ManualGameEngine();
@@ -191,12 +191,6 @@ public class SpaceRaceLoadTest {
             }
         }
         System.out.println(statistics);
-        //        Min: 1
-        //        Max: 41
-        //        Average: 3.43
-        //        Min: 1
-        //        Max: 48
-        //        Average: 2.98
     }
 
     private static void testSocketServerResponseTime() throws InterruptedException, IOException {
@@ -223,32 +217,6 @@ public class SpaceRaceLoadTest {
                     throw new IllegalArgumentException("Unable to map object to JSON", e);
                 }
                 out.println(requestString);
-                //                outputStream.writeObject("AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB" +
-                //                                         "AAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBB");
-                //                try {
-                //                    //                    final ServerResponse response = (ServerResponse) inputStream.readObject();
-                //                    final String response = (String) inputStream.readObject();
-                //                    System.out.println(response);
-                //                    //                    System.out.println(response);
-                //                }
-                //                catch (final IOException | ClassNotFoundException ex) {
-                //                    ex.printStackTrace();
-                //                }
                 try {
                     final String response = in.readLine();
                     if (response == null) {

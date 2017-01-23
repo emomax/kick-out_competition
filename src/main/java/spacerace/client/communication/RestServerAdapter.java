@@ -5,7 +5,7 @@ import org.springframework.web.client.RestTemplate;
 import spacerace.domain.Action;
 import spacerace.server.communication.response.ServerResponse;
 
-public class RemoteServerAdapter implements ServerAdapter {
+public class RestServerAdapter implements ServerAdapter {
 
     private static final int PORT = 8080;
 
@@ -14,7 +14,7 @@ public class RemoteServerAdapter implements ServerAdapter {
     private final String gameName;
     private final int    levelNumber;
 
-    public RemoteServerAdapter(final String serverIP, final String playerName, final String gameName, final int levelNumber) {
+    public RestServerAdapter(final String serverIP, final String playerName, final String gameName, final int levelNumber) {
         this.serverAddress = serverIP + ":" + PORT;
         this.playerName = playerName;
         this.gameName = gameName;
@@ -37,6 +37,13 @@ public class RemoteServerAdapter implements ServerAdapter {
     public ServerResponse getGameState() {
         final RestTemplate restTemplate = new RestTemplate();
         final String       url          = "http://" + serverAddress + "/getGameState?gameName=" + gameName;
+        return restTemplate.getForObject(url, ServerResponse.class);
+    }
+
+    @Override
+    public ServerResponse getGameStateForViewing() {
+        final RestTemplate restTemplate = new RestTemplate();
+        final String       url          = "http://" + serverAddress + "/getGameStateForViewing?gameName=" + gameName;
         return restTemplate.getForObject(url, ServerResponse.class);
     }
 

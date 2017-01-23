@@ -1,15 +1,15 @@
 package spacerace.client.communication;
 
 import spacerace.domain.Action;
+import spacerace.server.communication.SpaceRaceServerController;
 import spacerace.server.communication.response.ServerResponse;
-import spacerace.server.communication.rest.SpaceRaceRestController;
 
 public class LocalServerAdapter implements ServerAdapter {
 
     private final String playerName;
     private final String gameName;
     private final int    levelNumber;
-    private final SpaceRaceRestController serverController = new SpaceRaceRestController();
+    private final SpaceRaceServerController serverController = new SpaceRaceServerController();
 
     public LocalServerAdapter(final String playerName, final String gameName, final int levelNumber) {
         this.playerName = playerName;
@@ -28,8 +28,14 @@ public class LocalServerAdapter implements ServerAdapter {
     }
 
     @Override
+    public ServerResponse getGameStateForViewing() {
+        // Not really meant to be used locally...
+        return null;
+    }
+
+    @Override
     public ServerResponse postActionToServer(final Action action) {
-        return serverController.action(gameName, playerName, action.getAccelerationX().toString(), action.getAccelerationY().toString(), action.isStabilize());
+        return serverController.action(gameName, playerName, action.getAccelerationX(), action.getAccelerationY(), action.isStabilize());
     }
 
     @Override
