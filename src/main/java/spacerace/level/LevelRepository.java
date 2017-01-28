@@ -5,7 +5,7 @@ import java.util.List;
 
 public class LevelRepository {
 
-    private static final List<Level> levels = Arrays.asList(Level1Builder.build());
+    private static final List<Level> levels = Arrays.asList(Level1Builder.build(), Level2Builder.build());
 
     public Level getLevel(final int levelNumber) {
         return levels.stream()

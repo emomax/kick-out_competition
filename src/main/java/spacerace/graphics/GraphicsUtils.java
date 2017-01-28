@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
@@ -30,6 +32,26 @@ public class GraphicsUtils {
     public static void drawRectangle(final Rectangle2D rectangle, final GradientPaint gradientPaint, final Graphics graphics) {
         ((Graphics2D) graphics).setPaint(gradientPaint);
         graphics.fillRect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+    }
+
+    public static void paintSphere(final int circleX, final int circleY, final int radius, final Color color, final Color shadow, final Graphics2D graphics) {
+        final Point2D center = new Point2D.Float(
+                new Double(circleX + 0.33 * radius).floatValue(),
+                new Double(circleY + 0.33 * radius).floatValue());
+
+        final float[] dist   = { 0.0f, 1.0f };
+        final Color[] colors = { color, shadow };
+        final RadialGradientPaint paint = new RadialGradientPaint(
+                center,
+                radius * 0.8f,
+                dist,
+                colors);
+
+        graphics.setPaint(paint);
+        graphics.fillOval(circleX,
+                          circleY,
+                          radius,
+                          radius);
     }
 
     public static BufferedImage rotateImage(final BufferedImage image, final int angle) {

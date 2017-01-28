@@ -94,8 +94,8 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
 
     void paintLevelBaseLayer(final Graphics graphics) {
         level.getTrackBorders().forEach(line -> GraphicsUtils.drawLine(line, Color.WHITE, graphics));
-        level.paintBaseLayer((Graphics2D) graphics);
         GraphicsUtils.drawLine(level.getGoalLine(), Color.YELLOW, graphics);
+        level.paintBaseLayer((Graphics2D) graphics);
     }
 
     void paintLevelTopLayer(final Graphics graphics) {
