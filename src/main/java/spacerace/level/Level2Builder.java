@@ -17,8 +17,9 @@ import spacerace.level.graphics.StarBackground;
 
 class Level2Builder {
 
-    public static final double STARS_ROTATION_ANGULAR_SPEED = 0.05;
-    private             double starsBackgroundAngle         = 0;
+    private static final double STARS_ROTATION_ANGULAR_SPEED = 0.05;
+
+    private double starsBackgroundAngle = 0;
 
     private Level2Builder() {
         // Intentionally empty

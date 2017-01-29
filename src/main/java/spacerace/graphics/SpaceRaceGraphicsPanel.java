@@ -1,12 +1,9 @@
 package spacerace.graphics;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.IntSummaryStatistics;
@@ -14,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import spacerace.domain.GameState;
@@ -31,8 +27,6 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
     private static final int GRAPHICS_UPDATE_INTERVAL = 17;
 
     protected final    Level              level;
-    private final      BufferedImage      shipImage;
-    private final      BufferedImage      fireImage;
     protected volatile GameState          gameState;
     private final      Statistics         gameCycleStatistics;
     private final      Statistics         responseTimeStatistics;
@@ -46,8 +40,6 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
         this.gameCycleStatistics = gameCycleStatistics;
         this.responseTimeStatistics = responseTimeStatistics;
         this.graphicsPaintStatistics = new Statistics();
-        this.shipImage = ImageIO.read(new File(getClass().getResource(level.getShipImagePath()).getFile()));
-        this.fireImage = ImageIO.read(new File(getClass().getResource(level.getFireImagePath()).getFile()));
 
         setFocusable(true);
         setBackground(Color.black);
@@ -61,10 +53,6 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
         scheduler.scheduleAtFixedRate(this::repaint, 0, GRAPHICS_UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
     }
 
-    public Dimension getShipImageDimension() {
-        return new Dimension(shipImage.getWidth(), shipImage.getHeight());
-    }
-
     public void setPlayerResults(final List<PlayerResult> playerResults) {
         this.playerResults = playerResults;
     }
@@ -73,12 +61,12 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
     //    public void addNotify() {
     //        super.addNotify();
     //    }
-
-    // ToDo: Must this be here?
-    @Override
-    public void update(final Graphics g) {
-        paint(g);
-    }
+    //
+    //    // ToDo: Must this be here?
+    //    @Override
+    //    public void update(final Graphics g) {
+    //        paint(g);
+    //    }
 
     public void setState(final GameState gameState) {
         this.gameState = gameState;
@@ -102,28 +90,9 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
         level.paintTopLayer((Graphics2D) graphics);
     }
 
-    void drawShip(final ShipState shipState, final Graphics graphics) {
-        GraphicsUtils.drawRectangle(new Rectangle2D((int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), shipImage.getWidth(), shipImage.getHeight()), new Color(shipState.getColorRGB()), graphics);
-        graphics.drawImage(shipImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY(), this);
-        drawRocketFire(shipState, graphics);
-    }
-
-    private void drawRocketFire(final ShipState shipState, final Graphics graphics) {
-        if (shipState.getAccelerationDirection().getY() < 0 || shipState.isStabilize()) {
-            graphics.drawImage(fireImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY() + shipImage.getHeight(), this);
-        }
-        if (shipState.getAccelerationDirection().getY() > 0 || shipState.isStabilize()) {
-            final BufferedImage rotatedImage = GraphicsUtils.rotateImage(fireImage, 180);
-            graphics.drawImage(rotatedImage, (int) shipState.getPosition().getX(), (int) shipState.getPosition().getY() - fireImage.getHeight(), this);
-        }
-        if (shipState.getAccelerationDirection().getX() < 0 || shipState.isStabilize()) {
-            final BufferedImage rotatedImage = GraphicsUtils.rotateImage(fireImage, 270);
-            graphics.drawImage(rotatedImage, (int) shipState.getPosition().getX() + shipImage.getWidth(), (int) shipState.getPosition().getY(), this);
-        }
-        if (shipState.getAccelerationDirection().getX() > 0 || shipState.isStabilize()) {
-            final BufferedImage rotatedImage = GraphicsUtils.rotateImage(fireImage, 90);
-            graphics.drawImage(rotatedImage, (int) shipState.getPosition().getX() - rotatedImage.getWidth(), (int) shipState.getPosition().getY(), this);
-        }
+    void drawShip(final ShipState shipState, final Graphics2D graphics) {
+        level.getShipGraphics().paint(shipState, graphics);
+        level.getRocketFireGraphics().paint(shipState, level.getShipGraphics(), graphics);
     }
 
     void drawInfoPanel(final Graphics graphics) {

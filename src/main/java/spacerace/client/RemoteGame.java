@@ -1,6 +1,5 @@
 package spacerace.client;
 
-import java.awt.Dimension;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,6 +20,7 @@ import spacerace.graphics.SpaceRaceGraphicsFactory;
 import spacerace.graphics.SpaceRacePlayerPanel;
 import spacerace.level.Level;
 import spacerace.level.LevelRepository;
+import spacerace.level.ShipGraphics;
 import spacerace.server.communication.response.ServerResponse;
 
 public class RemoteGame {
@@ -67,7 +67,7 @@ public class RemoteGame {
             final GameState            gameState       = response.getGameState();
             final SpaceRacePlayerPanel graphics        = getGraphics(gameState, manualKeyListener);
             final ShipState            playerShipState = getPlayerShip(gameState);
-            final List<Detector>       detectors       = getDetectors(graphics.getShipImageDimension(), playerShipState);
+            final List<Detector>       detectors       = getDetectors(level.getShipGraphics(), playerShipState);
             playerShipState.setDetectors(detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
@@ -101,8 +101,8 @@ public class RemoteGame {
         return spaceRacePlayerGraphics;
     }
 
-    private List<Detector> getDetectors(final Dimension shipImageDimension, final ShipState playerShipState) {
-        final DetectorFactory detectorFactory = new DetectorFactory(playerShipState, shipImageDimension, level);
+    private List<Detector> getDetectors(final ShipGraphics shipGraphics, final ShipState playerShipState) {
+        final DetectorFactory detectorFactory = new DetectorFactory(playerShipState, shipGraphics, level);
         return detectorFactory.getDetectors();
     }
 

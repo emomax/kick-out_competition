@@ -1,11 +1,11 @@
 package spacerace.domain;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
 import spacerace.graphics.DetectorPosition;
 import spacerace.level.Level;
+import spacerace.level.ShipGraphics;
 
 import static java.util.stream.Collectors.toList;
 
@@ -19,11 +19,11 @@ public class DetectorFactory {
     private final int                        shipWidth;
     private final List<java.awt.geom.Line2D> trackBorders;
 
-    public DetectorFactory(final ShipState shipState, final Dimension shipImageDimension, final Level level) {
+    public DetectorFactory(final ShipState shipState, final ShipGraphics shipGraphics, final Level level) {
         this.shipPosX = (int) shipState.getPosition().getX();
         this.shipPosY = (int) shipState.getPosition().getY();
-        this.shipHeight = (int) shipImageDimension.getHeight();
-        this.shipWidth = (int) shipImageDimension.getWidth();
+        this.shipHeight = (int) shipGraphics.getHeight();
+        this.shipWidth = (int) shipGraphics.getWidth();
         this.trackBorders = level.getTrackBorders().stream()
                 .map(Line2D::convertToAWTLine2D)
                 .collect(toList());

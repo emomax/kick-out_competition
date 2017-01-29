@@ -8,13 +8,15 @@ import java.util.function.Consumer;
 import spacerace.domain.Line2D;
 import spacerace.domain.Require;
 import spacerace.domain.Vector2D;
+import spacerace.level.graphics.rocketfire.SimpleRocketFireGraphics;
+import spacerace.level.graphics.ship.SimpleShipGraphics;
 
 public class Level implements Serializable {
 
-    static final         int    DEFAULT_WIDTH           = 900;
-    static final         int    DEFAULT_HEIGHT          = 600;
-    private static final String DEFAULT_SHIP_IMAGE_PATH = "../../spacerace/ship2.png";
-    private static final String DEFAULT_FIRE_IMAGE_PATH = "../../spacerace/fire_50px.png";
+    private static final int                DEFAULT_WIDTH                = 900;
+    private static final int                DEFAULT_HEIGHT               = 600;
+    private static final ShipGraphics       DEFAULT_SHIP_GRAPHICS        = new SimpleShipGraphics();
+    private static final RocketFireGraphics DEFAULT_ROCKET_FIRE_GRAPHICS = new SimpleRocketFireGraphics();
 
     private int                  number;
     private int                  width;
@@ -24,8 +26,8 @@ public class Level implements Serializable {
     private List<Line2D>         trackBorders;
     private Consumer<Graphics2D> baseLayerPainter;
     private Consumer<Graphics2D> topLayerPainter;
-    private String               shipImagePath;
-    private String               fireImagePath;
+    private ShipGraphics         shipGraphics;
+    private RocketFireGraphics   rocketFireGraphics;
 
     private Level() {
         // Intentionally empty
@@ -55,12 +57,12 @@ public class Level implements Serializable {
         return goalLine;
     }
 
-    public String getShipImagePath() {
-        return shipImagePath;
+    public ShipGraphics getShipGraphics() {
+        return shipGraphics;
     }
 
-    public String getFireImagePath() {
-        return fireImagePath;
+    public RocketFireGraphics getRocketFireGraphics() {
+        return rocketFireGraphics;
     }
 
     public void paintBaseLayer(final Graphics2D graphics) {
@@ -71,49 +73,49 @@ public class Level implements Serializable {
         topLayerPainter.accept(graphics);
     }
 
-    public static class Builder {
+    static class Builder {
         private final Level level;
 
         private Builder(final Level level) {
             this.level = level;
         }
 
-        public static Builder aLevel() {
+        static Builder aLevel() {
             final Level level = new Level();
             return new Builder(level);
         }
 
-        public Builder withNumber(final int number) {
+        Builder withNumber(final int number) {
             level.number = number;
             return this;
         }
 
-        public Builder withWidth(final int width) {
+        Builder withWidth(final int width) {
             level.width = width;
             return this;
         }
 
-        public Builder withHeight(final int height) {
+        Builder withHeight(final int height) {
             level.height = height;
             return this;
         }
 
-        public Builder withStartPosition(final Vector2D startPosition) {
+        Builder withStartPosition(final Vector2D startPosition) {
             level.startPosition = startPosition;
             return this;
         }
 
-        public Builder withGoalLine(final Line2D goalLine) {
+        Builder withGoalLine(final Line2D goalLine) {
             level.goalLine = goalLine;
             return this;
         }
 
-        public Builder withTrackBoarders(final List<Line2D> trackBorders) {
+        Builder withTrackBoarders(final List<Line2D> trackBorders) {
             level.trackBorders = trackBorders;
             return this;
         }
 
-        public Builder withBaseLayerPainter(final Consumer<Graphics2D> baseLayerPainter) {
+        Builder withBaseLayerPainter(final Consumer<Graphics2D> baseLayerPainter) {
             level.baseLayerPainter = baseLayerPainter;
             return this;
         }
@@ -123,17 +125,17 @@ public class Level implements Serializable {
             return this;
         }
 
-        public Builder withShipImagePath(final String shipImagePath) {
-            level.shipImagePath = shipImagePath;
+        public Builder withShipGraphics(final ShipGraphics shipGraphics) {
+            level.shipGraphics = shipGraphics;
             return this;
         }
 
-        public Builder withFireImagePath(final String fireImagePath) {
-            level.fireImagePath = fireImagePath;
+        public Builder withRocketFireGraphics(final RocketFireGraphics rocketFireGraphics) {
+            level.rocketFireGraphics = rocketFireGraphics;
             return this;
         }
 
-        public Level build() {
+        Level build() {
             Require.that(level.number > 0, "Level number must be > 0");
             Require.notNull(level.startPosition, level.goalLine, level.trackBorders);
 
@@ -143,11 +145,11 @@ public class Level implements Serializable {
             if (level.height == 0) {
                 level.height = DEFAULT_HEIGHT;
             }
-            if (level.shipImagePath == null) {
-                level.shipImagePath = DEFAULT_SHIP_IMAGE_PATH;
+            if (level.shipGraphics == null) {
+                level.shipGraphics = DEFAULT_SHIP_GRAPHICS;
             }
-            if (level.fireImagePath == null) {
-                level.fireImagePath = DEFAULT_FIRE_IMAGE_PATH;
+            if (level.rocketFireGraphics == null) {
+                level.rocketFireGraphics = DEFAULT_ROCKET_FIRE_GRAPHICS;
             }
             if (level.baseLayerPainter == null) {
                 level.baseLayerPainter = graphics -> {
