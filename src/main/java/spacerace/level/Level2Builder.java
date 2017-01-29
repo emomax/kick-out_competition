@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -12,11 +13,12 @@ import spacerace.domain.Line2D;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.Vector2D;
 import spacerace.graphics.GraphicsUtils;
-import spacerace.level.graphics.OrbitAnimation;
-import spacerace.level.graphics.SolarSystem;
-import spacerace.level.graphics.Sun;
+import spacerace.level.graphics.StarBackground;
 
 class Level2Builder {
+
+    public static final double STARS_ROTATION_ANGULAR_SPEED = 0.05;
+    private             double starsBackgroundAngle         = 0;
 
     private Level2Builder() {
         // Intentionally empty
@@ -32,10 +34,9 @@ class Level2Builder {
         final Vector2D startPosition = new Vector2D((width / 2) - 25, height - 80);
         final Line2D   goalLine      = new Line2D((width / 2) - 375, height - 275, (width / 2) - 375, height - 400);
 
-        final SolarSystem solarSystem = createSolarSystem(width, height);
-
+        final StarBackground       starBackground   = new StarBackground(30, width, height, 200);
         final Level2Builder        builder          = new Level2Builder();
-        final Consumer<Graphics2D> baseLayerPainter = graphics2D -> builder.paintBaseLayer(graphics2D, height, width, solarSystem);
+        final Consumer<Graphics2D> baseLayerPainter = graphics2D -> builder.paintBaseLayer(graphics2D, height, width, starBackground);
 
         return Level.Builder.aLevel()
                 .withNumber(levelNumber)
@@ -46,47 +47,6 @@ class Level2Builder {
                 .withTrackBoarders(trackBorders)
                 .withBaseLayerPainter(baseLayerPainter)
                 .build();
-    }
-
-    private static SolarSystem createSolarSystem(final int width, final int height) {
-        final Color ellipseColor = new Color(114, 112, 112);
-
-        final OrbitAnimation orbitAnimation1 = OrbitAnimation.anOrbitAnimation()
-                .withCenterX(width / 2)
-                .withCenterY(height / 2)
-                .withA(200)
-                .withB(25)
-                .withEllipseColor(ellipseColor)
-                .withSphereRadius(30)
-                .withSphereColor(Color.BLUE)
-                .withSphereShadowColor(Color.BLACK)
-                .build();
-
-        final OrbitAnimation orbitAnimation2 = OrbitAnimation.anOrbitAnimation()
-                .withCenterX(width / 2)
-                .withCenterY(height / 2)
-                .withA(300)
-                .withB(50)
-                .withEllipseColor(ellipseColor)
-                .withSphereRadius(50)
-                .withSphereColor(Color.GREEN)
-                .withSphereShadowColor(Color.BLACK)
-                .build();
-
-        final OrbitAnimation orbitAnimation3 = OrbitAnimation.anOrbitAnimation()
-                .withCenterX(width / 2)
-                .withCenterY(height / 2)
-                .withA(400)
-                .withB(75)
-                .withEllipseColor(ellipseColor)
-                .withSphereRadius(60)
-                .withSphereColor(Color.RED)
-                .withSphereShadowColor(Color.BLACK)
-                .build();
-
-        final List<OrbitAnimation> orbitAnimations = Arrays.asList(orbitAnimation1, orbitAnimation2, orbitAnimation3);
-        final Sun                  sun             = new Sun(80, width / 2, height / 2);
-        return new SolarSystem(sun, orbitAnimations);
     }
 
     private static List<Line2D> createTrackBoarders(final int width, final int height) {
@@ -149,14 +109,40 @@ class Level2Builder {
                 end);
     }
 
-    private void paintBaseLayer(final Graphics2D graphics, final int height, final int width, final SolarSystem solarSystem) {
+    private void paintBaseLayer(final Graphics2D graphics, final int height, final int width, final StarBackground starBackground) {
+        paintStars(graphics, height, width, starBackground);
+        paintTrackBackground(graphics);
         drawFinishLine(graphics, height, width);
-        solarSystem.paint(graphics);
+    }
+
+    private void paintStars(final Graphics2D graphics, final int height, final int width, final StarBackground starBackground) {
+        final AffineTransform old = graphics.getTransform();
+        if (starsBackgroundAngle > 360) {
+            starsBackgroundAngle = 0;
+        }
+        graphics.rotate(Math.toRadians(starsBackgroundAngle), -width, -height);
+        starsBackgroundAngle += STARS_ROTATION_ANGULAR_SPEED;
+        starBackground.paintStars(graphics);
+        graphics.setTransform(old);
     }
 
     private void drawFinishLine(final Graphics graphics, final int height, final int width) {
         final Rectangle2D   finish        = new Rectangle2D((width / 2) - 385, height - 400, 10, 125);
         final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.WHITE, 25, 15, Color.BLACK, true);
         GraphicsUtils.drawRectangle(finish, gradientPaint, graphics);
+    }
+
+    private void paintTrackBackground(final Graphics2D graphics) {
+        final float[] rgb = new Color(0x000D62).getRGBColorComponents(null);
+        //        final float[] rgb            = Color.BLACK.getRGBColorComponents(null);
+        final Color colorWithAlpha = new Color(rgb[0], rgb[1], rgb[2], 0.8f);
+        graphics.setColor(colorWithAlpha);
+
+        // Fill track up -> down
+        graphics.fillRect(375, 100, 150, 100);
+        graphics.fillRect(50, 200, 800, 125);
+        graphics.fillRect(375, 325, 150, 50);
+        graphics.fillRect(250, 375, 400, 100);
+        graphics.fillRect(375, 475, 150, 100);
     }
 }

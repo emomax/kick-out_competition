@@ -21,7 +21,8 @@ public class StarBackground {
     private List<Point> starCenterPoints;
 
     public StarBackground(final int numberOfStars, final int width, final int height, final int backgroundChangeSpeed) {
-        this.numberOfStars = numberOfStars;
+        // Multiply because we paint on 8 times the visible screen to make rotation look good
+        this.numberOfStars = numberOfStars * 8;
         this.width = width;
         this.height = height;
         this.backgroundChangeSpeed = backgroundChangeSpeed;
@@ -52,8 +53,9 @@ public class StarBackground {
         final Random      random           = new Random();
         final List<Point> starCenterPoints = new ArrayList<>();
         for (int i = 0; i < numberOfStars; i++) {
-            final int   x          = random.nextInt(width);
-            final int   y          = random.nextInt(height);
+            // Multiply because we paint on 8 times the visible screen to make rotation look good
+            final int   x          = (4 * width) - random.nextInt(width * 8);
+            final int   y          = (4 * height) - random.nextInt(height * 8);
             final Point starCenter = new Point(x, y);
             starCenterPoints.add(starCenter);
         }

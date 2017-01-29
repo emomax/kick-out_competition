@@ -29,7 +29,7 @@ public class SpaceRaceViewerPanel extends SpaceRaceGraphicsPanel {
     SpaceRaceViewerPanel(final Level level, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String gameName) throws IOException {
         super(level, gameState, gameCycleStatistics, responseTimeStatistics);
         this.gameName = gameName;
-        starBackground = new StarBackground(30, level.getWidth(), level.getHeight(), 200);
+        starBackground = new StarBackground(50, level.getWidth(), level.getHeight(), 200);
     }
 
     @Override
