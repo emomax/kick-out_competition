@@ -25,7 +25,7 @@ public class Sphere {
         return centerX;
     }
 
-    int getCenterY() {
+    public int getCenterY() {
         return centerY;
     }
 
@@ -33,11 +33,7 @@ public class Sphere {
         return color;
     }
 
-    Color getShadowColor() {
-        return shadowColor;
-    }
-
-    int getRadius() {
+    public int getRadius() {
         return radius;
     }
 

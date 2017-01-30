@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import spacerace.domain.GameStatus;
 import spacerace.domain.Statistics;
 import spacerace.level.Level;
 import spacerace.level.graphics.OrbitAnimation;
+import spacerace.level.graphics.ParticleOrbitAnimation;
 import spacerace.level.graphics.SolarSystem;
 import spacerace.level.graphics.StarBackground;
 import spacerace.level.graphics.Sun;
@@ -116,6 +118,8 @@ public class SpaceRaceViewerPanel extends SpaceRaceGraphicsPanel {
                 .withSphereColor(Color.GREEN)
                 .withSphereShadowColor(Color.BLACK)
                 .build();
+        final List<OrbitAnimation> moonOrbitAnimations = getMoonOrbitAnimations(orbitAnimation2);
+        orbitAnimation2.setMoonOrbitAnimations(moonOrbitAnimations);
 
         final OrbitAnimation orbitAnimation3 = OrbitAnimation.anOrbitAnimation()
                 .withCenterX(width / 2)
@@ -127,9 +131,65 @@ public class SpaceRaceViewerPanel extends SpaceRaceGraphicsPanel {
                 .withSphereColor(Color.RED)
                 .withSphereShadowColor(Color.BLACK)
                 .build();
+        final List<ParticleOrbitAnimation> ringOrbitAnimations = getRingOrbitAnimations(orbitAnimation3);
+        orbitAnimation3.setParticleOrbitAnimations(ringOrbitAnimations);
 
         final List<OrbitAnimation> orbitAnimations = Arrays.asList(orbitAnimation1, orbitAnimation2, orbitAnimation3);
         final Sun                  sun             = new Sun(80, width / 2, height / 2);
         return new SolarSystem(sun, orbitAnimations);
+    }
+
+    private static List<OrbitAnimation> getMoonOrbitAnimations(final OrbitAnimation planetOrbitAnimation) {
+        final Color transparentColor = GraphicsUtils.createColorWithAlpha(Color.BLACK, 0);
+        final OrbitAnimation moonOrbitAnimation1 = OrbitAnimation.anOrbitAnimation()
+                .withCenterX(planetOrbitAnimation.getSphere().getCenterX())
+                .withCenterY(planetOrbitAnimation.getSphere().getCenterY())
+                .withA((int) (planetOrbitAnimation.getSphere().getRadius() * 1.3))
+                .withB(planetOrbitAnimation.getSphere().getRadius() / 4)
+                .withEllipseColor(transparentColor)
+                .withSphereRadius(15)
+                .withSphereColor(Color.PINK)
+                .withSphereShadowColor(Color.BLACK)
+                .build();
+
+        final OrbitAnimation moonOrbitAnimation2 = OrbitAnimation.anOrbitAnimation()
+                .withCenterX(planetOrbitAnimation.getSphere().getCenterX())
+                .withCenterY(planetOrbitAnimation.getSphere().getCenterY())
+                .withA((int) (planetOrbitAnimation.getSphere().getRadius() * 1.5))
+                .withB(planetOrbitAnimation.getSphere().getRadius() / 3)
+                .withEllipseColor(transparentColor)
+                .withSphereRadius(10)
+                .withSphereColor(Color.ORANGE)
+                .withSphereShadowColor(Color.BLACK)
+                .build();
+
+        final OrbitAnimation moonOrbitAnimation3 = OrbitAnimation.anOrbitAnimation()
+                .withCenterX(planetOrbitAnimation.getSphere().getCenterX())
+                .withCenterY(planetOrbitAnimation.getSphere().getCenterY())
+                .withA((int) (planetOrbitAnimation.getSphere().getRadius() * 1.7))
+                .withB(planetOrbitAnimation.getSphere().getRadius() / 2)
+                .withEllipseColor(transparentColor)
+                .withSphereRadius(12)
+                .withSphereColor(Color.LIGHT_GRAY)
+                .withSphereShadowColor(Color.BLACK)
+                .build();
+        return new ArrayList<>(Arrays.asList(moonOrbitAnimation1, moonOrbitAnimation2, moonOrbitAnimation3));
+    }
+
+    private static List<ParticleOrbitAnimation> getRingOrbitAnimations(final OrbitAnimation planetOrbitAnimation) {
+        final Color                        transparentColor   = GraphicsUtils.createColorWithAlpha(Color.BLACK, 0);
+        final List<ParticleOrbitAnimation> particleAnimations = new ArrayList<>();
+
+        for (int i = 0; i < 1_000; i++) {
+            final ParticleOrbitAnimation particleAnimation = ParticleOrbitAnimation.aParticleOrbitAnimation()
+                    .withCenterX(planetOrbitAnimation.getSphere().getCenterX())
+                    .withCenterY(planetOrbitAnimation.getSphere().getCenterY())
+                    .withA((int) (planetOrbitAnimation.getSphere().getRadius() * (1 + 0.002 * i)))
+                    .withB(planetOrbitAnimation.getSphere().getRadius() / 2)
+                    .withParticleRadius(3)
+                    .build();
+            particleAnimations.add(particleAnimation);
+        }
+        return particleAnimations;
     }
 }

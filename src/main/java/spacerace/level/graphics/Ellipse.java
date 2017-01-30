@@ -11,9 +11,9 @@ import java.awt.Graphics2D;
 public class Ellipse {
     private final int   a;
     private final int   b;
-    private final int   centerX;
-    private final int   centerY;
-    private final Color color;
+    private       int   centerX;
+    private       int   centerY;
+    private       Color color;
 
     public Ellipse(final int a, final int b, final int centerX, final int centerY, final Color color) {
         this.a = a;
@@ -21,6 +21,13 @@ public class Ellipse {
         this.centerX = centerX;
         this.centerY = centerY;
         this.color = color;
+    }
+
+    public Ellipse(final int a, final int b, final int centerX, final int centerY) {
+        this.a = a;
+        this.b = b;
+        this.centerX = centerX;
+        this.centerY = centerY;
     }
 
     public int getA() {
@@ -33,6 +40,14 @@ public class Ellipse {
 
     public int getCenterY() {
         return centerY;
+    }
+
+    public void setCenterX(final int centerX) {
+        this.centerX = centerX;
+    }
+
+    public void setCenterY(final int centerY) {
+        this.centerY = centerY;
     }
 
     /**

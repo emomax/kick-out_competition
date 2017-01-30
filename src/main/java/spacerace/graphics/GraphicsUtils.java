@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.function.Consumer;
 
 import spacerace.domain.Line2D;
 import spacerace.domain.Rectangle2D;
@@ -66,5 +67,12 @@ public class GraphicsUtils {
     public static Color createColorWithAlpha(final Color color, final float alpha) {
         final float[] rgb = color.getRGBColorComponents(null);
         return new Color(rgb[0], rgb[1], rgb[2], alpha);
+    }
+
+    public static void paintWithRotation(final double theta, final double x, final double y, final Graphics2D graphics, final Consumer<Graphics2D> painter) {
+        final AffineTransform old = graphics.getTransform();
+        graphics.rotate(Math.toRadians(theta), x, y);
+        painter.accept(graphics);
+        graphics.setTransform(old);
     }
 }

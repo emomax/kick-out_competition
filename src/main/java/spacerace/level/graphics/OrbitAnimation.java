@@ -2,14 +2,19 @@ package spacerace.level.graphics;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.List;
+
+import spacerace.graphics.GraphicsUtils;
 
 public class OrbitAnimation {
 
     private double sphereRelativeCenterX;
     private double angle = 0;
-    private final Ellipse ellipse;
-    private final Sphere  sphere;
-    private final double  speed;
+    private final Ellipse                      ellipse;
+    private final Sphere                       sphere;
+    private final double                       speed;
+    private       List<OrbitAnimation>         moonOrbitAnimations;
+    private       List<ParticleOrbitAnimation> particleOrbitAnimations;
 
     private OrbitAnimation(final int ellipseCenterX, final int ellipseCenterY, final int a, final int b, final Color ellipseColor, final int sphereRadius, final Color sphereColor, final Color sphereShadowColor) {
         this.ellipse = new Ellipse(a, b, ellipseCenterX, ellipseCenterY, ellipseColor);
@@ -59,6 +64,22 @@ public class OrbitAnimation {
         OrbitAnimation build();
     }
 
+    public Sphere getSphere() {
+        return sphere;
+    }
+
+    public Ellipse getEllipse() {
+        return ellipse;
+    }
+
+    public void setMoonOrbitAnimations(final List<OrbitAnimation> moonOrbitAnimations) {
+        this.moonOrbitAnimations = moonOrbitAnimations;
+    }
+
+    public void setParticleOrbitAnimations(final List<ParticleOrbitAnimation> particleOrbitAnimations) {
+        this.particleOrbitAnimations = particleOrbitAnimations;
+    }
+
     void paintUpperPart(final Graphics2D graphics) {
         ellipse.paintUpperPart(graphics);
         if (isSphereInUpperQuadrants()) {
@@ -78,20 +99,63 @@ public class OrbitAnimation {
     }
 
     private void paintPlanet(final Graphics2D graphics) {
+        if (moonOrbitAnimations != null) {
+            paintPlanetAndMoons(graphics);
+        }
+        else if (particleOrbitAnimations != null) {
+            paintPlanetAndParticles(graphics);
+        }
+        else {
+            sphere.paint(graphics);
+        }
+    }
+
+    private void paintPlanetAndMoons(final Graphics2D graphics) {
+        for (final OrbitAnimation moonOrbitAnimation : moonOrbitAnimations) {
+            moonOrbitAnimation.getEllipse().setCenterX(sphere.getCenterX());
+            moonOrbitAnimation.getEllipse().setCenterY(sphere.getCenterY());
+            moonOrbitAnimation.tickAnimation();
+        }
+
+        GraphicsUtils.paintWithRotation(30, sphere.getCenterX(), sphere.getCenterY(), graphics, graphics2D -> {
+            for (int i = moonOrbitAnimations.size() - 1; i >= 0; i--) {
+                final OrbitAnimation moonOrbitAnimation = moonOrbitAnimations.get(i);
+                moonOrbitAnimation.paintUpperPart(graphics);
+            }
+        });
+
         sphere.paint(graphics);
 
-        //        final OrbitAnimation orbitAnimation = OrbitAnimation.anOrbitAnimation()
-        //                .withCenterX(sphere.getCenterX())
-        //                .withCenterY(sphere.getCenterY())
-        //                .withA((int) (sphere.getRadius() * 1.5))
-        //                .withB((int) (sphere.getRadius() * 0.5))
-        //                .withEllipseColor(new Color(1, 1, 1, 0))
-        //                .withSphereRadius(20)
-        //                .withSphereColor(Color.PINK)
-        //                .withSphereShadowColor(Color.BLACK)
-        //                .build();
-        //        orbitAnimation.paintUpperPart(graphics);
-        //        orbitAnimation.paintLowerPart(graphics);
+        GraphicsUtils.paintWithRotation(30, sphere.getCenterX(), sphere.getCenterY(), graphics, graphics2D -> {
+            for (final OrbitAnimation moonOrbitAnimation : moonOrbitAnimations) {
+                moonOrbitAnimation.paintLowerPart(graphics);
+            }
+        });
+    }
+
+    private void paintPlanetAndParticles(final Graphics2D graphics) {
+        for (final ParticleOrbitAnimation particleOrbitAnimation : particleOrbitAnimations) {
+            particleOrbitAnimation.getEllipse().setCenterX(sphere.getCenterX());
+            particleOrbitAnimation.getEllipse().setCenterY(sphere.getCenterY());
+            particleOrbitAnimation.tickAnimation();
+        }
+
+        graphics.setColor(Color.white);
+        GraphicsUtils.paintWithRotation(30, sphere.getCenterX(), sphere.getCenterY(), graphics, graphics2D -> {
+            for (int i = particleOrbitAnimations.size() - 1; i >= 0; i--) {
+                final ParticleOrbitAnimation particleOrbitAnimations = this.particleOrbitAnimations.get(i);
+                particleOrbitAnimations.paintUpperPart(graphics);
+            }
+        });
+
+        sphere.paint(graphics);
+
+        graphics.setColor(Color.white);
+        GraphicsUtils.paintWithRotation(30, sphere.getCenterX(), sphere.getCenterY(), graphics, graphics2D -> {
+            for (final ParticleOrbitAnimation particleOrbitAnimation : particleOrbitAnimations) {
+                particleOrbitAnimation.paintLowerPart(graphics);
+            }
+        });
     }
 
     void tickAnimation() {
