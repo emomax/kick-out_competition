@@ -47,7 +47,7 @@ public class GameViewer {
         //        this.server = new RestServerAdapter(SERVER_IP, null, gameName, levelNumber);
     }
 
-    void start() throws IOException, InterruptedException {
+    private void start() throws IOException, InterruptedException {
         runViewerLoop();
     }
 

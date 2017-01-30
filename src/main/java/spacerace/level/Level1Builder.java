@@ -16,8 +16,9 @@ import spacerace.graphics.GraphicsUtils;
 
 class Level1Builder {
 
-    private static final String SHIP_IMAGE_PATH = "../../spacerace/ship2.png";
-    private static final String FIRE_IMAGE_PATH = "../../spacerace/fire_50px.png";
+    private static final double BACKGROUND_CHANGE_LIMIT = 400.0;
+
+    private int paintCycleCount = 0;
 
     private Level1Builder() {
         // Intentionally empty
@@ -34,8 +35,9 @@ class Level1Builder {
         final Vector2D startPosition = new Vector2D(150, height - 150);
         final Line2D   goalLine      = new Line2D(650, height - 75, 800, height - 75);
 
-        final Level1Builder        builder          = new Level1Builder();
-        final Consumer<Graphics2D> baseLayerPainter = graphics2D -> builder.paintBaseLayer(graphics2D, height, width);
+        final Level1Builder        builder              = new Level1Builder();
+        final List<Rectangle2D>    backgroundRectangles = getLevelBackgroundRectangles(height, width);
+        final Consumer<Graphics2D> baseLayerPainter     = graphics2D -> builder.paintBaseLayer(graphics2D, height, backgroundRectangles);
 
         return Level.Builder.aLevel()
                 .withNumber(levelNumber)
@@ -70,12 +72,40 @@ class Level1Builder {
                 end);
     }
 
-    private void paintBaseLayer(final Graphics2D graphics, final int height, final int width) {
-        drawLevelRectangles(graphics, height, width);
+    private void paintBaseLayer(final Graphics2D graphics, final int height, final List<Rectangle2D> backgroundRectangles) {
+        drawLevelRectangles(graphics, backgroundRectangles);
         drawFinishLine(graphics, height);
     }
 
-    private void drawLevelRectangles(final Graphics2D graphics, final int height, final int width) {
+    private void drawLevelRectangles(final Graphics2D graphics, final List<Rectangle2D> backgroundRectangles) {
+        paintCycleCount++;
+        final float foregroundAlpha;
+        final float backgroundAlpha;
+        if (paintCycleCount <= BACKGROUND_CHANGE_LIMIT) {
+            foregroundAlpha = new Double((BACKGROUND_CHANGE_LIMIT - paintCycleCount) / BACKGROUND_CHANGE_LIMIT).floatValue();
+            backgroundAlpha = new Double((1.0 * paintCycleCount) / BACKGROUND_CHANGE_LIMIT).floatValue();
+        }
+        else {
+            foregroundAlpha = new Double((1.0 * (paintCycleCount - BACKGROUND_CHANGE_LIMIT)) / BACKGROUND_CHANGE_LIMIT).floatValue();
+            backgroundAlpha = new Double((2 * BACKGROUND_CHANGE_LIMIT - paintCycleCount) / BACKGROUND_CHANGE_LIMIT).floatValue();
+        }
+        if (paintCycleCount == 2 * BACKGROUND_CHANGE_LIMIT) {
+            paintCycleCount = 0;
+        }
+
+        final Color         foregroundColor1   = GraphicsUtils.createColorWithAlpha(Color.BLUE, foregroundAlpha);
+        final Color         foregroundColor2   = GraphicsUtils.createColorWithAlpha(Color.BLACK, foregroundAlpha);
+        final GradientPaint foregroundGradient = new GradientPaint(25, 25, foregroundColor1, 15, 25, foregroundColor2, true);
+
+        final Color         backgroundColor1   = GraphicsUtils.createColorWithAlpha(Color.BLACK, backgroundAlpha);
+        final Color         backgroundColor2   = GraphicsUtils.createColorWithAlpha(Color.GREEN, backgroundAlpha);
+        final GradientPaint backgroundGradient = new GradientPaint(25, 25, backgroundColor1, 15, 25, backgroundColor2, true);
+
+        backgroundRectangles.forEach(rectangle -> GraphicsUtils.drawRectangle(rectangle, backgroundGradient, graphics));
+        backgroundRectangles.forEach(rectangle -> GraphicsUtils.drawRectangle(rectangle, foregroundGradient, graphics));
+    }
+
+    private static List<Rectangle2D> getLevelBackgroundRectangles(final int height, final int width) {
         final Rectangle2D start = new Rectangle2D(100, height - 25, 150, 25);
         final Rectangle2D left  = new Rectangle2D(0, 0, 100, height);
         final Rectangle2D up    = new Rectangle2D(100, 0, width - 100, 100);
@@ -90,9 +120,7 @@ class Level1Builder {
         rectangles.add(start);
         rectangles.add(right);
         rectangles.add(end);
-
-        final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.BLUE, 15, 25, Color.BLACK, true);
-        rectangles.forEach(rectangle -> GraphicsUtils.drawRectangle(rectangle, gradientPaint, graphics));
+        return rectangles;
     }
 
     private void drawFinishLine(final Graphics graphics, final int height) {
