@@ -62,4 +62,9 @@ public class GraphicsUtils {
         final AffineTransformOp transformOp      = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
         return transformOp.filter(image, null);
     }
+
+    public static Color createColorWithAlpha(final Color color, final float alpha) {
+        final float[] rgb = color.getRGBColorComponents(null);
+        return new Color(rgb[0], rgb[1], rgb[2], alpha);
+    }
 }

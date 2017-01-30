@@ -8,7 +8,6 @@ import spacerace.domain.Rectangle2D;
 import spacerace.domain.Ship;
 
 import static java.util.stream.Collectors.toList;
-import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
 
 public class GameCycle implements Runnable {
 
@@ -46,7 +45,7 @@ public class GameCycle implements Runnable {
     }
 
     private boolean gameTimeIsUp() {
-        return (System.currentTimeMillis() - game.getStartTime()) > GAME_TIME_LIMIT;
+        return (System.currentTimeMillis() - game.getStartTime()) > game.getLevel().getTimeLimit();
     }
 
     private void runGameCycle(final long timeSinceLastCycle) {

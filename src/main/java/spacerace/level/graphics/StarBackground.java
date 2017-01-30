@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import spacerace.graphics.GraphicsUtils;
+
 public class StarBackground {
 
     private final int numberOfStars;
@@ -66,13 +68,9 @@ public class StarBackground {
         if (alpha < 0 || alpha > 1) {
             throw new IllegalArgumentException("Illegal alpha: " + alpha);
         }
-        final Color   color1          = Color.WHITE;
-        final Color   color2          = Color.YELLOW;
-        final float[] rgb1            = color1.getRGBColorComponents(null);
-        final float[] rgb2            = color2.getRGBColorComponents(null);
-        final Color   color1WithAlpha = new Color(rgb1[0], rgb1[1], rgb1[2], alpha);
-        final Color   color2WithAlpha = new Color(rgb2[0], rgb2[1], rgb2[2], alpha);
-        final Color[] colors          = { color1WithAlpha, color2WithAlpha };
+        final Color   colorWithAlpha1 = GraphicsUtils.createColorWithAlpha(Color.WHITE, alpha);
+        final Color   colorWithAlpha2 = GraphicsUtils.createColorWithAlpha(Color.YELLOW, alpha);
+        final Color[] colors          = { colorWithAlpha1, colorWithAlpha2 };
         final float[] fractions       = { 0, 0.8f };
         final int     radius          = 5;
         final RadialGradientPaint paint = new RadialGradientPaint(

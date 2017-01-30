@@ -25,6 +25,7 @@ class Level1Builder {
 
     static Level build() {
         final int levelNumber = 1;
+        final int timeLimit   = 30_000;
         final int width       = 900;
         final int height      = 600;
 
@@ -38,6 +39,7 @@ class Level1Builder {
 
         return Level.Builder.aLevel()
                 .withNumber(levelNumber)
+                .withTimeLimit(timeLimit)
                 .withWidth(width)
                 .withHeight(height)
                 .withStartPosition(startPosition)

@@ -27,6 +27,7 @@ class Level2Builder {
 
     static Level build() {
         final int levelNumber = 2;
+        final int timeLimit   = 30_000;
         final int width       = 900;
         final int height      = 600;
 
@@ -41,6 +42,7 @@ class Level2Builder {
 
         return Level.Builder.aLevel()
                 .withNumber(levelNumber)
+                .withTimeLimit(timeLimit)
                 .withWidth(width)
                 .withHeight(height)
                 .withStartPosition(startPosition)
@@ -134,9 +136,8 @@ class Level2Builder {
     }
 
     private void paintTrackBackground(final Graphics2D graphics) {
-        final float[] rgb = new Color(0x000D62).getRGBColorComponents(null);
-        //        final float[] rgb            = Color.BLACK.getRGBColorComponents(null);
-        final Color colorWithAlpha = new Color(rgb[0], rgb[1], rgb[2], 0.8f);
+        final Color trackBackgroundColor = new Color(0x000D62);
+        final Color colorWithAlpha       = GraphicsUtils.createColorWithAlpha(trackBackgroundColor, 0.8f);
         graphics.setColor(colorWithAlpha);
 
         // Fill track up -> down

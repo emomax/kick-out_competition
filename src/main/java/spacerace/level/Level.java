@@ -19,6 +19,7 @@ public class Level implements Serializable {
     private static final RocketFireGraphics DEFAULT_ROCKET_FIRE_GRAPHICS = new SimpleRocketFireGraphics();
 
     private int                  number;
+    private long                 timeLimit;
     private int                  width;
     private int                  height;
     private Vector2D             startPosition;
@@ -35,6 +36,10 @@ public class Level implements Serializable {
 
     int getNumber() {
         return number;
+    }
+
+    public long getTimeLimit() {
+        return timeLimit;
     }
 
     public int getWidth() {
@@ -90,6 +95,11 @@ public class Level implements Serializable {
             return this;
         }
 
+        Builder withTimeLimit(final long timeLimit) {
+            level.timeLimit = timeLimit;
+            return this;
+        }
+
         Builder withWidth(final int width) {
             level.width = width;
             return this;
@@ -137,6 +147,7 @@ public class Level implements Serializable {
 
         Level build() {
             Require.that(level.number > 0, "Level number must be > 0");
+            Require.that(level.timeLimit > 0, "Time limit must be > 0");
             Require.notNull(level.startPosition, level.goalLine, level.trackBorders);
 
             if (level.width == 0) {

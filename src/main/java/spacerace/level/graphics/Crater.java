@@ -6,14 +6,14 @@ import java.awt.RadialGradientPaint;
 import java.awt.geom.Point2D;
 
 
-public class Sphere {
+public class Crater {
     private final Color color;
     private final Color shadowColor;
     private final int   radius;
     private       int   centerX;
     private       int   centerY;
 
-    Sphere(final Color color, final Color shadowColor, final int radius, final int centerX, final int centerY) {
+    Crater(final Color color, final Color shadowColor, final int radius, final int centerX, final int centerY) {
         this.color = color;
         this.shadowColor = shadowColor;
         this.radius = radius;
@@ -52,7 +52,7 @@ public class Sphere {
     /**
      * Ok, so this i kinda weird-looking but goes something like this. We set the paint to a standard Radial gradient with only two
      * colors. Then we offset that gradient relative the oval we draw next to get the focus of the gradient to the upper left of
-     * the oval, giving the sphere illusion.
+     * the oval, giving the crater illusion.
      * <p>
      * Read more about implementation and examples here: https://docs.oracle.com/javase/7/docs/api/java/awt/RadialGradientPaint.html
      */
@@ -62,14 +62,14 @@ public class Sphere {
         final int circleY  = centerY - radius;
 
         final Point2D center = new Point2D.Float(
-                new Double(circleX + 0.33 * diameter).floatValue(),
-                new Double(circleY + 0.33 * diameter).floatValue());
+                new Double(circleX + 0.7 * diameter).floatValue(),
+                new Double(circleY + 0.7 * diameter).floatValue());
 
         final float[] fractions = { 0.0f, 1.0f };
         final Color[] colors    = { color, shadowColor };
         final RadialGradientPaint paint = new RadialGradientPaint(
                 center,
-                diameter * 0.8f,
+                diameter,
                 fractions,
                 colors);
 

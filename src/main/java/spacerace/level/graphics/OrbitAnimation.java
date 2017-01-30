@@ -59,25 +59,42 @@ public class OrbitAnimation {
         OrbitAnimation build();
     }
 
-    public void paintUpperPart(final Graphics2D graphics) {
+    void paintUpperPart(final Graphics2D graphics) {
         ellipse.paintUpperPart(graphics);
         if (isSphereInUpperQuadrants()) {
-            sphere.paint(graphics);
+            paintPlanet(graphics);
         }
     }
 
-    public void paintLowerPart(final Graphics2D graphics) {
+    void paintLowerPart(final Graphics2D graphics) {
         ellipse.paintLowerPart(graphics);
         if (!isSphereInUpperQuadrants()) {
-            sphere.paint(graphics);
+            paintPlanet(graphics);
         }
     }
 
-    public boolean isSphereInUpperQuadrants() {
+    private boolean isSphereInUpperQuadrants() {
         return sphere.getCenterY() <= ellipse.getCenterY();
     }
 
-    public void tickAnimation() {
+    private void paintPlanet(final Graphics2D graphics) {
+        sphere.paint(graphics);
+
+        //        final OrbitAnimation orbitAnimation = OrbitAnimation.anOrbitAnimation()
+        //                .withCenterX(sphere.getCenterX())
+        //                .withCenterY(sphere.getCenterY())
+        //                .withA((int) (sphere.getRadius() * 1.5))
+        //                .withB((int) (sphere.getRadius() * 0.5))
+        //                .withEllipseColor(new Color(1, 1, 1, 0))
+        //                .withSphereRadius(20)
+        //                .withSphereColor(Color.PINK)
+        //                .withSphereShadowColor(Color.BLACK)
+        //                .build();
+        //        orbitAnimation.paintUpperPart(graphics);
+        //        orbitAnimation.paintLowerPart(graphics);
+    }
+
+    void tickAnimation() {
         if ((angle >= (2 * Math.PI))) {
             angle = 0;
         }

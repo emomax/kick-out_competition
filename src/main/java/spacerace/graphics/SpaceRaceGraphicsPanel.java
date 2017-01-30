@@ -20,8 +20,6 @@ import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
 import spacerace.level.Level;
 
-import static spacerace.server.SpaceRaceGame.GAME_TIME_LIMIT;
-
 abstract class SpaceRaceGraphicsPanel extends JPanel {
 
     private static final int GRAPHICS_UPDATE_INTERVAL = 17;
@@ -138,7 +136,7 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
         }
         else {
             final long timeSinceGameStart = System.currentTimeMillis() - gameState.getStartTime();
-            timeLeftText += ((int) (GAME_TIME_LIMIT - timeSinceGameStart) / 1000);
+            timeLeftText += ((int) (level.getTimeLimit() - timeSinceGameStart) / 1000);
         }
         graphics.setColor(Color.GREEN);
         graphics.setFont(font);
