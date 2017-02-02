@@ -1,4 +1,4 @@
-package spacerace.graphics;
+package spacerace.graphics.panel;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,13 +18,14 @@ import spacerace.domain.PlayerResult;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
+import spacerace.graphics.GraphicsUtils;
 import spacerace.level.Level;
 
-abstract class SpaceRaceGraphicsPanel extends JPanel {
+public abstract class GraphicsPanel extends JPanel {
 
     private static final int GRAPHICS_UPDATE_INTERVAL = 17;
 
-    protected final    Level              level;
+    protected          Level              level;
     protected volatile GameState          gameState;
     private final      Statistics         gameCycleStatistics;
     private final      Statistics         responseTimeStatistics;
@@ -32,7 +33,7 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
     private volatile   List<PlayerResult> playerResults;
     private volatile   long               lastPaintTime;
 
-    SpaceRaceGraphicsPanel(final Level level, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics) throws IOException {
+    GraphicsPanel(final Level level, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics) throws IOException {
         this.level = level;
         this.gameState = gameState;
         this.gameCycleStatistics = gameCycleStatistics;
@@ -80,8 +81,8 @@ abstract class SpaceRaceGraphicsPanel extends JPanel {
 
     void paintLevelBaseLayer(final Graphics graphics) {
         level.getTrackBorders().forEach(line -> GraphicsUtils.drawLine(line, Color.WHITE, graphics));
-        GraphicsUtils.drawLine(level.getGoalLine(), Color.YELLOW, graphics);
         level.paintBaseLayer((Graphics2D) graphics);
+        GraphicsUtils.drawLine(level.getGoalLine(), Color.YELLOW, graphics);
     }
 
     void paintLevelTopLayer(final Graphics graphics) {

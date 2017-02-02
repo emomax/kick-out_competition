@@ -3,7 +3,6 @@ package spacerace.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import spacerace.graphics.DetectorPosition;
 import spacerace.level.Level;
 import spacerace.level.ShipGraphics;
 

@@ -16,8 +16,8 @@ import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
 import spacerace.gameengine.ManualGameEngine;
 import spacerace.gameengine.SpaceRaceGameEngine;
-import spacerace.graphics.SpaceRaceGraphicsFactory;
-import spacerace.graphics.SpaceRacePlayerPanel;
+import spacerace.graphics.GraphicsFactory;
+import spacerace.graphics.PlayerGraphics;
 import spacerace.level.Level;
 import spacerace.level.LevelRepository;
 import spacerace.level.ShipGraphics;
@@ -27,11 +27,11 @@ public class RemoteGame {
 
     private static final int GAME_CYCLE_MIN_TIME = 15;
 
-    private final String               gameName;
-    private final String               playerName;
-    private final ServerAdapter        server;
-    private final Level                level;
-    private       SpaceRacePlayerPanel spaceRacePlayerGraphics;
+    private final String         gameName;
+    private final String         playerName;
+    private final ServerAdapter  server;
+    private final Level          level;
+    private       PlayerGraphics playerGraphics;
     private final Statistics gameCycleStatistics    = new Statistics();
     private final Statistics responseTimeStatistics = new Statistics();
 
@@ -39,9 +39,7 @@ public class RemoteGame {
         this.gameName = gameName;
         this.playerName = playerName;
         this.server = server;
-
-        final LevelRepository levelRepository = new LevelRepository();
-        this.level = levelRepository.getLevel(levelNumber);
+        this.level = LevelRepository.getLevel(levelNumber);
     }
 
     void runManualGame() throws IOException, InterruptedException {
@@ -54,7 +52,7 @@ public class RemoteGame {
     }
 
     public void runGame(final SpaceRaceGameEngine gameEngine, final KeyListener manualKeyListener) throws IOException, InterruptedException {
-        final ServerResponse response = invokeServerCall(server::registerPlayer, "Exception when trying to register player: " + playerName);
+        invokeServerCall(server::registerPlayer, "Exception when trying to register player: " + playerName);
         runGameLoop(gameEngine, manualKeyListener);
     }
 
@@ -63,11 +61,11 @@ public class RemoteGame {
         while (!stop) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
-            final ServerResponse       response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
-            final GameState            gameState       = response.getGameState();
-            final SpaceRacePlayerPanel graphics        = getGraphics(gameState, manualKeyListener);
-            final ShipState            playerShipState = getPlayerShip(gameState);
-            final List<Detector>       detectors       = getDetectors(level.getShipGraphics(), playerShipState);
+            final ServerResponse response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
+            final GameState      gameState       = response.getGameState();
+            final PlayerGraphics graphics        = getPlayerGraphics(gameState, manualKeyListener);
+            final ShipState      playerShipState = getPlayerShip(gameState);
+            final List<Detector> detectors       = getDetectors(level.getShipGraphics(), playerShipState);
             playerShipState.setDetectors(detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
@@ -92,13 +90,13 @@ public class RemoteGame {
                 .orElseThrow(() -> new IllegalStateException("Could not find ship for player: " + playerName));
     }
 
-    private SpaceRacePlayerPanel getGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {
-        if (spaceRacePlayerGraphics == null) {
+    private PlayerGraphics getPlayerGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {
+        if (playerGraphics == null) {
             final StartGameKeyAdapter startGameKeyAdapter = new StartGameKeyAdapter(this);
             final List<KeyListener>   keyListeners        = Arrays.asList(manualKeyListener, startGameKeyAdapter);
-            spaceRacePlayerGraphics = SpaceRaceGraphicsFactory.createPlayerGraphics(level, keyListeners, gameState, gameCycleStatistics, responseTimeStatistics, playerName);
+            playerGraphics = GraphicsFactory.createPlayerGraphics(level, keyListeners, gameState, gameCycleStatistics, responseTimeStatistics, playerName);
         }
-        return spaceRacePlayerGraphics;
+        return playerGraphics;
     }
 
     private List<Detector> getDetectors(final ShipGraphics shipGraphics, final ShipState playerShipState) {
@@ -115,7 +113,7 @@ public class RemoteGame {
         gameCycleStatistics.add(cycleTime.intValue());
     }
 
-    public void sendStartCommand() {
+    void sendStartCommand() {
         invokeServerCall(server::sendStartCommand, "Exception when starting game: " + gameName);
     }
 

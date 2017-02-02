@@ -12,6 +12,7 @@ public class ServerResponse implements Serializable {
     private String             errorMessage;
     private GameState          gameState;
     private List<PlayerResult> playerResults;
+    private int                levelNumber;
 
     public String getMessage() {
         return message;
@@ -43,5 +44,13 @@ public class ServerResponse implements Serializable {
 
     public void setPlayerResults(final List<PlayerResult> playerResults) {
         this.playerResults = playerResults;
+    }
+
+    public int getLevelNumber() {
+        return levelNumber;
+    }
+
+    public void setLevelNumber(final int levelNumber) {
+        this.levelNumber = levelNumber;
     }
 }

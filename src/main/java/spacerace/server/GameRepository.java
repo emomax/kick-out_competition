@@ -17,9 +17,8 @@ class GameRepository {
 
     public static final int MOVE_OLD_GAMES_PERIOD = 5;
 
-    private final ConcurrentHashMap<String, SpaceRaceGame> games           = new ConcurrentHashMap<>();
-    private final LevelRepository                          levelRepository = new LevelRepository();
-    private final List<SpaceRaceGame>                      finishedGames   = Collections.synchronizedList(new ArrayList<>());
+    private final ConcurrentHashMap<String, SpaceRaceGame> games         = new ConcurrentHashMap<>();
+    private final List<SpaceRaceGame>                      finishedGames = Collections.synchronizedList(new ArrayList<>());
 
     GameRepository() {
         startOldGamesCleaner();
@@ -46,7 +45,7 @@ class GameRepository {
             }
             else {
                 final UUID          id    = UUID.randomUUID();
-                final Level         level = levelRepository.getLevel(levelNumber);
+                final Level         level = LevelRepository.getLevel(levelNumber);
                 final SpaceRaceGame game  = new SpaceRaceGame(id, gameName, level);
                 games.put(gameName, game);
                 return game;

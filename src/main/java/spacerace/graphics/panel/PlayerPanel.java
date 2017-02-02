@@ -1,4 +1,4 @@
-package spacerace.graphics;
+package spacerace.graphics.panel;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,19 +15,22 @@ import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
 import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
+import spacerace.graphics.GraphicsUtils;
+import spacerace.graphics.PlayerGraphics;
 import spacerace.level.Level;
 
-public class SpaceRacePlayerPanel extends SpaceRaceGraphicsPanel {
+public class PlayerPanel extends GraphicsPanel implements PlayerGraphics {
 
     private volatile List<Detector> detectors;
     private final    String         playerName;
 
-    SpaceRacePlayerPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String playerName) throws IOException {
+    public PlayerPanel(final Level level, final List<KeyListener> keyListeners, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String playerName) throws IOException {
         super(level, gameState, gameCycleStatistics, responseTimeStatistics);
         this.playerName = playerName;
         keyListeners.forEach(this::addKeyListener);
     }
 
+    @Override
     public void setDetectors(final List<Detector> detectors) {
         this.detectors = detectors;
     }

@@ -1,4 +1,4 @@
-package spacerace.graphics;
+package spacerace.graphics.panel;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -14,6 +14,7 @@ import java.util.List;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
 import spacerace.domain.Statistics;
+import spacerace.graphics.GraphicsUtils;
 import spacerace.level.Level;
 import spacerace.level.graphics.OrbitAnimation;
 import spacerace.level.graphics.ParticleOrbitAnimation;
@@ -21,17 +22,27 @@ import spacerace.level.graphics.SolarSystem;
 import spacerace.level.graphics.StarBackground;
 import spacerace.level.graphics.Sun;
 
-public class SpaceRaceViewerPanel extends SpaceRaceGraphicsPanel {
+public class ViewerPanel extends GraphicsPanel {
 
+    public static final int WAITING_FRAME_WIDTH  = 900;
+    public static final int WAITING_FRAME_HEIGHT = 600;
 
     private final String gameName;
-    private final SolarSystem solarSystem = createSolarSystem(level.getWidth(), level.getHeight());
+    private final SolarSystem solarSystem = createSolarSystem(WAITING_FRAME_WIDTH, WAITING_FRAME_HEIGHT);
     private final StarBackground starBackground;
 
-    SpaceRaceViewerPanel(final Level level, final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String gameName) throws IOException {
-        super(level, gameState, gameCycleStatistics, responseTimeStatistics);
+    public ViewerPanel(final GameState gameState, final Statistics gameCycleStatistics, final Statistics responseTimeStatistics, final String gameName) throws IOException {
+        super(null, gameState, gameCycleStatistics, responseTimeStatistics);
         this.gameName = gameName;
-        starBackground = new StarBackground(50, level.getWidth(), level.getHeight(), 200);
+        starBackground = new StarBackground(50, WAITING_FRAME_WIDTH, WAITING_FRAME_HEIGHT, 200);
+    }
+
+    public boolean isLevelSet() {
+        return level != null;
+    }
+
+    public void setLevel(final Level level) {
+        this.level = level;
     }
 
     @Override
@@ -88,10 +99,10 @@ public class SpaceRaceViewerPanel extends SpaceRaceGraphicsPanel {
 
         final Font bigFont = new Font("Helvetica", Font.BOLD, 50);
         graphics.setFont(bigFont);
-        graphics.drawString("Searching for game:", (level.getWidth() / 2) - 250, ((level.getHeight() / 2) - 220));
+        graphics.drawString("Searching for game:", (WAITING_FRAME_WIDTH / 2) - 250, ((WAITING_FRAME_HEIGHT / 2) - 220));
 
         graphics.setColor(Color.RED);
-        graphics.drawString(gameName, (level.getWidth() / 2) - 175, ((level.getHeight() / 2) - 160));
+        graphics.drawString(gameName, (WAITING_FRAME_WIDTH / 2) - 175, ((WAITING_FRAME_HEIGHT / 2) - 160));
     }
 
     private static SolarSystem createSolarSystem(final int width, final int height) {
@@ -177,9 +188,7 @@ public class SpaceRaceViewerPanel extends SpaceRaceGraphicsPanel {
     }
 
     private static List<ParticleOrbitAnimation> getRingOrbitAnimations(final OrbitAnimation planetOrbitAnimation) {
-        final Color                        transparentColor   = GraphicsUtils.createColorWithAlpha(Color.BLACK, 0);
         final List<ParticleOrbitAnimation> particleAnimations = new ArrayList<>();
-
         for (int i = 0; i < 1_000; i++) {
             final ParticleOrbitAnimation particleAnimation = ParticleOrbitAnimation.aParticleOrbitAnimation()
                     .withCenterX(planetOrbitAnimation.getSphere().getCenterX())

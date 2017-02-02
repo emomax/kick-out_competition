@@ -17,8 +17,8 @@ public class Action implements Serializable {
         this.stabilize = stabilize;
     }
 
-    public static Action withStabilize(final boolean stabilize) {
-        return new Action(Acceleration.NONE, Acceleration.NONE, stabilize);
+    public static Action withStabilize() {
+        return new Action(Acceleration.NONE, Acceleration.NONE, true);
     }
 
     public static Action withAcceleration(final Acceleration accelerationX, final Acceleration accelerationY) {

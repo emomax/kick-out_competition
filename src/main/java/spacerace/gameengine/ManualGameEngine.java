@@ -19,7 +19,7 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
     @Override
     public Action getAction(final ShipState shipState) {
         if (stabilize) {
-            return Action.withStabilize(true);
+            return Action.withStabilize();
         }
         else {
             return Action.withAcceleration(accelerationX, accelerationY);
@@ -63,7 +63,7 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
     public static void main(final String[] args) throws IOException, InterruptedException {
         final String             playerName       = "Robocop";
         final String             gameName         = "Battle of Trustly";
-        final int                levelNumber      = 1;
+        final int                levelNumber      = 3;
         final LocalServerAdapter server           = new LocalServerAdapter(playerName, gameName, levelNumber);
         final RemoteGame         remoteGame       = new RemoteGame(server, playerName, gameName, levelNumber);
         final ManualGameEngine   manualGameEngine = new ManualGameEngine();

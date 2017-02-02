@@ -1,7 +1,5 @@
 package spacerace.domain;
 
-import spacerace.graphics.DetectorPosition;
-
 public class Detector {
 
     private final DetectorPosition detectorPosition;

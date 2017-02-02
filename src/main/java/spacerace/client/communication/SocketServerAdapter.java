@@ -19,12 +19,16 @@ public class SocketServerAdapter implements ServerAdapter {
 
     private final String         playerName;
     private final String         gameName;
-    private final int            levelNumber;
+    private final Integer        levelNumber;
     private       Socket         socket;
     private       BufferedReader in;
     private       PrintWriter    out;
 
-    public SocketServerAdapter(final String serverIP, final String playerName, final String gameName, final int levelNumber) {
+    public SocketServerAdapter(final String serverIP, final String playerName, final String gameName) {
+        this(serverIP, playerName, gameName, null);
+    }
+
+    public SocketServerAdapter(final String serverIP, final String playerName, final String gameName, final Integer levelNumber) {
         this.playerName = playerName;
         this.gameName = gameName;
         this.levelNumber = levelNumber;

@@ -9,12 +9,16 @@ public class RestServerAdapter implements ServerAdapter {
 
     private static final int PORT = 8080;
 
-    private final String serverAddress;
-    private final String playerName;
-    private final String gameName;
-    private final int    levelNumber;
+    private final String  serverAddress;
+    private final String  playerName;
+    private final String  gameName;
+    private final Integer levelNumber;
 
-    public RestServerAdapter(final String serverIP, final String playerName, final String gameName, final int levelNumber) {
+    public RestServerAdapter(final String serverIP, final String playerName, final String gameName) {
+        this(serverIP, playerName, gameName, null);
+    }
+
+    public RestServerAdapter(final String serverIP, final String playerName, final String gameName, final Integer levelNumber) {
         this.serverAddress = serverIP + ":" + PORT;
         this.playerName = playerName;
         this.gameName = gameName;

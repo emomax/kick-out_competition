@@ -34,7 +34,7 @@ public class Level implements Serializable {
         // Intentionally empty
     }
 
-    int getNumber() {
+    public int getNumber() {
         return number;
     }
 

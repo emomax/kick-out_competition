@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import spacerace.client.RemoteGame;
 import spacerace.client.communication.LocalServerAdapter;
-import spacerace.domain.Acceleration;
 import spacerace.domain.Action;
 import spacerace.domain.ShipState;
 
@@ -12,8 +11,8 @@ public class MyN00bGameEngine implements SpaceRaceGameEngine {
 
     @Override
     public Action getAction(final ShipState shipState) {
-        // Insert awesome code here
-        return Action.withAcceleration(Acceleration.NONE, Acceleration.NONE);
+        // Create a GUI interface using visual basic to track the killers IP address (youtube.com/watch?v=hkDD03yeLnU)
+        return null;
     }
 
     public static void main(final String[] args) throws IOException, InterruptedException {

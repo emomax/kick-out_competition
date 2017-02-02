@@ -73,6 +73,7 @@ public class SpaceRaceServerController {
         if (game != null) {
             final GameState gameState = GameStateConverter.convertGameToGameState(game);
             response.setGameState(gameState);
+            response.setLevelNumber(game.getLevel().getNumber());
         }
         return response;
     }

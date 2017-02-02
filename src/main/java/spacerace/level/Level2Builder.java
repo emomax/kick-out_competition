@@ -34,7 +34,7 @@ class Level2Builder {
         final List<Line2D> trackBorders = createTrackBoarders(width, height);
 
         final Vector2D startPosition = new Vector2D((width / 2) - 25, height - 80);
-        final Line2D   goalLine      = new Line2D((width / 2) - 375, height - 275, (width / 2) - 375, height - 400);
+        final Line2D   goalLine      = new Line2D((width / 2) - 290, height - 275, (width / 2) - 290, height - 400);
 
         final StarBackground       starBackground   = new StarBackground(30, width, height, 200);
         final Level2Builder        builder          = new Level2Builder();
@@ -130,7 +130,7 @@ class Level2Builder {
     }
 
     private void drawFinishLine(final Graphics graphics, final int height, final int width) {
-        final Rectangle2D   finish        = new Rectangle2D((width / 2) - 385, height - 400, 10, 125);
+        final Rectangle2D   finish        = new Rectangle2D((width / 2) - 300, height - 400, 10, 125);
         final GradientPaint gradientPaint = new GradientPaint(25, 25, Color.WHITE, 25, 15, Color.BLACK, true);
         GraphicsUtils.drawRectangle(finish, gradientPaint, graphics);
     }

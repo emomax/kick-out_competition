@@ -13,7 +13,7 @@ public class Sphere {
     private       int   centerX;
     private       int   centerY;
 
-    Sphere(final Color color, final Color shadowColor, final int radius, final int centerX, final int centerY) {
+    public Sphere(final Color color, final Color shadowColor, final int radius, final int centerX, final int centerY) {
         this.color = color;
         this.shadowColor = shadowColor;
         this.radius = radius;
