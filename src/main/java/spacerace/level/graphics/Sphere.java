@@ -37,11 +37,11 @@ public class Sphere {
         return radius;
     }
 
-    void setCenterX(final int centerX) {
+    public void setCenterX(final int centerX) {
         this.centerX = centerX;
     }
 
-    void setCenterY(final int centerY) {
+    public void setCenterY(final int centerY) {
         this.centerY = centerY;
     }
 

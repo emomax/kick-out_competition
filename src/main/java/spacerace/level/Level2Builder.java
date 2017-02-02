@@ -13,13 +13,13 @@ import spacerace.domain.Line2D;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.Vector2D;
 import spacerace.graphics.GraphicsUtils;
+import spacerace.level.graphics.Sphere;
 import spacerace.level.graphics.StarBackground;
 
 class Level2Builder {
 
-    private static final double STARS_ROTATION_ANGULAR_SPEED = 0.05;
-
-    private double starsBackgroundAngle = 0;
+    public static final double PLANET_ORBIT_SPEED = 0.005;
+    private double planetPosAngle;
 
     private Level2Builder() {
         // Intentionally empty
@@ -36,9 +36,10 @@ class Level2Builder {
         final Vector2D startPosition = new Vector2D((width / 2) - 25, height - 80);
         final Line2D   goalLine      = new Line2D((width / 2) - 290, height - 275, (width / 2) - 290, height - 400);
 
-        final StarBackground       starBackground   = new StarBackground(30, width, height, 200);
+        final Sphere               planet           = new Sphere(Color.RED, Color.BLACK, 500, 0, 0);
+        final StarBackground       starBackground   = new StarBackground(50, width, height, 200);
         final Level2Builder        builder          = new Level2Builder();
-        final Consumer<Graphics2D> baseLayerPainter = graphics2D -> builder.paintBaseLayer(graphics2D, height, width, starBackground);
+        final Consumer<Graphics2D> baseLayerPainter = graphics2D -> builder.paintBaseLayer(graphics2D, height, width, planet, starBackground);
 
         return Level.Builder.aLevel()
                 .withNumber(levelNumber)
@@ -112,20 +113,38 @@ class Level2Builder {
                 end);
     }
 
-    private void paintBaseLayer(final Graphics2D graphics, final int height, final int width, final StarBackground starBackground) {
-        paintStars(graphics, height, width, starBackground);
+    private void paintBaseLayer(final Graphics2D graphics, final int height, final int width, final Sphere planet, final StarBackground starBackground) {
+        starBackground.paintStars(graphics);
+        paintPlanet(graphics, height, width, planet);
         paintTrackBackground(graphics);
         drawFinishLine(graphics, height, width);
     }
 
-    private void paintStars(final Graphics2D graphics, final int height, final int width, final StarBackground starBackground) {
-        final AffineTransform old = graphics.getTransform();
-        if (starsBackgroundAngle > 360) {
-            starsBackgroundAngle = 0;
+    private void paintPlanet(final Graphics2D graphics, final int height, final int width, final Sphere planet) {
+        if (planetPosAngle >= (Math.PI * 2)) {
+            planetPosAngle = 0;
         }
-        graphics.rotate(Math.toRadians(starsBackgroundAngle), -width, -height);
-        starsBackgroundAngle += STARS_ROTATION_ANGULAR_SPEED;
-        starBackground.paintStars(graphics);
+
+        final int planetCenterX = (int) ((width / 2) + Math.cos(planetPosAngle) * (width / 4));
+        final int planetCenterY = (int) ((height / 2) + Math.sin(planetPosAngle) * (height / 2));
+        planet.setCenterX(planetCenterX);
+        planet.setCenterY(planetCenterY);
+
+        planetPosAngle += PLANET_ORBIT_SPEED;
+
+        planet.paint(graphics);
+
+        final Color         color1   = GraphicsUtils.createColorWithAlpha(Color.BLACK, 0.25f);
+        final Color         color2   = GraphicsUtils.createColorWithAlpha(Color.WHITE, 0f);
+        final GradientPaint gradient = new GradientPaint(0, 0, color1, 0, 150, color2, true);
+        graphics.setPaint(gradient);
+
+        final AffineTransform old = graphics.getTransform();
+        graphics.rotate(planetPosAngle, planetCenterX, planetCenterY);
+        graphics.fillOval(planetCenterX - planet.getRadius(),
+                          planetCenterY - planet.getRadius(),
+                          planet.getRadius() * 2,
+                          planet.getRadius() * 2);
         graphics.setTransform(old);
     }
 

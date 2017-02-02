@@ -80,8 +80,8 @@ public abstract class GraphicsPanel extends JPanel {
     }
 
     void paintLevelBaseLayer(final Graphics graphics) {
-        level.getTrackBorders().forEach(line -> GraphicsUtils.drawLine(line, Color.WHITE, graphics));
         level.paintBaseLayer((Graphics2D) graphics);
+        level.getTrackBorders().forEach(line -> GraphicsUtils.drawLine(line, Color.WHITE, graphics));
         GraphicsUtils.drawLine(level.getGoalLine(), Color.YELLOW, graphics);
     }
 
