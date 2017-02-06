@@ -16,7 +16,7 @@ public class Detector {
         this.beam = beam;
     }
 
-    private DetectorPosition getDetectorPosition() {
+    public DetectorPosition getDetectorPosition() {
         return detectorPosition;
     }
 
