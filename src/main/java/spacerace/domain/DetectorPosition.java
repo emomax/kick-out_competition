@@ -1,5 +1,5 @@
 package spacerace.domain;
 
-enum DetectorPosition {
+public enum DetectorPosition {
     UP, DOWN, LEFT, RIGHT
 }
