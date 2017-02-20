@@ -27,7 +27,7 @@ class Level5Builder {
     }
 
     static Level build() {
-        final int levelNumber = 4;
+        final int levelNumber = 5;
         final int timeLimit   = 120_000;
         final int height      = 768;
         final int width       = 1020;
