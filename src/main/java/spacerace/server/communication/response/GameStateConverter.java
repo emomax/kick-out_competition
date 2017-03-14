@@ -39,6 +39,9 @@ public class GameStateConverter {
         shipState.setColorRGB(ship.getColor().getRGB());
         shipState.setResetFrozen(ship.isResetFrozen());
         shipState.setPassedGoal(ship.isPassedGoal());
+        if (ship.getMissile() != null) {
+            shipState.setMissilePosition(ship.getMissile().getPosition());
+        }
         return shipState;
     }
 }

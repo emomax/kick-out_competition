@@ -14,12 +14,14 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JPanel;
 
 import spacerace.domain.GameState;
+import spacerace.domain.Missile;
 import spacerace.domain.PlayerResult;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
 import spacerace.graphics.GraphicsUtils;
 import spacerace.level.Level;
+import spacerace.level.graphics.Sphere;
 
 public abstract class GraphicsPanel extends JPanel {
 
@@ -92,6 +94,19 @@ public abstract class GraphicsPanel extends JPanel {
     void drawShip(final ShipState shipState, final Graphics2D graphics) {
         level.getShipGraphics().paint(shipState, graphics);
         level.getRocketFireGraphics().paint(shipState, level.getShipGraphics(), graphics);
+        paintMissile(shipState, graphics);
+    }
+
+    private void paintMissile(final ShipState shipState, final Graphics2D graphics) {
+        if (shipState.getMissilePosition() == null) {
+            return;
+        }
+        final Sphere missile = new Sphere(new Color(shipState.getColorRGB()),
+                                          Color.BLACK,
+                                          Missile.RADIUS,
+                                          (int) shipState.getMissilePosition().getX(),
+                                          (int) shipState.getMissilePosition().getY());
+        missile.paint(graphics);
     }
 
     void drawInfoPanel(final Graphics graphics) {

@@ -92,6 +92,7 @@ public class SocketServerAdapter implements ServerAdapter {
         request.setAccelerationX(action.getAccelerationX());
         request.setAccelerationY(action.getAccelerationY());
         request.setStabilize(action.isStabilize());
+        request.setMissileAngle(action.getMissileAngle());
         return sendRequest(request);
     }
 

@@ -60,7 +60,8 @@ public class RestServerAdapter implements ServerAdapter {
                            + "&playerName=" + playerName
                            + "&accelerationX=" + action.getAccelerationX()
                            + "&accelerationY=" + action.getAccelerationY()
-                           + "&stabilize=" + action.isStabilize();
+                           + "&stabilize=" + action.isStabilize()
+                           + "&missileAngle=" + action.getMissileAngle();
 
         return restTemplate.getForObject(url, ServerResponse.class);
     }

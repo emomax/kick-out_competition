@@ -83,9 +83,10 @@ public class SpaceRaceServerController {
             final String playerName,
             final Acceleration accelerationX,
             final Acceleration accelerationY,
-            final boolean stabilize) {
+            final boolean stabilize,
+            final Double missileAngle) {
         final SpaceRaceGame game = gameHandler.getGame(gameName);
-        game.updateShipParameters(playerName, accelerationX, accelerationY, stabilize);
+        game.updateShipParameters(playerName, accelerationX, accelerationY, stabilize, missileAngle);
         return new ServerResponse();
     }
 

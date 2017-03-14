@@ -35,7 +35,7 @@ public class LocalServerAdapter implements ServerAdapter {
 
     @Override
     public ServerResponse postActionToServer(final Action action) {
-        return serverController.action(gameName, playerName, action.getAccelerationX(), action.getAccelerationY(), action.isStabilize());
+        return serverController.action(gameName, playerName, action.getAccelerationX(), action.getAccelerationY(), action.isStabilize(), action.getMissileAngle());
     }
 
     @Override

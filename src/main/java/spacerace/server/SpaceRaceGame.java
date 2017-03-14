@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import spacerace.domain.Acceleration;
 import spacerace.domain.GameStatus;
+import spacerace.domain.Missile;
 import spacerace.domain.PlayerResult;
 import spacerace.domain.Ship;
 import spacerace.domain.Vector2D;
@@ -120,7 +121,7 @@ public class SpaceRaceGame {
         }
     }
 
-    public void updateShipParameters(final String playerName, final Acceleration accelerationX, final Acceleration accelerationY, final boolean stabilize) {
+    public void updateShipParameters(final String playerName, final Acceleration accelerationX, final Acceleration accelerationY, final boolean stabilize, final Double missileAngle) {
         final Ship ship = ships.get(playerName);
 
         final int      accelerationDirectionX = convertAcceleration(accelerationX);
@@ -129,6 +130,21 @@ public class SpaceRaceGame {
         ship.setAccelerationDirection(accelerationDirection);
 
         ship.setStabilize(stabilize);
+
+        if (ship.getMissile() != null && ship.getMissile().shouldSelfDestruct()) {
+            ship.setMissile(null);
+        }
+        if (ship.getMissile() == null && missileAngle != null) {
+            final Missile missile = createMissile(missileAngle, ship.getCenter());
+            ship.setMissile(missile);
+        }
+    }
+
+    private Missile createMissile(final Double missileAngle, final Vector2D shipCenter) {
+        final double   missileDirectionX = Math.cos(missileAngle);
+        final double   missileDirectionY = Math.sin(missileAngle);
+        final Vector2D missileDirection  = new Vector2D(missileDirectionX, missileDirectionY);
+        return new Missile(shipCenter, missileDirection);
     }
 
     private int convertAcceleration(final Acceleration acceleration) {
@@ -147,16 +163,8 @@ public class SpaceRaceGame {
         return new ArrayList<>(playerPositions.values());
     }
 
-    // This implementation only supports that a player finishes one time. If we want to support multiple runs,
-    // we must save the last start time (and check if new run is better)
     void setShipPassedGoalLine(final Ship ship) {
-        final long lapTime;
-        if (ship.getResetTime() != null) {
-            lapTime = System.currentTimeMillis() - ship.getResetTime();
-        }
-        else {
-            lapTime = System.currentTimeMillis() - startTime;
-        }
+        final long         lapTime      = System.currentTimeMillis() - startTime;
         final PlayerResult playerResult = new PlayerResult(ship.getName(), lapTime);
         playerPositions.put(ship.getName(), playerResult);
     }

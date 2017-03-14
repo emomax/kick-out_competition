@@ -3,12 +3,14 @@ package spacerace.gameengine;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.util.List;
 
 import spacerace.client.RemoteGame;
 import spacerace.client.communication.LocalServerAdapter;
 import spacerace.domain.Acceleration;
 import spacerace.domain.Action;
 import spacerace.domain.ShipState;
+import spacerace.domain.Vector2D;
 
 public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine {
 
@@ -17,7 +19,7 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
     private volatile boolean      stabilize     = false;
 
     @Override
-    public Action getAction(final ShipState shipState) {
+    public Action getAction(final ShipState shipState, final List<Vector2D> otherShipPositions) {
         if (stabilize) {
             return Action.withStabilize();
         }

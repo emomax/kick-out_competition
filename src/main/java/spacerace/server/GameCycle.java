@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.util.List;
 
 import spacerace.domain.Line2D;
+import spacerace.domain.Missile;
 import spacerace.domain.Rectangle2D;
 import spacerace.domain.Ship;
 
@@ -65,8 +66,10 @@ public class GameCycle implements Runnable {
             }
 
             checkWallCollisions(trackBounds, ship, shipRectangle);
+            checkMissileCollisions(ship);
         }
         moveShips(timeSinceLastCycle);
+        moveMissiles(timeSinceLastCycle);
     }
 
     private List<java.awt.geom.Line2D> getLevelRectangles() {
@@ -88,12 +91,39 @@ public class GameCycle implements Runnable {
         for (final java.awt.geom.Line2D wallLine : trackBounds) {
             if (wallLine.intersects(shipRectangle)) {
                 ship.reset(game.getLevel().getStartPosition());
+                return;
             }
         }
     }
 
+    private void checkMissileCollisions(final Ship shipToCheck) {
+        final Rectangle     shipRectangle = createShipRectangle(shipToCheck);
+        final List<Missile> missiles      = getMissilesFromOtherShips(shipToCheck);
+        for (final Missile missile : missiles) {
+            if (missile.getShape().intersects(shipRectangle)) {
+                shipToCheck.reset(game.getLevel().getStartPosition());
+                return;
+            }
+        }
+    }
+
+    private List<Missile> getMissilesFromOtherShips(final Ship shipToExclude) {
+        return game.getShips().stream()
+                .filter(ship -> ship != shipToExclude)
+                .filter(ship -> ship.getMissile() != null)
+                .map(Ship::getMissile)
+                .collect(toList());
+    }
+
     private void moveShips(final long timeSinceLastCycle) {
         game.getShips().stream().forEach(ship -> ship.move(timeSinceLastCycle));
+    }
+
+    private void moveMissiles(final long timeSinceLastCycle) {
+        game.getShips().stream()
+                .filter(ship -> ship.getMissile() != null)
+                .map(Ship::getMissile)
+                .forEach(missile -> missile.move(timeSinceLastCycle));
     }
 
     private void sleep(final long sleepTime) {

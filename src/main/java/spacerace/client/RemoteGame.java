@@ -14,6 +14,7 @@ import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
 import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
+import spacerace.domain.Vector2D;
 import spacerace.gameengine.ManualGameEngine;
 import spacerace.gameengine.SpaceRaceGameEngine;
 import spacerace.graphics.GraphicsFactory;
@@ -22,6 +23,8 @@ import spacerace.level.Level;
 import spacerace.level.LevelRepository;
 import spacerace.level.ShipGraphics;
 import spacerace.server.communication.response.ServerResponse;
+
+import static java.util.stream.Collectors.toList;
 
 public class RemoteGame {
 
@@ -61,15 +64,16 @@ public class RemoteGame {
         while (!stop) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
-            final ServerResponse response        = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
-            final GameState      gameState       = response.getGameState();
-            final PlayerGraphics graphics        = getPlayerGraphics(gameState, manualKeyListener);
-            final ShipState      playerShipState = getPlayerShip(gameState);
-            final List<Detector> detectors       = getDetectors(level.getShipGraphics(), playerShipState);
+            final ServerResponse response           = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
+            final GameState      gameState          = response.getGameState();
+            final PlayerGraphics graphics           = getPlayerGraphics(gameState, manualKeyListener);
+            final ShipState      playerShipState    = getPlayerShip(gameState);
+            final List<Vector2D> otherShipPositions = getOtherShipPositions(playerShipState, gameState);
+            final List<Detector> detectors          = getDetectors(level.getShipGraphics(), playerShipState);
             playerShipState.setDetectors(detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
-                final Action action = gameEngine.getAction(playerShipState);
+                final Action action = gameEngine.getAction(playerShipState, otherShipPositions);
                 invokeServerCall(() -> server.postActionToServer(action), "Exception when posting action: " + action);
             }
             else if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.FINISHED) {
@@ -88,6 +92,21 @@ public class RemoteGame {
                 .filter(shipState -> shipState.getName().equals(playerName))
                 .findAny()
                 .orElseThrow(() -> new IllegalStateException("Could not find ship for player: " + playerName));
+    }
+
+    private List<Vector2D> getOtherShipPositions(final ShipState shipStateToExclude, final GameState gameState) {
+        final double shipWidth  = level.getShipGraphics().getWidth() / 2.0;
+        final double shipHeight = level.getShipGraphics().getHeight() / 2.0;
+        return gameState.getShipStates().stream()
+                .filter(shipState -> shipState != shipStateToExclude)
+                .map(shipState -> getShipCenter(shipState, shipWidth, shipHeight))
+                .collect(toList());
+    }
+
+    private Vector2D getShipCenter(final ShipState shipState, final double shipWidth, final double shipHeight) {
+        final double shipCenterX = shipState.getPosition().getX() + shipWidth;
+        final double shipCenterY = shipState.getPosition().getY() + shipHeight;
+        return new Vector2D(shipCenterX, shipCenterY);
     }
 
     private PlayerGraphics getPlayerGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {

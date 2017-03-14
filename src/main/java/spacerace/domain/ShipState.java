@@ -14,6 +14,7 @@ public class ShipState implements Serializable {
     private List<Detector> detectors;
     private boolean        resetFrozen;
     private boolean        passedGoal;
+    private Vector2D       missilePosition;
 
     public ShipState() {
         // For JSON conversion
@@ -91,6 +92,14 @@ public class ShipState implements Serializable {
         this.passedGoal = passedGoal;
     }
 
+    public Vector2D getMissilePosition() {
+        return missilePosition;
+    }
+
+    public void setMissilePosition(final Vector2D missilePosition) {
+        this.missilePosition = missilePosition;
+    }
+
     @Override
     public String toString() {
         return "ShipState{" +
@@ -103,6 +112,7 @@ public class ShipState implements Serializable {
                ", detectors=" + detectors +
                ", resetFrozen=" + resetFrozen +
                ", passedGoal=" + passedGoal +
+               ", missilePosition=" + missilePosition +
                '}';
     }
 }

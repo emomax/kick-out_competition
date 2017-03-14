@@ -13,6 +13,7 @@ public class SocketRequest implements Serializable {
     private Acceleration      accelerationX;
     private Acceleration      accelerationY;
     private boolean           stabilize;
+    private Double            missileAngle;
 
     public SocketRequestType getType() {
         return type;
@@ -68,5 +69,13 @@ public class SocketRequest implements Serializable {
 
     public void setStabilize(final boolean stabilize) {
         this.stabilize = stabilize;
+    }
+
+    public Double getMissileAngle() {
+        return missileAngle;
+    }
+
+    public void setMissileAngle(final Double missileAngle) {
+        this.missileAngle = missileAngle;
     }
 }

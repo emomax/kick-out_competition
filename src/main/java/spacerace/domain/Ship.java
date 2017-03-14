@@ -26,6 +26,7 @@ public class Ship {
     private volatile boolean  resetFrozen           = false;
     private volatile Long     resetTime             = null;
     private          boolean  passedGoal            = false;
+    private volatile Missile  missile               = null;
 
     public Ship(final String name, final Color color, final Vector2D startPosition) throws IOException {
         this.image = ImageIO.read(new File(getClass().getResource(SHIP_IMAGE_DIR).getFile()));
@@ -60,6 +61,12 @@ public class Ship {
 
     public int getHeight() {
         return image.getHeight();
+    }
+
+    public Vector2D getCenter() {
+        final double centerX = getPosition().getX() + (getWidth() / 2);
+        final double centerY = getPosition().getY() + (getHeight() / 2);
+        return new Vector2D(centerX, centerY);
     }
 
     public Vector2D getSpeed() {
@@ -100,6 +107,14 @@ public class Ship {
 
     public boolean isPassedGoal() {
         return passedGoal;
+    }
+
+    public Missile getMissile() {
+        return missile;
+    }
+
+    public void setMissile(final Missile missile) {
+        this.missile = missile;
     }
 
     public void reset(final Vector2D startPosition) {

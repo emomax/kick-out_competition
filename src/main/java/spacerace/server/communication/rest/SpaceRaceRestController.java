@@ -43,13 +43,15 @@ public class SpaceRaceRestController {
             @RequestParam(value = "playerName") final String playerName,
             @RequestParam(value = "accelerationX") final String accelerationX,
             @RequestParam(value = "accelerationY") final String accelerationY,
-            @RequestParam(value = "stabilize") final boolean stabilize) {
+            @RequestParam(value = "stabilize") final boolean stabilize,
+            @RequestParam(value = "missileAngle") final Double missileAngle) {
         return serverController.action(
                 gameName,
                 playerName,
                 Acceleration.valueOf(accelerationX),
                 Acceleration.valueOf(accelerationY),
-                stabilize
+                stabilize,
+                missileAngle
         );
     }
 

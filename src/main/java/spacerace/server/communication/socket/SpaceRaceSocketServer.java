@@ -111,7 +111,8 @@ public class SpaceRaceSocketServer {
                                                       request.getPlayerName(),
                                                       request.getAccelerationX(),
                                                       request.getAccelerationY(),
-                                                      request.isStabilize());
+                                                      request.isStabilize(),
+                                                      request.getMissileAngle());
             }
             else if (request.getType() == SocketRequestType.SEND_START_COMMAND) {
                 return communicationController.startGame(request.getGameName());
