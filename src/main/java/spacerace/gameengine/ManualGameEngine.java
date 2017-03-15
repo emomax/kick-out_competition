@@ -19,7 +19,7 @@ public class ManualGameEngine extends KeyAdapter implements SpaceRaceGameEngine 
     private volatile boolean      stabilize     = false;
 
     @Override
-    public Action getAction(final ShipState shipState, final List<Vector2D> otherShipPositions) {
+    public Action getAction(final ShipState shipState, final List<Vector2D> otherShipPositions, final List<Vector2D> otherShipMissilePositions) {
         if (stabilize) {
             return Action.withStabilize();
         }

@@ -12,6 +12,7 @@ import spacerace.domain.Detector;
 import spacerace.domain.DetectorFactory;
 import spacerace.domain.GameState;
 import spacerace.domain.GameStatus;
+import spacerace.domain.Missile;
 import spacerace.domain.ShipState;
 import spacerace.domain.Statistics;
 import spacerace.domain.Vector2D;
@@ -64,16 +65,17 @@ public class RemoteGame {
         while (!stop) {
             final long timeBeforeCycle = System.currentTimeMillis();
 
-            final ServerResponse response           = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
-            final GameState      gameState          = response.getGameState();
-            final PlayerGraphics graphics           = getPlayerGraphics(gameState, manualKeyListener);
-            final ShipState      playerShipState    = getPlayerShip(gameState);
-            final List<Vector2D> otherShipPositions = getOtherShipPositions(playerShipState, gameState);
-            final List<Detector> detectors          = getDetectors(level.getShipGraphics(), playerShipState);
+            final ServerResponse response                  = invokeServerCall(server::getGameState, "Exception when getting game state for game: " + gameName);
+            final GameState      gameState                 = response.getGameState();
+            final PlayerGraphics graphics                  = getPlayerGraphics(gameState, manualKeyListener);
+            final ShipState      playerShipState           = getPlayerShip(gameState);
+            final List<Vector2D> otherShipPositions        = getOtherShipPositions(playerShipState, gameState);
+            final List<Vector2D> otherShipMissilePositions = getOtherShipsMissilePositions(playerShipState, gameState);
+            final List<Detector> detectors                 = getDetectors(level.getShipGraphics(), playerShipState);
             playerShipState.setDetectors(detectors);
 
             if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.RUNNING) {
-                final Action action = gameEngine.getAction(playerShipState, otherShipPositions);
+                final Action action = gameEngine.getAction(playerShipState, otherShipPositions, otherShipMissilePositions);
                 invokeServerCall(() -> server.postActionToServer(action), "Exception when posting action: " + action);
             }
             else if (GameStatus.valueOf(gameState.getGameStatus()) == GameStatus.FINISHED) {
@@ -99,14 +101,22 @@ public class RemoteGame {
         final double shipHeight = level.getShipGraphics().getHeight() / 2.0;
         return gameState.getShipStates().stream()
                 .filter(shipState -> shipState != shipStateToExclude)
-                .map(shipState -> getShipCenter(shipState, shipWidth, shipHeight))
+                .map(shipState -> getCenter(shipState.getPosition(), shipWidth, shipHeight))
                 .collect(toList());
     }
 
-    private Vector2D getShipCenter(final ShipState shipState, final double shipWidth, final double shipHeight) {
-        final double shipCenterX = shipState.getPosition().getX() + shipWidth;
-        final double shipCenterY = shipState.getPosition().getY() + shipHeight;
-        return new Vector2D(shipCenterX, shipCenterY);
+    private List<Vector2D> getOtherShipsMissilePositions(final ShipState shipStateToExclude, final GameState gameState) {
+        return gameState.getShipStates().stream()
+                .filter(shipState -> shipState != shipStateToExclude)
+                .filter(shipState -> shipState.getMissilePosition() != null)
+                .map(shipState -> getCenter(shipState.getMissilePosition(), Missile.RADIUS, Missile.RADIUS))
+                .collect(toList());
+    }
+
+    private Vector2D getCenter(final Vector2D position, final double halfWidth, final double halfHeight) {
+        final double centerX = position.getX() + halfWidth;
+        final double centerY = position.getY() + halfHeight;
+        return new Vector2D(centerX, centerY);
     }
 
     private PlayerGraphics getPlayerGraphics(final GameState gameState, final KeyListener manualKeyListener) throws IOException {

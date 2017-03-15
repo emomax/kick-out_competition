@@ -12,7 +12,7 @@ import spacerace.domain.Vector2D;
 public class MyN00bGameEngine implements SpaceRaceGameEngine {
 
     @Override
-    public Action getAction(final ShipState shipState, final List<Vector2D> otherShipPositions) {
+    public Action getAction(final ShipState shipState, final List<Vector2D> otherShipPositions, final List<Vector2D> otherShipMissilePositions) {
         // Create a GUI interface using visual basic to track the killers IP address (youtube.com/watch?v=hkDD03yeLnU)
         return null;
     }
