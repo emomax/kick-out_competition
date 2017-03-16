@@ -143,12 +143,6 @@ public class SpaceRaceGame {
     }
 
     private boolean missileFireAllowedForPlayer(final Double missileAngle, final Ship ship) {
-        if (ship.getName().equals("Robocop1")) {
-            System.out.println("Has missile: " + (ship.getMissile() == null));
-            System.out.println("Has missile angle: " + (missileAngle != null));
-            System.out.println("Time passed: " + (someTimeHasPassedSinceStart()));
-            System.out.println("Player has finished: " + playerPositions.containsKey(ship.getName()));
-        }
         return ship.getMissile() == null && missileAngle != null && someTimeHasPassedSinceStart() && !playerHasFinished(ship);
     }
 
