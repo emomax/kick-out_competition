@@ -33,8 +33,9 @@ import static java.util.Arrays.asList;
 
 public class SpaceRaceGame {
 
-    public static final  int         JOIN_GAME_TIMEOUT    = 30;
-    private static final List<Color> STANDARD_SHIP_COLORS = asList(RED, BLUE, MAGENTA, GREEN, CYAN, WHITE, YELLOW, PINK);
+    private static final int         JOIN_GAME_TIMEOUT               = 30;
+    private static final List<Color> STANDARD_SHIP_COLORS            = asList(RED, BLUE, MAGENTA, GREEN, CYAN, WHITE, YELLOW, PINK);
+    private static final long        TIME_UNTIL_MISSILE_FIRE_ALLOWED = 1_000;
 
     private final UUID   id;
     private final String name;
@@ -134,10 +135,18 @@ public class SpaceRaceGame {
         if (ship.getMissile() != null && ship.getMissile().shouldSelfDestruct()) {
             ship.setMissile(null);
         }
-        if (ship.getMissile() == null && missileAngle != null) {
+        if (missileFireAllowedForPlayer(missileAngle, ship)) {
             final Missile missile = createMissile(missileAngle, ship.getCenter());
             ship.setMissile(missile);
         }
+    }
+
+    private boolean missileFireAllowedForPlayer(final Double missileAngle, final Ship ship) {
+        return ship.getMissile() == null && missileAngle != null && someTimeHasPassedSinceStart();
+    }
+
+    private boolean someTimeHasPassedSinceStart() {
+        return (System.currentTimeMillis() - startTime) > TIME_UNTIL_MISSILE_FIRE_ALLOWED;
     }
 
     private Missile createMissile(final Double missileAngle, final Vector2D shipCenter) {
