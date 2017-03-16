@@ -136,17 +136,28 @@ public class SpaceRaceGame {
             ship.setMissile(null);
         }
         if (missileFireAllowedForPlayer(missileAngle, ship)) {
+            System.out.println("Creating missile!");
             final Missile missile = createMissile(missileAngle, ship.getCenter());
             ship.setMissile(missile);
         }
     }
 
     private boolean missileFireAllowedForPlayer(final Double missileAngle, final Ship ship) {
-        return ship.getMissile() == null && missileAngle != null && someTimeHasPassedSinceStart();
+        if (ship.getName().equals("Robocop1")) {
+            System.out.println("Has missile: " + (ship.getMissile() == null));
+            System.out.println("Has missile angle: " + (missileAngle != null));
+            System.out.println("Time passed: " + (someTimeHasPassedSinceStart()));
+            System.out.println("Player has finished: " + playerPositions.containsKey(ship.getName()));
+        }
+        return ship.getMissile() == null && missileAngle != null && someTimeHasPassedSinceStart() && !playerHasFinished(ship);
     }
 
     private boolean someTimeHasPassedSinceStart() {
         return (System.currentTimeMillis() - startTime) > TIME_UNTIL_MISSILE_FIRE_ALLOWED;
+    }
+
+    private boolean playerHasFinished(final Ship ship) {
+        return playerPositions.get(ship.getName()).getBestFinishTime() != null;
     }
 
     private Missile createMissile(final Double missileAngle, final Vector2D shipCenter) {

@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import commons.MaxGameEngine;
 import spacerace.client.RemoteGame;
 import spacerace.client.communication.SocketServerAdapter;
 import spacerace.domain.Statistics;
@@ -26,11 +27,12 @@ import static spacerace.server.communication.socket.SpaceRaceSocketServer.PORT;
 
 public class SpaceRaceLoadTest {
 
-    //    private static final String SERVER_IP = "127.0.0.1"; // If you run locally
+    private static final String SERVER_IP    = "127.0.0.1"; // If you run locally
+    public static final  int    LEVEL_NUMBER = 3;
     //    private static final String SERVER_IP = "10.46.1.42"; // Game server WIFI
     //    private static final String SERVER_IP = "10.46.1.69"; // Game server ETHERNET
     //    private static final String SERVER_IP = "192.168.1.174"; // Other
-    private static final String SERVER_IP = "10.46.1.19"; // Other
+    //    private static final String SERVER_IP = "10.46.1.19"; // Other
 
     public static void main(final String[] args) throws InterruptedException, IOException {
         startGameWithMultipleShips();
@@ -49,78 +51,79 @@ public class SpaceRaceLoadTest {
                 e.printStackTrace();
             }
         }).start();
+        Thread.sleep(100);
         new Thread(() -> {
             try {
-                startGame("Robocop2", gameName);
+                startManualGame("Robocop2", gameName);
             }
             catch (final Exception e) {
                 e.printStackTrace();
             }
         }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop3", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop4", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop5", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop6", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop7", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop8", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop9", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-        new Thread(() -> {
-            try {
-                startGame("Robocop10", gameName);
-            }
-            catch (final Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop3", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop4", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop5", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop6", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop7", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop8", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop9", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
+        //        new Thread(() -> {
+        //            try {
+        //                startGame("Robocop10", gameName);
+        //            }
+        //            catch (final Exception e) {
+        //                e.printStackTrace();
+        //            }
+        //        }).start();
         //        new Thread(() -> {
         //            try {
         //                startGame("Robocop11", gameName);
@@ -164,10 +167,17 @@ public class SpaceRaceLoadTest {
     }
 
     private static void startGame(final String playerName, final String gameName) throws IOException, InterruptedException {
-        final int levelNumber = 1;
         //        final RestServerAdapter server = new RestServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
-        final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
-        final RemoteGame          remoteGame       = new RemoteGame(server, playerName, gameName, levelNumber);
+        final SocketServerAdapter server        = new SocketServerAdapter(SERVER_IP, playerName, gameName, LEVEL_NUMBER);
+        final RemoteGame          remoteGame    = new RemoteGame(server, playerName, gameName, LEVEL_NUMBER);
+        final MaxGameEngine       maxGameEngine = new MaxGameEngine();
+        remoteGame.runGame(maxGameEngine);
+    }
+
+    private static void startManualGame(final String playerName, final String gameName) throws IOException, InterruptedException {
+        //        final RestServerAdapter server = new RestServerAdapter(SERVER_IP, playerName, gameName, levelNumber);
+        final SocketServerAdapter server           = new SocketServerAdapter(SERVER_IP, playerName, gameName, LEVEL_NUMBER);
+        final RemoteGame          remoteGame       = new RemoteGame(server, playerName, gameName, LEVEL_NUMBER);
         final ManualGameEngine    manualGameEngine = new ManualGameEngine();
         remoteGame.runGame(manualGameEngine, manualGameEngine);
     }

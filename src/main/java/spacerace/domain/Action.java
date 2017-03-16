@@ -26,11 +26,11 @@ public class Action implements Serializable {
         return new Action(accelerationX, accelerationY, false);
     }
 
-    public void setMissileAngle(final double missileAngle) {
+    public void setMissileAngle(final Double missileAngle) {
         this.missileAngle = missileAngle;
     }
 
-    public Action andMissileAngle(final double missileAngle) {
+    public Action andMissileAngle(final Double missileAngle) {
         this.missileAngle = missileAngle;
         return this;
     }

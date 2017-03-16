@@ -97,11 +97,12 @@ public class RemoteGame {
     }
 
     private List<Vector2D> getOtherShipPositions(final ShipState shipStateToExclude, final GameState gameState) {
-        final double shipWidth  = level.getShipGraphics().getWidth() / 2.0;
-        final double shipHeight = level.getShipGraphics().getHeight() / 2.0;
+        final double shipHalfWidth  = level.getShipGraphics().getWidth() / 2.0;
+        final double shipHalfHeight = level.getShipGraphics().getHeight() / 2.0;
         return gameState.getShipStates().stream()
                 .filter(shipState -> shipState != shipStateToExclude)
-                .map(shipState -> getCenter(shipState.getPosition(), shipWidth, shipHeight))
+                .filter(shipState -> !shipState.isPassedGoal())
+                .map(shipState -> getCenter(shipState.getPosition(), shipHalfWidth, shipHalfHeight))
                 .collect(toList());
     }
 
