@@ -57,6 +57,11 @@ class Level5Builder {
     private static List<Line2D> createTrackBorders(final int width, final int height) {
         final List<Line2D> resultList = new ArrayList<>();
 
+        resultList.add(new Line2D(0, 0, 0, height));
+        resultList.add(new Line2D(0, 0, width, 0));
+        resultList.add(new Line2D(0, height, width, height));
+        resultList.add(new Line2D(width, 0, width, height));
+
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 resultList.addAll(generateCircle(radius, width / 3 * i + width / 3 / 2, height / 3 * j + height / 3 / 2));
