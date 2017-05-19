@@ -23,6 +23,8 @@ import spacerace.graphics.GraphicsUtils;
 import spacerace.level.Level;
 import spacerace.level.graphics.Sphere;
 
+import static spacerace.level.graphics.ship.SimpleShipImageGraphics.playersAndImages;
+
 public abstract class GraphicsPanel extends JPanel {
 
     private static final int GRAPHICS_UPDATE_INTERVAL = 17;
@@ -197,9 +199,13 @@ public abstract class GraphicsPanel extends JPanel {
         int y                  = background.getY() + 20;
         int numberOfShipsInRow = 0;
         for (final ShipState ship : gameState.getShipStates()) {
-            final Rectangle2D shipColorRectangle = new Rectangle2D(x, y, 20, 20);
+            final int width = 50;
+            final int height = 50;
+
+            final Rectangle2D shipColorRectangle = new Rectangle2D(x - 2, y - 2, width + 4, height + 4);
             GraphicsUtils.drawRectangle(shipColorRectangle, new Color(ship.getColorRGB()), graphics);
-            graphics.drawString(ship.getName(), (shipColorRectangle.getX() + shipColorRectangle.getWidth()) + 5, shipColorRectangle.getY() + 15);
+            graphics.drawImage(playersAndImages.get(ship.getName()), x, y, width, height, null);
+            graphics.drawString(ship.getName(), (shipColorRectangle.getX() + shipColorRectangle.getWidth()) + 5, shipColorRectangle.getY() + 33);
 
             numberOfShipsInRow++;
             if (numberOfShipsInRow == 3) {
@@ -237,7 +243,7 @@ public abstract class GraphicsPanel extends JPanel {
         int       position = 1;
         for (final PlayerResult playerResult : playerResults) {
             printPosition(graphics, x, y, position, playerResult);
-            y = y + 30;
+            y = y + 50;
             position++;
         }
     }
@@ -246,7 +252,10 @@ public abstract class GraphicsPanel extends JPanel {
         // Print position and name
         final ShipState ship = getShipByName(playerResult.getName());
         graphics.setColor(new Color(ship.getColorRGB()));
-        graphics.drawString(position + ".  " + ship.getName(), x, y);
+        final Rectangle2D shipColorRectangle = new Rectangle2D(x - 42, y - 27, 54, 54);
+        GraphicsUtils.drawRectangle(shipColorRectangle, new Color(ship.getColorRGB()), graphics);
+        graphics.drawImage(playersAndImages.get(ship.getName()), x - 40, y - 25, 50, 50, null);
+        graphics.drawString(position + ".  " + ship.getName(), x + 20, y);
 
         // Print time
         final String timeText;
@@ -257,7 +266,7 @@ public abstract class GraphicsPanel extends JPanel {
             final DecimalFormat formatter = new DecimalFormat("#0.0000");
             timeText = formatter.format(playerResult.getBestFinishTime() / 1000d) + " s";
         }
-        graphics.drawString(timeText, x + 180, y);
+        graphics.drawString(timeText, x + 200, y);
     }
 
     private ShipState getShipByName(final String name) {
