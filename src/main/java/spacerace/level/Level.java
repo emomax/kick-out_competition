@@ -9,13 +9,13 @@ import spacerace.domain.Line2D;
 import spacerace.domain.Require;
 import spacerace.domain.Vector2D;
 import spacerace.level.graphics.rocketfire.SimpleRocketFireGraphics;
-import spacerace.level.graphics.ship.SimpleShipGraphics;
+import spacerace.level.graphics.ship.SimpleShipImageGraphics;
 
 public class Level implements Serializable {
 
     private static final int                DEFAULT_WIDTH                = 900;
     private static final int                DEFAULT_HEIGHT               = 600;
-    private static final ShipGraphics       DEFAULT_SHIP_GRAPHICS        = new SimpleShipGraphics();
+    private static final ShipGraphics       DEFAULT_SHIP_GRAPHICS        = new SimpleShipImageGraphics();
     private static final RocketFireGraphics DEFAULT_ROCKET_FIRE_GRAPHICS = new SimpleRocketFireGraphics();
 
     private int                  number;
