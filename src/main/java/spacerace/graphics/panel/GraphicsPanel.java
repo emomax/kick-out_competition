@@ -243,7 +243,7 @@ public abstract class GraphicsPanel extends JPanel {
         int       position = 1;
         for (final PlayerResult playerResult : playerResults) {
             printPosition(graphics, x, y, position, playerResult);
-            y = y + 50;
+            y = y + 60;
             position++;
         }
     }

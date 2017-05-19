@@ -28,8 +28,6 @@ public class SimpleShipImageGraphics implements ShipGraphics {
     private static final int WIDTH = 50;
     private static final int HEIGHT = 50;
 
-    private Image shipImage;
-
     @Override
     public int getWidth() {
         return WIDTH;
@@ -53,7 +51,7 @@ public class SimpleShipImageGraphics implements ShipGraphics {
 
     private Image getImage(final String shipName) {
         // Lazy load
-        if (shipName != null && shipImage == null) {
+        if (shipName != null && playersAndImages.get(shipName) == null) {
             final String searchName = shipName.replace(" ", "+");
             try {
                 final String imageUrl = getGiphyUrl(searchName);
@@ -68,7 +66,6 @@ public class SimpleShipImageGraphics implements ShipGraphics {
                 }
 
                 playersAndImages.put(shipName, image);
-                this.shipImage = playersAndImages.get(shipName);
             }
             catch (final IOException e) {
                 throw new IllegalArgumentException("Failed to load ship image.", e);
