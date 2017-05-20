@@ -11,7 +11,8 @@ public class LevelRepository {
                                                             Level4Builder.build(),
                                                             Level5Builder.build(),
                                                             Level6Builder.build(),
-                                                            Level7Builder.build());
+                                                            Level7Builder.build(),
+                                                            Level8Builder.build());
 
     public static Level getLevel(final int levelNumber) {
         return levels.stream()
