@@ -52,9 +52,8 @@ public class SimpleShipImageGraphics implements ShipGraphics {
     private Image getImage(final String shipName) {
         // Lazy load
         if (shipName != null && playersAndImages.get(shipName) == null) {
-            final String searchName = shipName.replace(" ", "+");
             try {
-                final String imageUrl = getGiphyUrl(searchName);
+                final String imageUrl = getGiphyUrl(shipName);
                 Image image;
 
                 if (imageUrl == null) {
@@ -74,8 +73,8 @@ public class SimpleShipImageGraphics implements ShipGraphics {
         return playersAndImages.get(shipName);
     }
 
-    private String getGiphyUrl(final String searchName) {
-        final String searchTerm = searchName.replaceAll("[^a-zA-Z0-9 ]", "").trim();
+    private String getGiphyUrl(final String shipName) {
+        final String searchTerm = shipName.replaceAll("[^a-zA-Z0-9 ]", "").trim().replace(" ", "+");
 
         final RestTemplate template = new RestTemplate();
         final String giphyResponse = template.getForObject("http://api.giphy.com/v1/gifs/search?q=" + searchTerm + "&api_key=dc6zaTOxFJmzC", String.class);
